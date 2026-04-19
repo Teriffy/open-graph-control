@@ -16,6 +16,8 @@ use EvzenLeonenko\OpenGraphControl\Admin\Assets;
 use EvzenLeonenko\OpenGraphControl\Admin\MetaBox;
 use EvzenLeonenko\OpenGraphControl\Admin\Notices;
 use EvzenLeonenko\OpenGraphControl\Admin\Page;
+use EvzenLeonenko\OpenGraphControl\Admin\TermEditor;
+use EvzenLeonenko\OpenGraphControl\Admin\UserEditor;
 use EvzenLeonenko\OpenGraphControl\Admin\Rest\ArchiveMetaController;
 use EvzenLeonenko\OpenGraphControl\Admin\Rest\ConflictController;
 use EvzenLeonenko\OpenGraphControl\Admin\Rest\MetaController;
@@ -219,6 +221,14 @@ final class Bootstrap {
 				$c->get( 'integrations.detector' ),
 				$c->get( 'options.repository' )
 			)
+		);
+		$container->set(
+			'admin.term_editor',
+			static fn ( Container $c ) => new TermEditor( $c->get( 'archivemeta.repository' ) )
+		);
+		$container->set(
+			'admin.user_editor',
+			static fn ( Container $c ) => new UserEditor( $c->get( 'archivemeta.repository' ) )
 		);
 
 		// REST controllers.

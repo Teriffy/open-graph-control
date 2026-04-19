@@ -43,6 +43,8 @@ final class Plugin {
 			$this->container->get( 'admin.assets' )->register();
 			$this->container->get( 'admin.meta_box' )->register();
 			$this->container->get( 'admin.notices' )->register();
+			$this->container->get( 'admin.term_editor' )->register();
+			$this->container->get( 'admin.user_editor' )->register();
 		}
 
 		if ( defined( 'WP_CLI' ) && \WP_CLI ) {

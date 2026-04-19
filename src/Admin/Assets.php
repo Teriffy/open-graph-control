@@ -30,6 +30,9 @@ final class Assets {
 		if ( 'post.php' === $hook || 'post-new.php' === $hook ) {
 			$this->enqueue_bundle( 'metabox' );
 		}
+		if ( in_array( $hook, [ 'edit-tags.php', 'term.php', 'user-edit.php', 'profile.php' ], true ) ) {
+			$this->enqueue_bundle( 'archive' );
+		}
 	}
 
 	private function enqueue_bundle( string $name ): void {
