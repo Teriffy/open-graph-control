@@ -332,7 +332,7 @@ export default function MetaBoxApp( { postId } ) {
 						}
 						return (
 							<>
-								<p style={ { opacity: 0.7 } }>
+								<p className="ogc-hint">
 									{ __(
 										'Override title / description / image for a specific platform only. Leave a field blank to inherit from the Base tab.',
 										'open-graph-control'

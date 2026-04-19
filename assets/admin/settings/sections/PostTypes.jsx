@@ -56,15 +56,7 @@ export default function PostTypes( { settings, onChange } ) {
 					<Card key={ type.slug }>
 						<CardHeader>
 							<strong>{ type.label }</strong>
-							<span
-								style={ {
-									marginLeft: '0.5rem',
-									opacity: 0.6,
-									fontSize: '0.85em',
-								} }
-							>
-								{ type.slug }
-							</span>
+							<span className="ogc-meta">{ type.slug }</span>
 						</CardHeader>
 						<CardBody>
 							<ToggleControl

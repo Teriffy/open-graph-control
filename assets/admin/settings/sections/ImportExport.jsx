@@ -90,9 +90,7 @@ export default function ImportExport( { settings } ) {
 
 			<Card>
 				<CardBody>
-					<h3 style={ { marginTop: 0 } }>
-						{ __( 'Export', 'open-graph-control' ) }
-					</h3>
+					<h3>{ __( 'Export', 'open-graph-control' ) }</h3>
 					<p>
 						{ __(
 							'Download the current settings as a JSON file. Useful for moving configuration between environments or backing up before a bulk edit.',
@@ -102,29 +100,18 @@ export default function ImportExport( { settings } ) {
 					<Button variant="primary" onClick={ download }>
 						{ __( 'Download settings JSON', 'open-graph-control' ) }
 					</Button>
-					<details style={ { marginTop: '1rem' } }>
+					<details className="ogc-export-preview">
 						<summary>
 							{ __( 'Preview', 'open-graph-control' ) }
 						</summary>
-						<pre
-							style={ {
-								background: '#f0f0f1',
-								padding: '0.75rem',
-								overflow: 'auto',
-								maxHeight: '20rem',
-							} }
-						>
-							{ exportJson }
-						</pre>
+						<pre className="ogc-code-block">{ exportJson }</pre>
 					</details>
 				</CardBody>
 			</Card>
 
 			<Card>
 				<CardBody>
-					<h3 style={ { marginTop: 0 } }>
-						{ __( 'Import', 'open-graph-control' ) }
-					</h3>
+					<h3>{ __( 'Import', 'open-graph-control' ) }</h3>
 					<p>
 						{ __(
 							'Paste a previously exported settings JSON. Import is deep-merged over the current values, so omitted keys are preserved.',

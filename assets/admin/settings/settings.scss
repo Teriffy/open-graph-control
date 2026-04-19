@@ -109,6 +109,16 @@
 // bundled into both settings AND metabox entry points (the rules need
 // to apply inside post-new.php / post.php, whose bundle is metabox.css).
 
+// Debug/Test tag table — first column narrower for the tag key.
+.ogc-debug-tag-table th:first-child {
+	width: 25%;
+}
+
+// Import/Export preview expand trigger sits under the download button.
+.ogc-export-preview {
+	margin-top: var(--ogc-space-md);
+}
+
 // Images section — dimensions/slug monospace + progress copy.
 .ogc-images__dimensions {
 	font-family: monospace;
