@@ -11,8 +11,20 @@ namespace EvzenLeonenko\OpenGraphControl;
 
 use EvzenLeonenko\OpenGraphControl\Images\SizeRegistry;
 use EvzenLeonenko\OpenGraphControl\Options\Repository as OptionsRepository;
+use EvzenLeonenko\OpenGraphControl\Platforms\Bluesky;
+use EvzenLeonenko\OpenGraphControl\Platforms\Discord;
 use EvzenLeonenko\OpenGraphControl\Platforms\Facebook;
+use EvzenLeonenko\OpenGraphControl\Platforms\IMessage;
+use EvzenLeonenko\OpenGraphControl\Platforms\LinkedIn;
+use EvzenLeonenko\OpenGraphControl\Platforms\Mastodon;
+use EvzenLeonenko\OpenGraphControl\Platforms\Pinterest;
+use EvzenLeonenko\OpenGraphControl\Platforms\PlatformInterface;
 use EvzenLeonenko\OpenGraphControl\Platforms\Registry as PlatformRegistry;
+use EvzenLeonenko\OpenGraphControl\Platforms\Slack;
+use EvzenLeonenko\OpenGraphControl\Platforms\Telegram;
+use EvzenLeonenko\OpenGraphControl\Platforms\Threads;
+use EvzenLeonenko\OpenGraphControl\Platforms\Twitter;
+use EvzenLeonenko\OpenGraphControl\Platforms\WhatsApp;
 use EvzenLeonenko\OpenGraphControl\PostMeta\Repository as PostMetaRepository;
 use EvzenLeonenko\OpenGraphControl\Renderer\Head;
 use EvzenLeonenko\OpenGraphControl\Renderer\TagBuilder;
@@ -83,24 +95,42 @@ final class Bootstrap {
 		);
 
 		// Platforms.
-		$container->set(
-			'platform.facebook',
-			static fn ( Container $c ) => new Facebook(
-				$c->get( 'options.repository' ),
-				$c->get( 'resolver.title' ),
-				$c->get( 'resolver.description' ),
-				$c->get( 'resolver.image' ),
-				$c->get( 'resolver.type' ),
-				$c->get( 'resolver.url' ),
-				$c->get( 'resolver.locale' )
-			)
-		);
+		$platform_classes = [
+			'facebook'  => Facebook::class,
+			'twitter'   => Twitter::class,
+			'linkedin'  => LinkedIn::class,
+			'imessage'  => IMessage::class,
+			'threads'   => Threads::class,
+			'mastodon'  => Mastodon::class,
+			'bluesky'   => Bluesky::class,
+			'whatsapp'  => WhatsApp::class,
+			'discord'   => Discord::class,
+			'pinterest' => Pinterest::class,
+			'telegram'  => Telegram::class,
+			'slack'     => Slack::class,
+		];
+		foreach ( $platform_classes as $slug => $fqcn ) {
+			$container->set(
+				'platform.' . $slug,
+				static fn ( Container $c ): PlatformInterface => new $fqcn(
+					$c->get( 'options.repository' ),
+					$c->get( 'resolver.title' ),
+					$c->get( 'resolver.description' ),
+					$c->get( 'resolver.image' ),
+					$c->get( 'resolver.type' ),
+					$c->get( 'resolver.url' ),
+					$c->get( 'resolver.locale' )
+				)
+			);
+		}
 
 		$container->set(
 			'platform.registry',
-			static function ( Container $c ): PlatformRegistry {
+			static function ( Container $c ) use ( $platform_classes ): PlatformRegistry {
 				$registry = new PlatformRegistry();
-				$registry->register( $c->get( 'platform.facebook' ) );
+				foreach ( array_keys( $platform_classes ) as $slug ) {
+					$registry->register( $c->get( 'platform.' . $slug ) );
+				}
 				return $registry;
 			}
 		);
