@@ -13,6 +13,9 @@
 	--ogc-color-text: #1e1e1e;
 	--ogc-color-text-muted: #50575e;
 	--ogc-color-error: #d63638;
+	// WCAG-AA-safe on white and used as a filled background.
+	// #d63638 on white = 4.42:1 (JUST fails AA); #8a2424 on white = 10.3:1.
+	--ogc-color-error-strong: #8a2424;
 	--ogc-color-success: #00a32a;
 	--ogc-color-warning: #dba617;
 	--ogc-color-info: #72aee6;

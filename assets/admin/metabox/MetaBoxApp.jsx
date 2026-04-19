@@ -368,16 +368,28 @@ export default function MetaBoxApp( { postId } ) {
 						variant="primary"
 						onClick={ save }
 						disabled={ saveState.kind === 'saving' }
+						aria-busy={ saveState.kind === 'saving' }
+						aria-label={ __(
+							'Save overrides',
+							'open-graph-control'
+						) }
 					>
 						{ saveState.kind === 'saving'
 							? __( 'Saving…', 'open-graph-control' )
 							: __( 'Save overrides', 'open-graph-control' ) }
 					</Button>
-					{ saveState.kind === 'saved' && (
-						<span className="ogc-section-footer__status ogc-section-footer__status--saved">
-							{ __( 'Saved.', 'open-graph-control' ) }
-						</span>
-					) }
+					<span
+						role="status"
+						aria-live="polite"
+						aria-atomic="true"
+						className="ogc-section-footer__status-region"
+					>
+						{ saveState.kind === 'saved' && (
+							<span className="ogc-section-footer__status ogc-section-footer__status--saved">
+								{ __( 'Saved.', 'open-graph-control' ) }
+							</span>
+						) }
+					</span>
 					{ saveState.kind === 'error' && (
 						<Notice status="error" isDismissible={ false }>
 							{ saveState.message }
@@ -386,7 +398,11 @@ export default function MetaBoxApp( { postId } ) {
 				</div>
 			</div>
 
-			<div className="ogc-metabox__preview-pane">
+			<div
+				className="ogc-metabox__preview-pane"
+				role="region"
+				aria-label={ __( 'Platform preview', 'open-graph-control' ) }
+			>
 				<Preview { ...previewProps } />
 				<WarningList warnings={ warnings } />
 			</div>

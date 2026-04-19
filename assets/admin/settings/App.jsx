@@ -144,21 +144,33 @@ export default function App() {
 							variant="primary"
 							onClick={ save }
 							disabled={ status.kind === 'saving' }
+							aria-busy={ status.kind === 'saving' }
+							aria-label={ __(
+								'Save changes',
+								'open-graph-control'
+							) }
 						>
 							{ status.kind === 'saving'
 								? __( 'Saving…', 'open-graph-control' )
 								: __( 'Save changes', 'open-graph-control' ) }
 						</Button>
-						{ status.kind === 'saved' && (
-							<span className="ogc-section-footer__status ogc-section-footer__status--saved">
-								{ __( 'Saved.', 'open-graph-control' ) }
-							</span>
-						) }
-						{ status.kind === 'error' && (
-							<span className="ogc-section-footer__status ogc-section-footer__status--error">
-								{ status.message }
-							</span>
-						) }
+						<span
+							role="status"
+							aria-live="polite"
+							aria-atomic="true"
+							className="ogc-section-footer__status-region"
+						>
+							{ status.kind === 'saved' && (
+								<span className="ogc-section-footer__status ogc-section-footer__status--saved">
+									{ __( 'Saved.', 'open-graph-control' ) }
+								</span>
+							) }
+							{ status.kind === 'error' && (
+								<span className="ogc-section-footer__status ogc-section-footer__status--error">
+									{ status.message }
+								</span>
+							) }
+						</span>
 					</div>
 				</main>
 			</div>

@@ -1,5 +1,17 @@
 @import '../shared/tokens';
 
+// Accessibility: honor user's reduced-motion preference. Covers any
+// future animations added to the admin without per-rule opt-in.
+@media (prefers-reduced-motion: reduce) {
+	.ogc-app *,
+	.ogc-metabox *,
+	.ogc-media-picker * {
+		animation-duration: 0.01ms !important;
+		animation-iteration-count: 1 !important;
+		transition-duration: 0.01ms !important;
+	}
+}
+
 .ogc-app {
 	max-width: 1200px;
 }
@@ -37,6 +49,14 @@
 		&.is-active {
 			background: var(--ogc-color-primary);
 			color: #fff;
+		}
+
+		// Amber focus ring stays visible against both the transparent hover
+		// surface and the blue is-primary fill; WP's default blue-on-blue
+		// can disappear for keyboard users.
+		&:focus-visible {
+			outline: 2px solid var(--ogc-color-focus-ring);
+			outline-offset: 2px;
 		}
 	}
 }
@@ -138,13 +158,14 @@
 	}
 }
 
-// Security section — audit trail severity badge (contrast-safe).
+// Security section — audit trail severity badge. Uses the "strong"
+// error shade so white text hits 10.3:1 contrast on the fill.
 .ogc-security-badge {
 	display: inline-block;
 	padding: 1px 6px;
 	border-radius: 3px;
 	font-size: var(--ogc-font-size-xs);
-	background: var(--ogc-color-error);
+	background: var(--ogc-color-error-strong);
 	color: #fff;
 }
 
