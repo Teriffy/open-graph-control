@@ -58,6 +58,14 @@ final class CacheTest extends TestCase {
 		Actions\expectAdded( 'switch_theme' )->once();
 		Actions\expectAdded( 'update_option_blogname' )->once();
 		Actions\expectAdded( 'update_option_blogdescription' )->once();
+		Actions\expectAdded( 'added_term_meta' )->once();
+		Actions\expectAdded( 'updated_term_meta' )->once();
+		Actions\expectAdded( 'deleted_term_meta' )->once();
+		Actions\expectAdded( 'deleted_term' )->once();
+		Actions\expectAdded( 'added_user_meta' )->once();
+		Actions\expectAdded( 'updated_user_meta' )->once();
+		Actions\expectAdded( 'deleted_user_meta' )->once();
+		Actions\expectAdded( 'deleted_user' )->once();
 
 		( new Cache( $this->options( 3600 ) ) )->register();
 		self::assertTrue( true );
@@ -84,6 +92,73 @@ final class CacheTest extends TestCase {
 		Functions\when( 'get_option' )->justReturn( 'salt1' );
 		Functions\expect( 'delete_transient' )->never();
 		( new Cache( $this->options( 3600 ) ) )->flush_post_from_meta( 1, 42, 'unrelated' );
+		self::assertTrue( true );
+	}
+
+	public function test_flush_term_from_meta_short_circuits_on_wrong_key(): void {
+		Functions\when( 'get_option' )->justReturn( 'salt1' );
+		Functions\expect( 'get_term' )->never();
+		Functions\expect( 'delete_transient' )->never();
+		( new Cache( $this->options( 3600 ) ) )->flush_term_from_meta( 1, 42, 'some_other_key', [] );
+		self::assertTrue( true );
+	}
+
+	public function test_flush_term_from_meta_flushes_on_ogc_meta(): void {
+		Functions\when( 'get_option' )->justReturn( 'salt1' );
+		Functions\when( 'get_term' )->justReturn(
+			(object) [
+				'term_id'  => 42,
+				'taxonomy' => 'category',
+			]
+		);
+		$expected_key = 'ogc_cache_' . md5( implode( ':', [ Context::TYPE_ARCHIVE, '', 'salt1' ] ) );
+		Functions\expect( 'delete_transient' )->once()->with( $expected_key );
+		( new Cache( $this->options( 3600 ) ) )->flush_term_from_meta( 1, 42, '_ogc_meta', [] );
+		self::assertTrue( true );
+	}
+
+	public function test_flush_term_on_delete_flushes_term_context(): void {
+		Functions\when( 'get_option' )->justReturn( 'salt1' );
+		Functions\when( 'get_term' )->justReturn(
+			(object) [
+				'term_id'  => 7,
+				'taxonomy' => 'post_tag',
+			]
+		);
+		$expected_key = 'ogc_cache_' . md5( implode( ':', [ Context::TYPE_ARCHIVE, '', 'salt1' ] ) );
+		Functions\expect( 'delete_transient' )->once()->with( $expected_key );
+		( new Cache( $this->options( 3600 ) ) )->flush_term_on_delete( 7, 99, 'post_tag' );
+		self::assertTrue( true );
+	}
+
+	public function test_flush_term_skips_when_term_not_found(): void {
+		Functions\when( 'get_option' )->justReturn( 'salt1' );
+		Functions\when( 'get_term' )->justReturn( null );
+		Functions\expect( 'delete_transient' )->never();
+		( new Cache( $this->options( 3600 ) ) )->flush_term_from_meta( 1, 42, '_ogc_meta', [] );
+		self::assertTrue( true );
+	}
+
+	public function test_flush_user_from_meta_short_circuits_on_wrong_key(): void {
+		Functions\when( 'get_option' )->justReturn( 'salt1' );
+		Functions\expect( 'delete_transient' )->never();
+		( new Cache( $this->options( 3600 ) ) )->flush_user_from_meta( 1, 42, 'some_other_key', [] );
+		self::assertTrue( true );
+	}
+
+	public function test_flush_user_from_meta_flushes_on_ogc_meta(): void {
+		Functions\when( 'get_option' )->justReturn( 'salt1' );
+		$expected_key = 'ogc_cache_' . md5( implode( ':', [ Context::TYPE_AUTHOR, '', 'salt1' ] ) );
+		Functions\expect( 'delete_transient' )->once()->with( $expected_key );
+		( new Cache( $this->options( 3600 ) ) )->flush_user_from_meta( 1, 42, '_ogc_meta', [] );
+		self::assertTrue( true );
+	}
+
+	public function test_flush_user_on_delete_flushes_author_context(): void {
+		Functions\when( 'get_option' )->justReturn( 'salt1' );
+		$expected_key = 'ogc_cache_' . md5( implode( ':', [ Context::TYPE_AUTHOR, '', 'salt1' ] ) );
+		Functions\expect( 'delete_transient' )->once()->with( $expected_key );
+		( new Cache( $this->options( 3600 ) ) )->flush_user_on_delete( 42 );
 		self::assertTrue( true );
 	}
 }
