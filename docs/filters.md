@@ -14,6 +14,8 @@ Modify the list of resolver steps before they execute. Signature:
 apply_filters( "ogc_resolve_{$field}_chain", array $chain, \EvzenLeonenko\OpenGraphControl\Resolvers\Context $context ): array
 ```
 
+Since v0.3, the default chain for `title`, `description`, and `image` includes an `archive_override` step that runs for author + taxonomy-term contexts. It reads the term-meta / user-meta override persisted by the term / author edit screen and short-circuits the chain when a value is set.
+
 Example — force product posts to use the post excerpt before the full-content trim:
 
 ```php

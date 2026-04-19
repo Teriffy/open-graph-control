@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Regenerates the four screenshot PNGs in .wordpress-org/ by driving a
+# Regenerates the five screenshot PNGs in .wordpress-org/ by driving a
 # running wp-env instance through Playwright. The release workflow uploads
 # these to the wp.org SVN assets/ subtree.
 #
@@ -8,7 +8,7 @@
 #   npx wp-env start          # http://localhost:8888 with the plugin active
 #   npm install               # Playwright + helpers
 #
-# Output: .wordpress-org/screenshot-{1,2,3,4}.png
+# Output: .wordpress-org/screenshot-{1,2,3,4,5}.png
 #
 
 set -euo pipefail

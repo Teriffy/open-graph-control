@@ -4,18 +4,19 @@
 ![PHP](https://img.shields.io/badge/PHP-%3E%3D8.1-blue)
 ![WordPress](https://img.shields.io/badge/WordPress-%3E%3D6.2-blue)
 ![License](https://img.shields.io/badge/License-GPL--2.0--or--later-green)
-![Tests](https://img.shields.io/badge/tests-173%20unit%20%7C%2018%20E2E%20%7C%208%20WP-brightgreen)
+![Tests](https://img.shields.io/badge/tests-218%20unit%20%7C%2018%20E2E%20%7C%2012%20WP-brightgreen)
 ![PHPStan](https://img.shields.io/badge/PHPStan-level%208-blueviolet)
 [![Security policy](https://img.shields.io/badge/security-policy-informational)](SECURITY.md)
 
 A WordPress plugin that emits Open Graph and social meta tags for 12 platforms, with per-platform rules, SEO-plugin conflict handling, Pinterest Rich Pins, output cache and live per-post preview.
 
-## Status (v0.2.0 — feature-complete developer preview)
+## Status (v0.3.0 — per-archive overrides shipped)
 
 **Backend**
 
 - 12 platform classes — Facebook, X / Twitter, LinkedIn, iMessage, Threads, Mastodon, Bluesky, WhatsApp, Discord, Pinterest, Telegram, Slack
 - 6 resolvers (title, description, image, type, URL, locale) with filterable fallback chains
+- **Per-archive overrides** (v0.3) — OG title / description / image editable on every category, tag, custom taxonomy term, and author edit screen, wired into the resolver chain via a dedicated `archive_override` step
 - Pinterest Rich Pins JSON-LD (Article / Product / Recipe)
 - 7 SEO plugin integrations with clean takeover — Yoast, Rank Math, All in One SEO, SEOPress, Jetpack, The SEO Framework, Slim SEO
 - 3 auto-registered image sizes (landscape 1200×630, square 600×600, Pinterest 1000×1500)
@@ -23,8 +24,9 @@ A WordPress plugin that emits Open Graph and social meta tags for 12 platforms, 
 
 **Admin UI (React)**
 
-- Top-level admin menu, 10 settings sections (Overview, Site defaults, Platforms, Post types, Images, Fallback chains, Integrations, Debug/Test, Import/Export, Advanced)
+- Top-level admin menu, 11 settings sections (Overview, Site defaults, Platforms, Post types, Images, Fallback chains, Integrations, Debug/Test, Import/Export, Advanced, Archive overrides)
 - Per-post meta box with Base + X / Twitter + Pinterest + Per-platform tabs, live preview for all 12 platforms, inline validation
+- **Archive editor** (v0.3) on every taxonomy term + author edit screen — OG title / description / image with live character-count hints
 - MediaUpload widget for master image + per-platform overrides
 - One-time admin notice when a competing SEO plugin is detected (take-over or keep choice)
 - Bulk "Regenerate OG image sizes" action for existing attachments
@@ -36,11 +38,11 @@ A WordPress plugin that emits Open Graph and social meta tags for 12 platforms, 
 
 **Quality gates (CI)**
 
-- PHP 8.1–8.4 matrix × PHPUnit (173 tests, 335 assertions) + PHPStan level 8 + WPCS
+- PHP 8.1–8.4 matrix × PHPUnit (218 tests, 429 assertions) + PHPStan level 8 + WPCS
 - Code coverage uploaded as artifact
 - JS lint (`@wordpress/scripts` ESLint + Prettier) + Webpack build
 - Playwright fixture suite (18 tests: rendering + `@axe-core` WCAG 2 A/AA scan)
-- Playwright WP suite (8 tests: activation, settings save, metabox override, frontend tags, axe on live wp-admin, responsive layout ≤782px) — opt-in via `OGC_E2E_WP=1`
+- Playwright WP suite (12 tests: activation, settings save, metabox override, frontend tags, axe on live wp-admin, responsive layout ≤782px, archive overrides) — opt-in via `OGC_E2E_WP=1`
 - [WordPress/plugin-check-action](https://github.com/WordPress/plugin-check-action) against the built dist zip on every push
 
 ## Security
@@ -56,7 +58,7 @@ Open Graph Control is built so **no user data leaves your server**. The plugin d
 - Post meta writes allowlist-filtered to six documented keys; arbitrary keys dropped
 - URL scheme filter via `wp_allowed_protocols()` — `javascript:` / `data:` rejected before reaching any meta output
 - Rate-limited `/preview` REST endpoint (20 req/min per user)
-- PHPStan level 8 + 173 PHPUnit tests + Playwright suite gated on every push
+- PHPStan level 8 + 218 PHPUnit tests + Playwright suite gated on every push
 
 **OWASP Top 10 (2021) coverage**
 

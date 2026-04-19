@@ -4,7 +4,7 @@ Tags: open graph, social meta, twitter cards, pinterest, mastodon
 Requires at least: 6.2
 Tested up to: 6.9
 Requires PHP: 8.1
-Stable tag: 0.2.1
+Stable tag: 0.3.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -31,15 +31,14 @@ Open Graph Control emits correctly-escaped Open Graph, Twitter Card, and platfor
 
 * Emits `og:*`, `article:*`, `twitter:*`, `fediverse:creator`, `theme-color`, and schema.org JSON-LD Rich Pins on `wp_head`
 * Site-wide defaults stored in one option row; per-post overrides in one meta blob
+* Per-archive overrides — edit OG title / description / image directly on the category, tag, custom taxonomy, or author edit screen
 * Three platform-optimized image sizes auto-registered (landscape 1200×630, square 600×600, Pinterest 1000×1500)
 * Filterable fallback chains for title, description, image, type, URL, and locale
 * Detects seven competing SEO/social plugins (Yoast SEO, Rank Math, All in One SEO, SEOPress, Jetpack, The SEO Framework, Slim SEO) and, with the site owner's consent, disables their Open Graph output to avoid duplicate tags
 
 = What it doesn't do (yet) =
 
-* Per-archive and per-author editor UI — v0.3
 * Dynamic OG image generation from templates — v0.4
-* Playwright end-to-end test suite — v0.3
 
 Per-post overrides can additionally be set programmatically via the `ogc_resolve_{title,description,image,type,url,locale}_value` filters or by writing to the `_ogc_meta` post meta key directly.
 
@@ -82,6 +81,10 @@ Yes. On activation, the plugin detects your SEO plugin and can disable its Open 
 
 No. Open Graph Control handles social meta tags only. Titles and descriptions in Google search results are still controlled by your SEO plugin.
 
+= Can I set a custom OG title for a category archive? =
+
+Yes. Open the term edit screen for that category (or any tag, custom taxonomy term, or author) and fill in the Open Graph fields in the Archive overrides box. Every saved override is also listed in **Open Graph Control → Archive overrides** in the admin UI so you can audit them in one place.
+
 = Can I customize which fallback values are used for the title or description? =
 
 Yes. Each resolver walks a filterable chain. The full chain is filterable via `ogc_resolve_title_chain` / `ogc_resolve_description_chain` / `ogc_resolve_image_chain` (etc.), and the final value via `ogc_resolve_{field}_value`.
@@ -112,6 +115,8 @@ Open Graph Control runs only on `wp_head` (front-end pages) and on the REST API 
 * Front page render: **mean 0.047 ms**, p95 0.060 ms, p99 0.166 ms
 * Single-post render (full resolver chain): **mean 0.396 ms**, p95 0.601 ms, p99 2.333 ms
 
+Archive-term contexts (category / tag / custom taxonomy / author) add one extra `get_term_meta` (or `get_user_meta`) call per request when the `archive_override` resolver step runs — still well under 1 ms.
+
 Output caching is opt-in via the Advanced settings and further reduces this to a single `get_transient` read (<0.05 ms) for cached contexts.
 
 = Is the plugin GPL? =
@@ -124,8 +129,16 @@ Yes, GPL-2.0-or-later. Source is on GitHub (URL in the plugin header).
 2. (v0.2) Settings page — platforms overview
 3. (v0.2) Per-post meta box with live preview
 4. (v0.2) SEO plugin conflict notice
+5. (v0.3) Archive overrides — edit OG title / description / image for a category archive directly on the term edit screen
 
 == Changelog ==
+
+= 0.3.0 =
+* feature: per-archive overrides — edit OG title / description / image for any category, tag, custom taxonomy term, or author directly on its edit screen. Values are persisted in term/user meta with sanitization and capability checks (`edit_term` / `edit_user`).
+* feature: new `archive_override` step wired into the default `ogc_resolve_{title,description,image}_chain` for `author` and taxonomy-term contexts; always runs before the existing `site_default` / `post_meta_override` steps for those contexts.
+* feature: **Archive overrides** settings section lists every saved override across taxonomies + authors for auditing and bulk clearing.
+* feature: term / author meta is registered via `register_meta( 'term', … )` / `register_meta( 'user', … )` with server-side validation, so REST writes are consistent with the admin UI.
+* test: adds one WP integration test (`07-archive-override.spec.ts`, 2 scenarios) plus two a11y scans covering the archive editor and the settings section; PHPUnit suite grows by 45 unit tests.
 
 = 0.2.1 =
 * security: prevent stored XSS via JSON-LD `<script>` tag breakout in the Pinterest Rich Pins payload. Encodes with `JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT`; adds a second-layer `str_replace` in the renderer. Reachable by an Author-role user via the post title before the fix; no exploitation known in the wild. Regression tests added.
@@ -147,6 +160,9 @@ Yes, GPL-2.0-or-later. Source is on GitHub (URL in the plugin header).
 * Initial development snapshot. Backend rendering pipeline (12 platforms, 7 SEO integrations, Pinterest Rich Pins JSON-LD).
 
 == Upgrade Notice ==
+
+= 0.3.0 =
+Adds per-archive OG overrides for categories, tags, custom taxonomy terms, and authors. Fully additive — existing sites keep the same rendered tags until you edit a term or author.
 
 = 0.2.1 =
 Security release. Patches a stored XSS in the Pinterest Rich Pins JSON-LD (author-role exploitable before 0.2.1). Upgrade recommended; no data migration needed.

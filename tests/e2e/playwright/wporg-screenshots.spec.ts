@@ -1,9 +1,9 @@
-import { test } from '@playwright/test';
+import { test, expect } from '@playwright/test';
 import { login, gotoSettings } from './helpers';
 import path from 'node:path';
 
 /**
- * Regenerates the four PNG screenshots described in readme.txt's
+ * Regenerates the five PNG screenshots described in readme.txt's
  * "== Screenshots ==" section. Output lands in .wordpress-org/ which
  * the release workflow uploads to the wp.org SVN `assets/` subtree.
  *
@@ -98,6 +98,50 @@ test( 'screenshot-4: security section', async ( { page } ) => {
 	await page.waitForTimeout( 400 );
 	await page.screenshot( {
 		path: path.join( OUT, 'screenshot-4.png' ),
+		fullPage: true,
+	} );
+} );
+
+test( 'screenshot-5: archive editor on term edit', async ( { page } ) => {
+	test.skip( ! SHOULD_RUN, 'Opt in with OGC_WPORG_SCREENSHOTS=1' );
+	await login( page );
+
+	// Create a category to edit.
+	await page.goto( '/wp-admin/' );
+	const nonce = await page.evaluate(
+		() =>
+			( window as unknown as { wpApiSettings?: { nonce: string } } )
+				.wpApiSettings?.nonce
+	);
+	const res = await page.request.post( '/wp-json/wp/v2/categories', {
+		headers: { 'X-WP-Nonce': nonce ?? '' },
+		data: {
+			name: 'Recepty',
+			slug: `recepty-screenshot-${ Date.now() }`,
+		},
+	} );
+	const category = await res.json();
+
+	await page.goto(
+		`/wp-admin/term.php?taxonomy=category&tag_ID=${ category.id }`
+	);
+	await expect( page.locator( '#ogc-archive-root' ) ).toBeVisible();
+
+	// Fill demo values for a good-looking screenshot.
+	await page
+		.locator( '#ogc-archive-root input[type="text"]' )
+		.first()
+		.fill( 'Recepty z české spíže' );
+	await page
+		.locator( '#ogc-archive-root textarea' )
+		.first()
+		.fill(
+			'Odzkoušené recepty z ingrediencí dostupných v běžné české samoobsluze.'
+		);
+	await page.waitForTimeout( 300 );
+
+	await page.screenshot( {
+		path: path.join( OUT, 'screenshot-5.png' ),
 		fullPage: true,
 	} );
 } );
