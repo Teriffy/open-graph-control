@@ -41,6 +41,7 @@ use EvzenLeonenko\OpenGraphControl\Platforms\Threads;
 use EvzenLeonenko\OpenGraphControl\Platforms\Twitter;
 use EvzenLeonenko\OpenGraphControl\Platforms\WhatsApp;
 use EvzenLeonenko\OpenGraphControl\PostMeta\Repository as PostMetaRepository;
+use EvzenLeonenko\OpenGraphControl\Validation\Validator;
 use EvzenLeonenko\OpenGraphControl\Renderer\Head;
 use EvzenLeonenko\OpenGraphControl\Renderer\TagBuilder;
 use EvzenLeonenko\OpenGraphControl\Resolvers\Description;
@@ -193,8 +194,16 @@ final class Bootstrap {
 			static fn ( Container $c ) => new SettingsController( $c->get( 'options.repository' ) )
 		);
 		$container->set(
+			'validation.validator',
+			static fn () => new Validator()
+		);
+		$container->set(
 			'rest.preview',
-			static fn ( Container $c ) => new PreviewController( $c->get( 'platform.registry' ) )
+			static fn ( Container $c ) => new PreviewController(
+				$c->get( 'platform.registry' ),
+				$c->get( 'options.repository' ),
+				$c->get( 'validation.validator' )
+			)
 		);
 		$container->set(
 			'rest.conflicts',

@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from '@wordpress/element';
+import { useCallback, useEffect, useState, useMemo } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	Button,
@@ -13,6 +13,7 @@ import {
 } from '@wordpress/components';
 
 import { api } from '../shared/api.js';
+import WarningList from '../shared/WarningList.jsx';
 import Preview from './previews/Preview.jsx';
 
 const LIMITS = {
@@ -199,6 +200,19 @@ export default function MetaBoxApp( { postId } ) {
 	const [ meta, setMeta ] = useState( null );
 	const [ settings, setSettings ] = useState( null );
 	const [ saveState, setSaveState ] = useState( { kind: 'idle' } );
+	const [ warnings, setWarnings ] = useState( [] );
+
+	const refreshPreview = useCallback( async () => {
+		try {
+			const resp = await api.preview( {
+				post_id: postId,
+				context: 'singular',
+			} );
+			setWarnings( resp.warnings || [] );
+		} catch ( e ) {
+			// Preview is best-effort; ignore.
+		}
+	}, [ postId ] );
 
 	useEffect( () => {
 		Promise.all( [ api.getPostMeta( postId ), api.getSettings() ] )
@@ -209,7 +223,8 @@ export default function MetaBoxApp( { postId } ) {
 			.catch( ( err ) =>
 				setSaveState( { kind: 'error', message: err.message } )
 			);
-	}, [ postId ] );
+		refreshPreview();
+	}, [ postId, refreshPreview ] );
 
 	const enabledPlatforms = useMemo( () => {
 		if ( ! settings ) {
@@ -253,6 +268,7 @@ export default function MetaBoxApp( { postId } ) {
 			const next = await api.savePostMeta( postId, meta );
 			setMeta( next );
 			setSaveState( { kind: 'saved' } );
+			refreshPreview();
 		} catch ( err ) {
 			setSaveState( { kind: 'error', message: err.message } );
 		}
@@ -362,6 +378,7 @@ export default function MetaBoxApp( { postId } ) {
 
 			<div style={ { width: '320px', flexShrink: 0 } }>
 				<Preview { ...previewProps } />
+				<WarningList warnings={ warnings } />
 			</div>
 		</div>
 	);

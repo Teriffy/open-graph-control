@@ -9,8 +9,10 @@ declare(strict_types=1);
 
 namespace EvzenLeonenko\OpenGraphControl\Admin\Rest;
 
+use EvzenLeonenko\OpenGraphControl\Options\Repository as OptionsRepository;
 use EvzenLeonenko\OpenGraphControl\Platforms\Registry as PlatformRegistry;
 use EvzenLeonenko\OpenGraphControl\Resolvers\Context;
+use EvzenLeonenko\OpenGraphControl\Validation\Validator;
 use WP_REST_Request;
 use WP_REST_Response;
 
@@ -29,7 +31,11 @@ use WP_REST_Response;
  */
 final class PreviewController extends AbstractController {
 
-	public function __construct( private PlatformRegistry $registry ) {}
+	public function __construct(
+		private PlatformRegistry $registry,
+		private OptionsRepository $options,
+		private Validator $validator
+	) {}
 
 	public function register_routes(): void {
 		register_rest_route(
@@ -71,10 +77,16 @@ final class PreviewController extends AbstractController {
 			$json[] = $payload;
 		}
 
+		$warnings = array_map(
+			static fn ( $warning ) => $warning->to_array(),
+			$this->validator->validate( $tags, $this->options->get() )
+		);
+
 		return new WP_REST_Response(
 			[
-				'tags'    => $tags,
-				'json_ld' => $json,
+				'tags'     => $tags,
+				'json_ld'  => $json,
+				'warnings' => $warnings,
 			],
 			200
 		);
