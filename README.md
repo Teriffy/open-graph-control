@@ -111,9 +111,11 @@ Minimum PHP: 8.1 · Minimum WordPress: 6.2.
 
 ## Documentation
 
+- [ROADMAP.md](ROADMAP.md) — living status, what's done, what's needed to ship to wordpress.org, what's next
 - [readme.txt](readme.txt) — WordPress.org plugin directory format
 - [docs/filters.md](docs/filters.md) — `ogc_*` filter reference with examples
-- [docs/superpowers/specs/](docs/superpowers/specs/) — original design spec
+- [docs/superpowers/specs/](docs/superpowers/specs/) — design specs
+- [docs/roadmap.html](docs/roadmap.html) — same roadmap as HTML with light/dark mode (for local viewing)
 
 ## Releasing
 
