@@ -22,6 +22,7 @@ final class Plugin {
 
 	public function on_init(): void {
 		$this->container->get( 'images.size_registry' )->register();
+		$this->container->get( 'integrations.detector' )->run();
 		$this->container->get( 'renderer.head' )->register();
 	}
 

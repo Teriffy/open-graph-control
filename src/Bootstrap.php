@@ -10,6 +10,14 @@ declare(strict_types=1);
 namespace EvzenLeonenko\OpenGraphControl;
 
 use EvzenLeonenko\OpenGraphControl\Images\SizeRegistry;
+use EvzenLeonenko\OpenGraphControl\Integrations\AIOSEO;
+use EvzenLeonenko\OpenGraphControl\Integrations\Detector;
+use EvzenLeonenko\OpenGraphControl\Integrations\Jetpack;
+use EvzenLeonenko\OpenGraphControl\Integrations\RankMath;
+use EvzenLeonenko\OpenGraphControl\Integrations\SEOPress;
+use EvzenLeonenko\OpenGraphControl\Integrations\SlimSEO;
+use EvzenLeonenko\OpenGraphControl\Integrations\TSF;
+use EvzenLeonenko\OpenGraphControl\Integrations\Yoast;
 use EvzenLeonenko\OpenGraphControl\Options\Repository as OptionsRepository;
 use EvzenLeonenko\OpenGraphControl\Platforms\Bluesky;
 use EvzenLeonenko\OpenGraphControl\Platforms\Discord;
@@ -156,6 +164,22 @@ final class Bootstrap {
 		$container->set(
 			'images.size_registry',
 			static fn () => new SizeRegistry()
+		);
+
+		// Integrations.
+		$container->set(
+			'integrations.detector',
+			static function ( Container $c ): Detector {
+				$detector = new Detector( $c->get( 'options.repository' ) );
+				$detector->register( new Yoast() );
+				$detector->register( new RankMath() );
+				$detector->register( new AIOSEO() );
+				$detector->register( new SEOPress() );
+				$detector->register( new Jetpack() );
+				$detector->register( new TSF() );
+				$detector->register( new SlimSEO() );
+				return $detector;
+			}
 		);
 	}
 }
