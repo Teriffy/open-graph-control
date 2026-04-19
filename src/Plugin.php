@@ -33,6 +33,7 @@ final class Plugin {
 			$this->container->get( 'admin.page' )->register();
 			$this->container->get( 'admin.assets' )->register();
 			$this->container->get( 'admin.meta_box' )->register();
+			$this->container->get( 'admin.notices' )->register();
 		}
 	}
 

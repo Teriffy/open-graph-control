@@ -11,6 +11,7 @@ namespace EvzenLeonenko\OpenGraphControl;
 
 use EvzenLeonenko\OpenGraphControl\Admin\Assets;
 use EvzenLeonenko\OpenGraphControl\Admin\MetaBox;
+use EvzenLeonenko\OpenGraphControl\Admin\Notices;
 use EvzenLeonenko\OpenGraphControl\Admin\Page;
 use EvzenLeonenko\OpenGraphControl\Admin\Rest\ConflictController;
 use EvzenLeonenko\OpenGraphControl\Admin\Rest\MetaController;
@@ -186,6 +187,13 @@ final class Bootstrap {
 		$container->set(
 			'admin.meta_box',
 			static fn ( Container $c ) => new MetaBox( $c->get( 'options.repository' ) )
+		);
+		$container->set(
+			'admin.notices',
+			static fn ( Container $c ) => new Notices(
+				$c->get( 'integrations.detector' ),
+				$c->get( 'options.repository' )
+			)
 		);
 
 		// REST controllers.

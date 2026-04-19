@@ -7,6 +7,8 @@ import {
 	TextareaControl,
 } from '@wordpress/components';
 
+import MediaPicker from '../../shared/MediaPicker.jsx';
+
 const OG_TYPES = [
 	{ label: 'website', value: 'website' },
 	{ label: 'article', value: 'article' },
@@ -61,6 +63,19 @@ export default function SiteDefaults( { settings, onChange } ) {
 						value={ site.type || 'website' }
 						options={ OG_TYPES }
 						onChange={ ( v ) => update( 'type', v ) }
+					/>
+
+					<MediaPicker
+						label={ __(
+							'Site master image',
+							'open-graph-control'
+						) }
+						help={ __(
+							'Used as the fallback og:image across contexts when no more specific image resolves. Ideal: 2400×1260+ so all three platform sizes can be derived.',
+							'open-graph-control'
+						) }
+						value={ site.master_image_id || 0 }
+						onChange={ ( id ) => update( 'master_image_id', id ) }
 					/>
 
 					<TextControl

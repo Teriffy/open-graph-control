@@ -13,6 +13,7 @@ import {
 } from '@wordpress/components';
 
 import { api } from '../shared/api.js';
+import MediaPicker from '../shared/MediaPicker.jsx';
 import WarningList from '../shared/WarningList.jsx';
 import Preview from './previews/Preview.jsx';
 
@@ -85,20 +86,14 @@ function BaseTab( { meta, onChange } ) {
 				value={ meta.description || '' }
 				onChange={ ( v ) => onChange( { description: v } ) }
 			/>
-			<TextControl
-				label={ __(
-					'Image attachment ID (optional)',
-					'open-graph-control'
-				) }
+			<MediaPicker
+				label={ __( 'Image override', 'open-graph-control' ) }
 				help={ __(
-					'Enter an attachment ID. Leave blank to use the featured image / fallback chain.',
+					'Leave blank to use the featured image / fallback chain.',
 					'open-graph-control'
 				) }
-				type="number"
-				value={ String( meta.image_id || '' ) }
-				onChange={ ( v ) =>
-					onChange( { image_id: parseInt( v, 10 ) || 0 } )
-				}
+				value={ meta.image_id || 0 }
+				onChange={ ( id ) => onChange( { image_id: id } ) }
 			/>
 			<SelectControl
 				label={ __( 'og:type override', 'open-graph-control' ) }
@@ -144,16 +139,10 @@ function PlatformTab( { slug, meta, onChange } ) {
 				value={ entry.description || '' }
 				onChange={ ( v ) => update( { description: v } ) }
 			/>
-			<TextControl
-				label={ __(
-					'Image attachment ID (optional)',
-					'open-graph-control'
-				) }
-				type="number"
-				value={ String( entry.image_id || '' ) }
-				onChange={ ( v ) =>
-					update( { image_id: parseInt( v, 10 ) || 0 } )
-				}
+			<MediaPicker
+				label={ __( 'Image override', 'open-graph-control' ) }
+				value={ entry.image_id || 0 }
+				onChange={ ( id ) => update( { image_id: id } ) }
 			/>
 			{ slug === 'twitter' && (
 				<SelectControl

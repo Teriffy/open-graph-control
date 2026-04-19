@@ -19,6 +19,8 @@
     "@wordpress/api-fetch": "^7.0.0",
     "@wordpress/element": "^6.0.0",
     "@wordpress/icons": "^10.0.0",
+    "@wordpress/media-utils": "^5.0.0",
+    "@wordpress/block-editor": "^14.0.0",
     "@playwright/test": "^1.44.0"
   }
 }
