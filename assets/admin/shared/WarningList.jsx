@@ -1,13 +1,13 @@
-const COLORS = {
-	error: '#d63638',
-	warn: '#dba617',
-	info: '#72aee6',
-};
-
 const ICONS = {
 	error: '⚠',
 	warn: '⚠',
 	info: 'ℹ',
+};
+
+const SEVERITY_CLASS = {
+	error: 'ogc-warning-item ogc-warning-item--error',
+	warn: 'ogc-warning-item ogc-warning-item--warn',
+	info: 'ogc-warning-item',
 };
 
 /**
@@ -23,42 +23,19 @@ export default function WarningList( { warnings } ) {
 		return null;
 	}
 	return (
-		<ul
-			aria-label="Validation warnings"
-			style={ {
-				listStyle: 'none',
-				margin: '0.75rem 0 0',
-				padding: 0,
-			} }
-		>
+		<ul aria-label="Validation warnings" className="ogc-warning-list">
 			{ warnings.map( ( w, idx ) => (
 				<li
 					key={ `${ w.field }-${ idx }` }
 					role={ w.severity === 'error' ? 'alert' : 'status' }
-					style={ {
-						padding: '0.4rem 0.6rem',
-						borderLeft: `4px solid ${
-							COLORS[ w.severity ] || COLORS.info
-						}`,
-						background: '#f6f7f7',
-						marginBottom: '0.25rem',
-						fontSize: '0.9em',
-					} }
+					className={
+						SEVERITY_CLASS[ w.severity ] || SEVERITY_CLASS.info
+					}
 				>
-					<span
-						aria-hidden="true"
-						style={ { marginRight: '0.5rem' } }
-					>
+					<span aria-hidden="true" className="ogc-warning-item__icon">
 						{ ICONS[ w.severity ] || ICONS.info }
 					</span>
-					<code
-						style={ {
-							marginRight: '0.5rem',
-							fontSize: '0.85em',
-						} }
-					>
-						{ w.field }
-					</code>
+					<code className="ogc-warning-item__field">{ w.field }</code>
 					{ w.message }
 				</li>
 			) ) }

@@ -102,12 +102,7 @@ export default function Images() {
 							: __( 'Start regeneration', 'open-graph-control' ) }
 					</Button>
 					{ regen.status === 'running' && (
-						<p
-							style={ {
-								marginTop: '0.5rem',
-								color: '#50575e',
-							} }
-						>
+						<p className="ogc-muted ogc-images__progress">
 							{ sprintf(
 								/* translators: %d: processed count */
 								__(
@@ -137,31 +132,11 @@ export default function Images() {
 				<Card key={ size.slug }>
 					<CardBody>
 						<strong>{ size.label }</strong>
-						<span
-							style={ {
-								marginLeft: '0.5rem',
-								fontFamily: 'monospace',
-								opacity: 0.7,
-							} }
-						>
+						<span className="ogc-meta ogc-images__dimensions">
 							{ size.dimensions }
 						</span>
-						<code
-							style={ {
-								marginLeft: '0.5rem',
-								fontSize: '0.85em',
-								opacity: 0.7,
-							} }
-						>
-							{ size.slug }
-						</code>
-						<p
-							style={ {
-								fontSize: '0.9em',
-								color: '#50575e',
-								marginTop: '0.5rem',
-							} }
-						>
+						<code className="ogc-meta">{ size.slug }</code>
+						<p className="ogc-muted ogc-images__usage">
 							{ __( 'Used by:', 'open-graph-control' ) }{ ' ' }
 							{ size.used }
 						</p>

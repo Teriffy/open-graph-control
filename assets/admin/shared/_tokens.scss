@@ -1,0 +1,35 @@
+// Design tokens for the plugin's admin UI.
+//
+// Scoped under plugin root classes so wp-admin globals aren't affected.
+// Values mirror the WordPress admin core palette; semantic names are
+// preferred over literal hex so /normalize and /harden passes can swap
+// them without touching every consumer.
+
+.ogc-app,
+.ogc-metabox,
+.ogc-media-picker,
+.ogc-warning-list {
+	// Palette.
+	--ogc-color-text: #1e1e1e;
+	--ogc-color-text-muted: #50575e;
+	--ogc-color-error: #d63638;
+	--ogc-color-success: #00a32a;
+	--ogc-color-warning: #dba617;
+	--ogc-color-info: #72aee6;
+	--ogc-color-primary: #2271b1;
+	--ogc-color-surface-muted: #f6f7f7;
+	--ogc-color-surface-hover: #f0f0f1;
+	--ogc-color-border: #dcdcde;
+	--ogc-color-focus-ring: #ffb900;
+
+	// Spacing scale (4pt grid).
+	--ogc-space-xs: 0.25rem;
+	--ogc-space-sm: 0.5rem;
+	--ogc-space-md: 1rem;
+	--ogc-space-lg: 1.5rem;
+
+	// Type scale for small copy.
+	--ogc-font-size-xs: 0.8em;
+	--ogc-font-size-sm: 0.85em;
+	--ogc-font-size-md: 0.9em;
+}
