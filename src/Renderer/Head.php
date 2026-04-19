@@ -30,7 +30,8 @@ final class Head {
 		private TagBuilder $builder,
 		private OptionsRepository $options,
 		private \EvzenLeonenko\OpenGraphControl\PostMeta\Repository $postmeta,
-		private Cache $cache
+		private Cache $cache,
+		private \EvzenLeonenko\OpenGraphControl\ArchiveMeta\Repository $archive
 	) {}
 
 	public function register(): void {
@@ -42,7 +43,7 @@ final class Head {
 		if ( ! $this->is_context_enabled( $context ) ) {
 			return;
 		}
-		if ( $this->is_post_excluded( $context ) ) {
+		if ( $this->is_context_excluded( $context ) ) {
 			return;
 		}
 
@@ -116,18 +117,44 @@ final class Head {
 			return Context::for_date();
 		}
 		if ( is_archive() ) {
+			$queried = get_queried_object();
+			if (
+				is_object( $queried )
+				&& isset( $queried->term_id )
+				&& isset( $queried->taxonomy )
+				&& is_string( $queried->taxonomy )
+			) {
+				return Context::for_archive_term(
+					(string) $queried->taxonomy,
+					(int) $queried->term_id
+				);
+			}
 			$kind = is_category() ? 'category' : ( is_tag() ? 'tag' : ( is_tax() ? 'taxonomy' : 'post_type' ) );
 			return Context::for_archive( $kind );
 		}
 		return Context::for_front();
 	}
 
-	private function is_post_excluded( Context $context ): bool {
-		if ( ! $context->is_singular() || null === $context->post_id() ) {
-			return false;
+	private function is_context_excluded( Context $context ): bool {
+		if ( $context->is_singular() && null !== $context->post_id() ) {
+			$meta = $this->postmeta->get( $context->post_id() );
+			return in_array( 'all', $meta['exclude'], true );
 		}
-		$meta = $this->postmeta->get( $context->post_id() );
-		return in_array( 'all', $meta['exclude'], true );
+		if ( $context->is_author() ) {
+			$user_id = $context->user_id();
+			if ( null === $user_id || $user_id <= 0 ) {
+				return false;
+			}
+			return in_array( 'all', $this->archive->get_for_user( $user_id )['exclude'], true );
+		}
+		if ( $context->is_archive_term() ) {
+			$term_id = $context->archive_term_id();
+			if ( null === $term_id || $term_id <= 0 ) {
+				return false;
+			}
+			return in_array( 'all', $this->archive->get_for_term( $term_id )['exclude'], true );
+		}
+		return false;
 	}
 
 	private function is_context_enabled( Context $context ): bool {

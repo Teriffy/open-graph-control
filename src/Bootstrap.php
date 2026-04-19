@@ -188,7 +188,8 @@ final class Bootstrap {
 				$c->get( 'renderer.tag_builder' ),
 				$c->get( 'options.repository' ),
 				$c->get( 'postmeta.repository' ),
-				$c->get( 'renderer.cache' )
+				$c->get( 'renderer.cache' ),
+				$c->get( 'archivemeta.repository' )
 			)
 		);
 

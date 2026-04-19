@@ -45,7 +45,12 @@ final class HeadTest extends TestCase {
 		Functions\when( 'get_queried_object' )->justReturn( (object) [ 'ID' => 42 ] );
 	}
 
-	private function head( PlatformRegistry $registry, array $options = [], array $exclude = [] ): Head {
+	private function head(
+		PlatformRegistry $registry,
+		array $options = [],
+		array $exclude = [],
+		?\EvzenLeonenko\OpenGraphControl\ArchiveMeta\Repository $archive = null
+	): Head {
 		$opt = $this->createStub( OptionsRepository::class );
 		$opt->method( 'get_path' )->willReturnCallback(
 			static function ( string $path ) use ( $options ) {
@@ -65,7 +70,26 @@ final class HeadTest extends TestCase {
 		);
 		$cache = $this->createStub( \EvzenLeonenko\OpenGraphControl\Renderer\Cache::class );
 		$cache->method( 'get' )->willReturn( null );
-		return new Head( $registry, new TagBuilder( strict: true ), $opt, $postmeta, $cache );
+		if ( null === $archive ) {
+			$archive = $this->createStub( \EvzenLeonenko\OpenGraphControl\ArchiveMeta\Repository::class );
+			$archive->method( 'get_for_term' )->willReturn(
+				[
+					'title'       => '',
+					'description' => '',
+					'image_id'    => 0,
+					'exclude'     => [],
+				]
+			);
+			$archive->method( 'get_for_user' )->willReturn(
+				[
+					'title'       => '',
+					'description' => '',
+					'image_id'    => 0,
+					'exclude'     => [],
+				]
+			);
+		}
+		return new Head( $registry, new TagBuilder( strict: true ), $opt, $postmeta, $cache, $archive );
 	}
 
 	private function registryWithTags( array $tags ): PlatformRegistry {
@@ -204,5 +228,59 @@ final class HeadTest extends TestCase {
 		// defanged </script> stays inside the script element as inert text.
 		self::assertSame( 1, substr_count( $output, '</script>' ) );
 		self::assertStringContainsString( '<\/script>', $output );
+	}
+
+	public function test_detect_context_returns_archive_term_for_category(): void {
+		$this->stubContextDetection( 'archive' );
+		Functions\when( 'is_category' )->justReturn( true );
+		Functions\when( 'get_queried_object' )->justReturn(
+			(object) [
+				'term_id'  => 12,
+				'taxonomy' => 'category',
+			]
+		);
+
+		$head = $this->head( $this->registryWithTags( [] ) );
+		$ref  = new \ReflectionClass( $head );
+		$m    = $ref->getMethod( 'detect_context' );
+		$m->setAccessible( true );
+		$context = $m->invoke( $head );
+
+		self::assertTrue( $context->is_archive_term() );
+		self::assertSame( 12, $context->archive_term_id() );
+		self::assertSame( 'category', $context->archive_kind() );
+	}
+
+	public function test_archive_context_excluded_emits_nothing(): void {
+		$this->stubContextDetection( 'archive' );
+		Functions\when( 'is_category' )->justReturn( true );
+		Functions\when( 'get_queried_object' )->justReturn(
+			(object) [
+				'term_id'  => 5,
+				'taxonomy' => 'category',
+			]
+		);
+		$archive = $this->createStub(
+			\EvzenLeonenko\OpenGraphControl\ArchiveMeta\Repository::class
+		);
+		$archive->method( 'get_for_term' )->willReturn(
+			[
+				'title'       => '',
+				'description' => '',
+				'image_id'    => 0,
+				'exclude'     => [ 'all' ],
+			]
+		);
+
+		$head = $this->head(
+			$this->registryWithTags( [ new Tag( Tag::KIND_PROPERTY, 'og:title', 'X' ) ] ),
+			[ 'non_post_pages.archive.enabled' => true ],
+			[],
+			$archive
+		);
+
+		ob_start();
+		$head->render();
+		self::assertSame( '', ob_get_clean() );
 	}
 }
