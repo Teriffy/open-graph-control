@@ -63,6 +63,9 @@ class Cache {
 		$parts = [
 			$context->type(),
 			(string) ( $context->post_id() ?? '' ),
+			(string) ( $context->archive_kind() ?? '' ),
+			(string) ( $context->archive_term_id() ?? '' ),
+			(string) ( $context->user_id() ?? '' ),
 			(string) $this->salt(),
 		];
 		return 'ogc_cache_' . md5( implode( ':', $parts ) );

@@ -111,7 +111,7 @@ final class CacheTest extends TestCase {
 				'taxonomy' => 'category',
 			]
 		);
-		$expected_key = 'ogc_cache_' . md5( implode( ':', [ Context::TYPE_ARCHIVE, '', 'salt1' ] ) );
+		$expected_key = 'ogc_cache_' . md5( implode( ':', [ Context::TYPE_ARCHIVE, '', 'category', '42', '', 'salt1' ] ) );
 		Functions\expect( 'delete_transient' )->once()->with( $expected_key );
 		( new Cache( $this->options( 3600 ) ) )->flush_term_from_meta( 1, 42, '_ogc_meta', [] );
 		self::assertTrue( true );
@@ -125,7 +125,7 @@ final class CacheTest extends TestCase {
 				'taxonomy' => 'post_tag',
 			]
 		);
-		$expected_key = 'ogc_cache_' . md5( implode( ':', [ Context::TYPE_ARCHIVE, '', 'salt1' ] ) );
+		$expected_key = 'ogc_cache_' . md5( implode( ':', [ Context::TYPE_ARCHIVE, '', 'post_tag', '7', '', 'salt1' ] ) );
 		Functions\expect( 'delete_transient' )->once()->with( $expected_key );
 		( new Cache( $this->options( 3600 ) ) )->flush_term_on_delete( 7, 99, 'post_tag' );
 		self::assertTrue( true );
@@ -148,7 +148,7 @@ final class CacheTest extends TestCase {
 
 	public function test_flush_user_from_meta_flushes_on_ogc_meta(): void {
 		Functions\when( 'get_option' )->justReturn( 'salt1' );
-		$expected_key = 'ogc_cache_' . md5( implode( ':', [ Context::TYPE_AUTHOR, '', 'salt1' ] ) );
+		$expected_key = 'ogc_cache_' . md5( implode( ':', [ Context::TYPE_AUTHOR, '', '', '', '42', 'salt1' ] ) );
 		Functions\expect( 'delete_transient' )->once()->with( $expected_key );
 		( new Cache( $this->options( 3600 ) ) )->flush_user_from_meta( 1, 42, '_ogc_meta', [] );
 		self::assertTrue( true );
@@ -156,9 +156,28 @@ final class CacheTest extends TestCase {
 
 	public function test_flush_user_on_delete_flushes_author_context(): void {
 		Functions\when( 'get_option' )->justReturn( 'salt1' );
-		$expected_key = 'ogc_cache_' . md5( implode( ':', [ Context::TYPE_AUTHOR, '', 'salt1' ] ) );
+		$expected_key = 'ogc_cache_' . md5( implode( ':', [ Context::TYPE_AUTHOR, '', '', '', '42', 'salt1' ] ) );
 		Functions\expect( 'delete_transient' )->once()->with( $expected_key );
 		( new Cache( $this->options( 3600 ) ) )->flush_user_on_delete( 42 );
 		self::assertTrue( true );
+	}
+
+	public function test_key_for_distinguishes_archive_terms(): void {
+		$opt = $this->createStub( OptionsRepository::class );
+		$opt->method( 'get_path' )->willReturn( 0 ); // cache enabled state doesn't matter for key_for
+		Functions\when( 'get_option' )->justReturn( 'test-salt' );
+
+		$cache = new Cache( $opt );
+
+		$k_cat_12 = $cache->key_for( Context::for_archive_term( 'category', 12 ) );
+		$k_cat_13 = $cache->key_for( Context::for_archive_term( 'category', 13 ) );
+		$k_tag_12 = $cache->key_for( Context::for_archive_term( 'post_tag', 12 ) );
+		$k_usr_5  = $cache->key_for( Context::for_author( 5 ) );
+		$k_usr_6  = $cache->key_for( Context::for_author( 6 ) );
+
+		self::assertNotSame( $k_cat_12, $k_cat_13 ); // same taxonomy, different term
+		self::assertNotSame( $k_cat_12, $k_tag_12 ); // same term id, different taxonomy
+		self::assertNotSame( $k_usr_5, $k_usr_6 );   // different authors
+		self::assertNotSame( $k_cat_12, $k_usr_5 );  // never collide across context types
 	}
 }
