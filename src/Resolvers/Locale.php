@@ -14,7 +14,7 @@ use EvzenLeonenko\OpenGraphControl\Options\Repository as OptionsRepository;
 /**
  * Resolves og:locale. Normalizes hyphen to underscore (OG wants en_US, not en-US).
  */
-final class Locale implements ResolverInterface {
+class Locale implements ResolverInterface {
 
 	public function __construct(
 		private OptionsRepository $options

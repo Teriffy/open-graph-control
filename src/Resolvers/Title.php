@@ -18,7 +18,7 @@ use EvzenLeonenko\OpenGraphControl\PostMeta\Repository as PostMetaRepository;
  * Chain steps (by default): post_meta_override, seo_plugin_title, post_title, site_name.
  * SEO plugin integrations hook into 'ogc_seo_plugin_title' in Phase 15.
  */
-final class Title implements ResolverInterface {
+class Title implements ResolverInterface {
 
 	public function __construct(
 		private PostMetaRepository $postmeta,

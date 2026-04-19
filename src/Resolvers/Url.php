@@ -13,7 +13,7 @@ namespace EvzenLeonenko\OpenGraphControl\Resolvers;
  * Resolves og:url. Uses get_permalink for singulars, home_url with the
  * request URI otherwise.
  */
-final class Url implements ResolverInterface {
+class Url implements ResolverInterface {
 
 	public function resolve( Context $context ): ?string {
 		$value = $this->compute( $context );

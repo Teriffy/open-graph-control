@@ -22,7 +22,7 @@ use EvzenLeonenko\OpenGraphControl\PostMeta\Repository as PostMetaRepository;
  * Chain (by default): post_meta_override, featured_image, first_content_image,
  * first_block_image, site_master_image.
  */
-final class Image implements ResolverInterface {
+class Image implements ResolverInterface {
 
 	public function __construct(
 		private PostMetaRepository $postmeta,

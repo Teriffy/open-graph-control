@@ -18,7 +18,7 @@ use EvzenLeonenko\OpenGraphControl\PostMeta\Repository as PostMetaRepository;
  * Chain (by default): post_meta_override, seo_plugin_desc, post_excerpt,
  * post_content_trim (160-char trimmed body), site_description.
  */
-final class Description implements ResolverInterface {
+class Description implements ResolverInterface {
 
 	private const TRIM_LENGTH = 160;
 

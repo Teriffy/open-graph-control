@@ -15,7 +15,7 @@ use EvzenLeonenko\OpenGraphControl\PostMeta\Repository as PostMetaRepository;
 /**
  * Returns the og:type value: post override, per-post-type default, or 'website'.
  */
-final class Type implements ResolverInterface {
+class Type implements ResolverInterface {
 
 	public function __construct(
 		private PostMetaRepository $postmeta,
