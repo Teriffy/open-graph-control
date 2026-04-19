@@ -73,7 +73,12 @@ final class Head {
 			echo $tag_html . "\n"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- TagBuilder escapes each tag.
 		}
 		foreach ( $json_ld as $payload ) {
-			echo '<script type="application/ld+json">' . $payload . "</script>\n"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Payload is JSON encoded by platform class.
+			// Belt-and-suspenders: platform classes already encode with
+			// JSON_HEX_TAG so "</" cannot appear, but if a future platform
+			// or filter emits a payload without those flags, this ensures
+			// the surrounding <script> tag can't be closed early.
+			$safe_payload = str_replace( '</', '<\/', $payload );
+			echo '<script type="application/ld+json">' . $safe_payload . "</script>\n"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- JSON payload is sanitized above against </script> breakout.
 		}
 		if ( $markers ) {
 			echo "<!-- /Open Graph Control -->\n";

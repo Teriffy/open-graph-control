@@ -81,11 +81,34 @@ final class ImageTest extends TestCase {
 		Functions\when( 'has_post_thumbnail' )->justReturn( false );
 		Functions\when( 'get_post_field' )->justReturn( '<p>Hi</p><img src="https://cdn.example.com/pic.jpg" alt="x"/><img src="second.jpg"/>' );
 		Functions\when( 'has_blocks' )->justReturn( false );
+		Functions\when( 'esc_url_raw' )->returnArg();
 		Filters\expectApplied( 'ogc_resolve_image_chain' )->andReturnFirstArg();
 		Filters\expectApplied( 'ogc_resolve_image_value' )->andReturnFirstArg();
 
 		$r = $this->resolver();
 		self::assertSame( 'https://cdn.example.com/pic.jpg', $r->resolve( Context::for_post( 1 ) ) );
+	}
+
+	/**
+	 * Regression test — javascript:/data:/vbscript: URLs planted in post content
+	 * must not reach the renderer. Even though the og:image meta tag is
+	 * esc_attr'd (so the scheme itself doesn't trigger JS in the attribute),
+	 * propagating the scheme into Pinterest JSON-LD or Twitter image tags is
+	 * a code smell at minimum, and one JSON_HEX_TAG regression away from
+	 * being exploitable. esc_url_raw enforces wp_allowed_protocols().
+	 */
+	public function test_first_content_image_rejects_dangerous_schemes(): void {
+		Functions\when( 'has_post_thumbnail' )->justReturn( false );
+		Functions\when( 'get_post_field' )->justReturn( '<img src="javascript:alert(1)"/>' );
+		Functions\when( 'has_blocks' )->justReturn( false );
+		// Mimic WP: esc_url_raw returns empty string for disallowed protocols.
+		Functions\when( 'esc_url_raw' )->alias(
+			static fn ( string $url ): string => 0 === stripos( $url, 'http://' ) || 0 === stripos( $url, 'https://' ) ? $url : ''
+		);
+		Filters\expectApplied( 'ogc_resolve_image_chain' )->andReturnFirstArg();
+
+		$r = $this->resolver();
+		self::assertNull( $r->resolve( Context::for_post( 1 ) ) );
 	}
 
 	public function test_first_block_image_extracts_attachment_id(): void {

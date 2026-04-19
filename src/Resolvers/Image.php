@@ -88,7 +88,11 @@ class Image implements ResolverInterface {
 		if ( ! preg_match( '/<img\b[^>]*\bsrc=["\']([^"\']+)["\']/i', $content, $match ) ) {
 			return null;
 		}
-		return $match[1];
+		// Reject javascript:/data:/vbscript: and any other non-allowlisted
+		// scheme by routing through esc_url_raw, which returns an empty
+		// string for URLs whose protocol isn't in wp_allowed_protocols().
+		$safe = esc_url_raw( $match[1] );
+		return '' === $safe ? null : $safe;
 	}
 
 	private function from_block_image( Context $context ): ?string {

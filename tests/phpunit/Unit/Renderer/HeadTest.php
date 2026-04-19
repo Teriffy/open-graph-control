@@ -180,4 +180,29 @@ final class HeadTest extends TestCase {
 		self::assertStringContainsString( '<script type="application/ld+json">', $output );
 		self::assertStringContainsString( '{"@type":"Article"}', $output );
 	}
+
+	/**
+	 * Defense-in-depth: even if a platform class forgets JSON_HEX_TAG,
+	 * Head::render must not allow a raw </ sequence inside the JSON-LD
+	 * block to close the surrounding <script> tag. Payload contents are
+	 * defanged by replacing "</" with "<\/" (valid JSON, inert HTML).
+	 */
+	public function test_render_defangs_script_breakout_in_json_ld(): void {
+		$registry = $this->createStub( PlatformRegistry::class );
+		$registry->method( 'collect_tags' )->willReturn( [] );
+		$registry->method( 'collect_json_ld' )->willReturn(
+			[ '{"headline":"bad</script><img src=x onerror=alert(1)>"}' ]
+		);
+
+		$head = $this->head( $registry, [ 'non_post_pages.front.enabled' => true ] );
+		ob_start();
+		$head->render();
+		$output = ob_get_clean();
+
+		// Only the wrapping </script> closer should remain; the payload's
+		// attempt to close the tag must be escaped. Anything after the
+		// defanged </script> stays inside the script element as inert text.
+		self::assertSame( 1, substr_count( $output, '</script>' ) );
+		self::assertStringContainsString( '<\/script>', $output );
+	}
 }
