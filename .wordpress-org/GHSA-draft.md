@@ -132,7 +132,7 @@ tag closer reaches the parser.
 
 ## Patch
 
-Commit: [`d330319`](https://github.com/Teriffy/open-graph-control/commit/d330319)
+Commit: [`3c96aa0`](https://github.com/Teriffy/open-graph-control/commit/3c96aa0)
 
 Three layered fixes:
 
@@ -159,7 +159,7 @@ audit.
 
 ## References
 
-- Commit: https://github.com/Teriffy/open-graph-control/commit/d330319
+- Commit: https://github.com/Teriffy/open-graph-control/commit/3c96aa0
 - Release: https://github.com/Teriffy/open-graph-control/releases/tag/v0.2.1
 - PHP JSON encoding flags: https://www.php.net/manual/en/json.constants.php
 - OWASP: Output Encoding for JavaScript Contexts

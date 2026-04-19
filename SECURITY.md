@@ -86,6 +86,6 @@ Open Graph Control is designed so that **no user data leaves your server**. The 
 
 Public security fixes are tagged with `security:` in their commit subject and linked from the changelog.
 
-- **2026-04-19** — Stored XSS via JSON-LD `<script>` breakout (author-role required). [Commit `d330319`](https://github.com/Teriffy/open-graph-control/commit/d330319).
+- **2026-04-19** — Stored XSS via JSON-LD `<script>` breakout (author-role required). [Commit `3c96aa0`](https://github.com/Teriffy/open-graph-control/commit/3c96aa0).
 
 Thank you for helping keep Open Graph Control users safe.
