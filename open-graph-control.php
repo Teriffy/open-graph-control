@@ -5,7 +5,7 @@
  * Description:       Full control over Open Graph and social meta tags across 12 platforms.
  * Version:           0.2.0
  * Requires at least: 6.2
- * Requires PHP:      8.0
+ * Requires PHP:      8.1
  * Author:            Evžen Leonenko
  * Author URI:        https://leonenko.cz
  * License:           GPL-2.0-or-later

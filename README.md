@@ -40,6 +40,11 @@ npm run lint:js     # ESLint
 npx wp-env start    # Local WP dev env at http://localhost:8888
 ```
 
+Minimum PHP: 8.1 · Minimum WordPress: 6.2.
+
+```bash
+```
+
 ## Documentation
 
 - [Design spec](docs/superpowers/specs/2026-04-19-open-graph-control-design.md)
