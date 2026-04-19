@@ -1,1 +1,2 @@
-console.log( '[OGC] Settings bundle loaded' );
+// Settings admin app entry point. React root mounted in Phase 9.
+export {};
