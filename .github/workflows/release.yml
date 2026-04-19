@@ -12,6 +12,10 @@ jobs:
   release:
     runs-on: ubuntu-latest
     if: startsWith( github.ref, 'refs/tags/v' )
+    # softprops/action-gh-release needs `contents: write` to POST the
+    # release object; the default workflow token only grants read.
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
 
