@@ -16,9 +16,15 @@
 	// WCAG-AA-safe on white and used as a filled background.
 	// #d63638 on white = 4.42:1 (JUST fails AA); #8a2424 on white = 10.3:1.
 	--ogc-color-error-strong: #8a2424;
+	--ogc-color-error-surface: #fbeaea;
 	--ogc-color-success: #00a32a;
 	--ogc-color-warning: #dba617;
+	// Warning icons want AA on light amber (#fcf4e0); the raw #dba617 fails there.
+	--ogc-color-warning-strong: #8a6a00;
+	--ogc-color-warning-surface: #fcf4e0;
 	--ogc-color-info: #72aee6;
+	--ogc-color-info-strong: #1e5785;
+	--ogc-color-info-surface: #e7f0f8;
 	--ogc-color-primary: #2271b1;
 	--ogc-color-surface-muted: #f6f7f7;
 	--ogc-color-surface-hover: #f0f0f1;

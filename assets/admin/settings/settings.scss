@@ -1,4 +1,4 @@
-@import '../shared/tokens';
+@import '../shared/utilities';
 
 // Accessibility: honor user's reduced-motion preference. Covers any
 // future animations added to the admin without per-rule opt-in.
@@ -96,111 +96,6 @@
 	}
 }
 
-// ---------------------------------------------------------------------------
-// Reusable utilities
-// ---------------------------------------------------------------------------
-
-// Small muted caption (replaces ad-hoc `fontSize: 0.85em; color: #50575e`).
-.ogc-muted {
-	color: var(--ogc-color-text-muted);
-	font-size: var(--ogc-font-size-sm);
-}
-
-// Secondary inline metadata (dimensions, slugs).
-.ogc-meta {
-	font-size: var(--ogc-font-size-sm);
-	opacity: 0.7;
-	margin-left: var(--ogc-space-sm);
-}
-
-// Status pill next to a card header ("active" / "not installed").
-.ogc-inline-marker {
-	margin-left: var(--ogc-space-sm);
-	font-size: var(--ogc-font-size-sm);
-
-	&--active {
-		color: var(--ogc-color-error);
-	}
-
-	&--muted {
-		color: var(--ogc-color-text-muted);
-	}
-}
-
-// Character counter under a TextControl.
-.ogc-charcount {
-	font-size: var(--ogc-font-size-sm);
-	color: var(--ogc-color-text-muted);
-
-	&--warn {
-		color: var(--ogc-color-warning);
-	}
-
-	&--error {
-		color: var(--ogc-color-error);
-	}
-}
-
-// Section save-button footer.
-.ogc-section-footer {
-	margin-top: var(--ogc-space-lg);
-
-	&__status {
-		margin-left: var(--ogc-space-md);
-
-		&--saved {
-			color: var(--ogc-color-success);
-		}
-
-		&--error {
-			color: var(--ogc-color-error);
-		}
-	}
-}
-
-// Security section — audit trail severity badge. Uses the "strong"
-// error shade so white text hits 10.3:1 contrast on the fill.
-.ogc-security-badge {
-	display: inline-block;
-	padding: 1px 6px;
-	border-radius: 3px;
-	font-size: var(--ogc-font-size-xs);
-	background: var(--ogc-color-error-strong);
-	color: #fff;
-}
-
-// Validation warnings list.
-.ogc-warning-list {
-	list-style: none;
-	margin: 0.75rem 0 0;
-	padding: 0;
-}
-
-.ogc-warning-item {
-	padding: 0.4rem 0.6rem;
-	background: var(--ogc-color-surface-muted);
-	margin-bottom: var(--ogc-space-xs);
-	font-size: var(--ogc-font-size-md);
-	border-left: 4px solid var(--ogc-color-info);
-
-	&--error {
-		border-left-color: var(--ogc-color-error);
-	}
-
-	&--warn {
-		border-left-color: var(--ogc-color-warning);
-	}
-
-	&__icon {
-		margin-right: var(--ogc-space-sm);
-	}
-
-	&__field {
-		margin-right: var(--ogc-space-sm);
-		font-size: var(--ogc-font-size-sm);
-	}
-}
-
 // Images section — dimensions/slug monospace + progress copy.
 .ogc-images__dimensions {
 	font-family: monospace;
@@ -240,32 +135,13 @@
 	}
 }
 
-// Media picker — shared across settings + meta box.
-.ogc-media-picker {
-	margin-bottom: var(--ogc-space-md);
-
-	&__label {
-		font-weight: 500;
-		margin-bottom: var(--ogc-space-xs);
-	}
-
-	&__row {
-		display: flex;
-		gap: var(--ogc-space-sm);
-		align-items: center;
-	}
-
-	&__preview {
-		width: 80px;
-		height: 80px;
-		object-fit: cover;
-		border-radius: 4px;
-		border: 1px solid var(--ogc-color-border);
-	}
-
-	&__help {
-		font-size: var(--ogc-font-size-sm);
-		color: var(--ogc-color-text-muted);
-		margin-top: var(--ogc-space-xs);
-	}
+// Security section — audit trail severity badge. Uses the "strong"
+// error shade so white text hits 10.3:1 contrast on the fill.
+.ogc-security-badge {
+	display: inline-block;
+	padding: 1px 6px;
+	border-radius: 3px;
+	font-size: var(--ogc-font-size-xs);
+	background: var(--ogc-color-error-strong);
+	color: #fff;
 }
