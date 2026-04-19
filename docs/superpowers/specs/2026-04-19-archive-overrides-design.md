@@ -63,17 +63,19 @@ Shape deliberately mirrors the `'title'`, `'description'`, `'image_id'`, `'exclu
 
 - `register_term_meta( $taxonomy, '_ogc_meta', [ 'single' => true, 'type' => 'object', 'show_in_rest' => false, 'default' => [], 'auth_callback' => ... ] )` called once per detected public taxonomy at `init`.
 - `register_meta( 'user', '_ogc_meta', ... )` registered once.
+- `show_in_rest => false` is deliberate: the bespoke `ArchiveMetaController` is the **only** REST surface for `_ogc_meta`, so WordPress core's auto-registered meta endpoints never expose the key. This keeps the permission model in one place.
+- Despite `'type' => 'object'`, we don't call `serialize()` ourselves — WordPress's meta API runs `maybe_serialize()` automatically for array values, and `maybe_unserialize()` on read.
 
 ### Invalidation hooks
 
-| Hook | Action |
-|---|---|
-| `edited_term_meta` | Flush transient for `Context::for_archive( $kind, $term_id )` |
-| `deleted_term` | Flush transient for that term's archive context |
-| `updated_user_meta`, `deleted_user_meta` (key === `_ogc_meta`) | Flush transient for `Context::for_author( $user_id )` |
-| `updated_user` / `deleted_user` | Same |
+| Hook | Filter | Action |
+|---|---|---|
+| `added_term_meta`, `updated_term_meta`, `deleted_term_meta` | `meta_key === '_ogc_meta'` | Flush transient for the archive term context (term_id + its taxonomy) |
+| `deleted_term` | — | Flush transient for that term's archive context |
+| `added_user_meta`, `updated_user_meta`, `deleted_user_meta` | `meta_key === '_ogc_meta'` | Flush transient for `Context::for_author( $user_id )` |
+| `deleted_user` | — | Same |
 
-Wired into the existing `Renderer\Cache` — add three new `add_action` registrations in `Cache::register()`.
+Wired into the existing `Renderer\Cache` — add new `add_action` registrations in `Cache::register()`. Note: WordPress does not emit an `edited_term_meta` hook; the `added_ / updated_ / deleted_` trio is the correct surface for meta writes, and each callback must short-circuit when `$meta_key !== '_ogc_meta'` to avoid flushing on unrelated writes.
 
 ### Shared repository
 
@@ -133,9 +135,9 @@ private function from_archive_override( Context $context ): ?string {
 
 `Context` already has `archive_kind` metadata but **not** `archive_term_id`. Extend:
 
-- Add `Context::for_archive_term( string $taxonomy, int $term_id )` factory (preferred for category / tag / custom tax).
-- Keep the existing `Context::for_archive( string $kind )` for "kind-only" archives (rare — effectively just the discovery fallback).
-- `Head::detect_context()` resolves the queried object via `get_queried_object()` and extracts `term_id` when the archive is a taxonomy term.
+- Add `Context::for_archive_term( string $taxonomy, int $term_id )` factory (preferred for category / tag / custom tax). `$taxonomy` fills the existing `archive_kind` slot — callers of the new factory get an archive context with both the taxonomy slug *and* the term ID available.
+- Keep the existing `Context::for_archive( string $kind )` factory untouched for "kind-only" archives (e.g. the `post_type` fallback branch in `Head::detect_context()`). No deprecation — both factories coexist indefinitely.
+- `Head::detect_context()` resolves the queried object via `get_queried_object()` and calls `for_archive_term()` when the archive is a taxonomy term (queried object has `term_id` + `taxonomy`), and the existing `for_archive()` otherwise.
 
 ## REST API
 
