@@ -25,7 +25,10 @@ export default defineConfig( {
 	fullyParallel: false,
 	retries: process.env.CI ? 2 : 0,
 	reporter: process.env.CI ? 'github' : 'list',
-	testIgnore: runWpSuite ? [] : [ '**/0[1-4]-*.spec.ts' ],
+	testIgnore: [
+		...( runWpSuite ? [] : [ '**/0[1-4]-*.spec.ts' ] ),
+		...( process.env.OGC_E2E_SNAPSHOT ? [] : [ '**/fixtures-snapshot.spec.ts' ] ),
+	],
 	use: {
 		baseURL: runWpSuite
 			? process.env.WP_BASE_URL || 'http://localhost:8888'
