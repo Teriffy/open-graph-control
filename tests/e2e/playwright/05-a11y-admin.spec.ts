@@ -69,3 +69,50 @@ test( 'security section has no axe violations', async ( { page } ) => {
 
 	expect( await ogcViolations( page ) ).toEqual( [] );
 } );
+
+test( 'archive overrides section has no axe violations', async ( { page } ) => {
+	await login( page );
+	await gotoSettings( page );
+
+	await page
+		.locator( '.ogc-nav button', { hasText: /^Archive overrides$/ } )
+		.click();
+	await page.waitForTimeout( 400 );
+	await expect(
+		page.getByRole( 'heading', { name: 'Archive overrides' } )
+	).toBeVisible();
+
+	expect( await ogcViolations( page ) ).toEqual( [] );
+} );
+
+test( 'term edit screen with archive editor has no axe violations', async ( {
+	page,
+} ) => {
+	await login( page );
+
+	// Ensure we're on an admin page so `wpApiSettings.nonce` is available.
+	await page.goto( '/wp-admin/' );
+	const nonce = await page.evaluate(
+		() =>
+			( window as unknown as {
+				wpApiSettings?: { nonce?: string };
+			} ).wpApiSettings?.nonce ?? ''
+	);
+	expect( nonce ).not.toBe( '' );
+
+	// Create a category via REST so we have a term to edit.
+	const stamp = Date.now();
+	const res = await page.request.post( '/wp-json/wp/v2/categories', {
+		headers: { 'X-WP-Nonce': nonce },
+		data: { name: `A11y Test ${ stamp }`, slug: `a11y-${ stamp }` },
+	} );
+	expect( res.ok() ).toBeTruthy();
+	const category = await res.json();
+
+	await page.goto(
+		`/wp-admin/term.php?taxonomy=category&tag_ID=${ category.id }`
+	);
+	await expect( page.locator( '#ogc-archive-root' ) ).toBeVisible();
+
+	expect( await ogcViolations( page ) ).toEqual( [] );
+} );
