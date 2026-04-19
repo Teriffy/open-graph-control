@@ -1,0 +1,41 @@
+{
+  "name": "evzenleonenko/open-graph-control",
+  "description": "WordPress plugin for social meta tag control across 12 platforms.",
+  "type": "wordpress-plugin",
+  "license": "GPL-2.0-or-later",
+  "require": {
+    "php": ">=8.0"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^10.5",
+    "brain/monkey": "^2.6",
+    "phpstan/phpstan": "^1.11",
+    "szepeviktor/phpstan-wordpress": "^1.3",
+    "wp-coding-standards/wpcs": "^3.1",
+    "dealerdirect/phpcodesniffer-composer-installer": "^1.0",
+    "yoast/phpunit-polyfills": "^2.0",
+    "php-stubs/wordpress-stubs": "^6.5"
+  },
+  "autoload": {
+    "psr-4": {
+      "EvzenLeonenko\\OpenGraphControl\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "EvzenLeonenko\\OpenGraphControl\\Tests\\": "tests/phpunit/"
+    }
+  },
+  "scripts": {
+    "test": "phpunit",
+    "stan": "phpstan analyse",
+    "cs": "phpcs",
+    "cs:fix": "phpcbf"
+  },
+  "config": {
+    "allow-plugins": {
+      "dealerdirect/phpcodesniffer-composer-installer": true
+    }
+  },
+  "minimum-stability": "stable"
+}
