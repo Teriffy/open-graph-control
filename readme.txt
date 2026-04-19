@@ -59,7 +59,7 @@ Open Graph Control is built so **no user data leaves your server**. The plugin d
 * **Dangerous URL schemes** — image URLs extracted from post content are filtered through `wp_allowed_protocols()`, so `javascript:` / `data:` never reach the output.
 * **Abuse of the preview endpoint** — rate-limited to 20 calls/minute per user.
 
-**Supply-chain hygiene:** PHP 8.1+, zero Composer runtime dependencies, JavaScript build only pulls packages from the `@wordpress/*` and `@axe-core/playwright` namespaces. PHPStan level 8 + 173 PHPUnit unit tests + Playwright integration suite run on every push.
+**Supply-chain hygiene:** PHP 8.1+, zero Composer runtime dependencies, JavaScript build only pulls packages from the `@wordpress/*` and `@axe-core/playwright` namespaces. PHPStan level 8 + 218 PHPUnit unit tests + Playwright integration suite run on every push.
 
 **Responsible disclosure:** please email security reports to the address in `SECURITY.md` on GitHub, or open a private [security advisory](https://github.com/Teriffy/open-graph-control/security/advisories/new). Response SLA: 3 business days; fix SLA: 30 days for confirmed valid reports.
 

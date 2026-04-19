@@ -86,7 +86,7 @@ Output cache reduces cached contexts to a single `get_transient` read.
 
 **Responsible disclosure** — please don't open a public issue for security problems. Use the [private advisory form](https://github.com/Teriffy/open-graph-control/security/advisories/new) or email the address in `SECURITY.md`. Response SLA: 3 business days; fix SLA: 30 days.
 
-Public security fixes are tagged `security:` in their commit subject. Latest: [`d330319`](https://github.com/Teriffy/open-graph-control/commit/d330319) — stored XSS via JSON-LD script-tag breakout.
+Public security fixes are tagged `security:` in their commit subject. Latest: [`3c96aa0`](https://github.com/Teriffy/open-graph-control/commit/3c96aa0) — stored XSS via JSON-LD script-tag breakout.
 
 ## Quick start
 
@@ -117,7 +117,7 @@ Minimum PHP: 8.1 · Minimum WordPress: 6.2.
 
 ## Releasing
 
-Tag the release (`git tag v0.2.0 && git push --tags`). The `.github/workflows/release.yml` workflow builds the zip, attaches it to the GitHub Release, and pushes to WordPress.org SVN when the `WP_SVN_USERNAME` / `WP_SVN_PASSWORD` secrets are set. Manual SVN path: `bin/publish.sh`.
+Tag the release (`git tag v0.3.0 && git push --tags`). The `.github/workflows/release.yml` workflow builds the zip, attaches it to the GitHub Release, and pushes to WordPress.org SVN when the `WP_SVN_USERNAME` / `WP_SVN_PASSWORD` secrets are set. Manual SVN path: `bin/publish.sh`.
 
 ## License
 
