@@ -9,6 +9,9 @@ declare(strict_types=1);
 
 namespace EvzenLeonenko\OpenGraphControl;
 
+use EvzenLeonenko\OpenGraphControl\Admin\Rest\ConflictController;
+use EvzenLeonenko\OpenGraphControl\Admin\Rest\PreviewController;
+use EvzenLeonenko\OpenGraphControl\Admin\Rest\SettingsController;
 use EvzenLeonenko\OpenGraphControl\Images\SizeRegistry;
 use EvzenLeonenko\OpenGraphControl\Integrations\AIOSEO;
 use EvzenLeonenko\OpenGraphControl\Integrations\Detector;
@@ -164,6 +167,20 @@ final class Bootstrap {
 		$container->set(
 			'images.size_registry',
 			static fn () => new SizeRegistry()
+		);
+
+		// REST controllers.
+		$container->set(
+			'rest.settings',
+			static fn ( Container $c ) => new SettingsController( $c->get( 'options.repository' ) )
+		);
+		$container->set(
+			'rest.preview',
+			static fn ( Container $c ) => new PreviewController( $c->get( 'platform.registry' ) )
+		);
+		$container->set(
+			'rest.conflicts',
+			static fn ( Container $c ) => new ConflictController( $c->get( 'integrations.detector' ) )
 		);
 
 		// Integrations.

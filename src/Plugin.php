@@ -24,6 +24,9 @@ final class Plugin {
 		$this->container->get( 'images.size_registry' )->register();
 		$this->container->get( 'integrations.detector' )->run();
 		$this->container->get( 'renderer.head' )->register();
+		$this->container->get( 'rest.settings' )->register();
+		$this->container->get( 'rest.preview' )->register();
+		$this->container->get( 'rest.conflicts' )->register();
 	}
 
 	public function container(): Container {
