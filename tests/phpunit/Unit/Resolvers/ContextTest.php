@@ -55,4 +55,10 @@ final class ContextTest extends TestCase {
 		self::assertFalse( $context->is_archive_term() );
 		self::assertNull( $context->archive_term_id() );
 	}
+
+	public function test_is_archive_returns_true_for_kind_only_archive(): void {
+		$c = Context::for_archive( 'post_type' );
+		self::assertTrue( $c->is_archive() );
+		self::assertFalse( $c->is_archive_term() );
+	}
 }

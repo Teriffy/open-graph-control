@@ -94,7 +94,8 @@ final class Context {
 	}
 
 	public function is_archive_term(): bool {
-		return is_int( $this->extra['archive_term_id'] ?? null );
+		return self::TYPE_ARCHIVE === $this->type
+			&& is_int( $this->extra['archive_term_id'] ?? null );
 	}
 
 	public function post_id(): ?int {
