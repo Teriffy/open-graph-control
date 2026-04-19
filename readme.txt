@@ -107,7 +107,12 @@ The `ogc_detected_plugins` filter lets third parties register detectable SEO com
 
 = Will this slow down my site? =
 
-Open Graph Control runs only on `wp_head` (front-end pages) and on the REST API when the admin UI is open. Output caching is opt-in via the Advanced settings; by default the plugin resolves tags fresh on each request because the resolver pipeline is already fast (~1 ms typical).
+Open Graph Control runs only on `wp_head` (front-end pages) and on the REST API when the admin UI is open. Measured in-process with the bundled `wp ogc bench` WP-CLI command (500 iterations, wp-env on Colima):
+
+* Front page render: **mean 0.047 ms**, p95 0.060 ms, p99 0.166 ms
+* Single-post render (full resolver chain): **mean 0.396 ms**, p95 0.601 ms, p99 2.333 ms
+
+Output caching is opt-in via the Advanced settings and further reduces this to a single `get_transient` read (<0.05 ms) for cached contexts.
 
 = Is the plugin GPL? =
 

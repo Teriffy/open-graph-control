@@ -112,6 +112,67 @@ final class Commands {
 	}
 
 	/**
+	 * Benchmark the tag-resolver + render pipeline in isolation (no HTTP,
+	 * no theme, no other plugins). Reports mean + p95 wall-clock time per
+	 * render in milliseconds.
+	 *
+	 * ## OPTIONS
+	 *
+	 * [<post_id>]
+	 * : Post ID to render for. 0 or omitted = front page.
+	 *
+	 * [--iterations=<n>]
+	 * : How many renders to measure. Default: 200.
+	 *
+	 * ## EXAMPLES
+	 *
+	 *     wp ogc bench
+	 *     wp ogc bench 42 --iterations=1000
+	 *
+	 * @when after_wp_load
+	 *
+	 * @param array<int, string>    $args
+	 * @param array<string, string> $assoc
+	 */
+	public function bench( array $args, array $assoc ): void {
+		$post_id    = isset( $args[0] ) ? (int) $args[0] : 0;
+		$iterations = isset( $assoc['iterations'] ) ? max( 10, (int) $assoc['iterations'] ) : 200;
+		$context    = $post_id > 0 ? Context::for_post( $post_id ) : Context::for_front();
+
+		// Warmup — prime WP object cache and PHP opcache for the code path.
+		for ( $i = 0; $i < 20; $i++ ) {
+			$this->builder->render( $this->registry->collect_tags( $context ) );
+		}
+
+		/** @var array<int, float> $samples */
+		$samples = [];
+		for ( $i = 0; $i < $iterations; $i++ ) {
+			$start = hrtime( true );
+			$this->builder->render( $this->registry->collect_tags( $context ) );
+			$samples[] = ( hrtime( true ) - $start ) / 1_000_000.0;
+		}
+
+		sort( $samples );
+		$mean  = array_sum( $samples ) / $iterations;
+		$p50   = $samples[ (int) floor( $iterations * 0.50 ) ];
+		$p95   = $samples[ (int) floor( $iterations * 0.95 ) ];
+		$p99   = $samples[ (int) floor( $iterations * 0.99 ) ];
+		$label = $post_id > 0 ? "post #{$post_id}" : 'front page';
+
+		\WP_CLI::success(
+			sprintf(
+				'Tag render for %s — mean %.3f ms, p50 %.3f ms, p95 %.3f ms, p99 %.3f ms (n=%d)',
+				$label,
+				$mean,
+				$p50,
+				$p95,
+				$p99,
+				$iterations
+			)
+		);
+	}
+
+	/**
 	 * Regenerate OG size variants for all attachments. Runs in-process (no
 	 * WP-Cron), walks the entire library.
 	 *
