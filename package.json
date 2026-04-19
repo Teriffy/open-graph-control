@@ -24,6 +24,7 @@
     "@wordpress/media-utils": "^5.0.0",
     "@wordpress/block-editor": "^14.0.0",
     "@playwright/test": "^1.44.0",
+    "@axe-core/playwright": "^4.10.0",
     "http-server": "^14.1.1"
   }
 }

@@ -106,7 +106,7 @@
 
 		.ogc-preview-site {
 			font-size: 10px;
-			color: #8e8e93;
+			color: #595959;
 			margin-top: 2px;
 		}
 	}
@@ -233,14 +233,14 @@
 
 		.ogc-preview-site {
 			font-size: 10px;
-			color: #8696a0;
+			color: #595959;
 			margin-top: 2px;
 		}
 	}
 
 	&.is-telegram {
 		background: #ecf4fb;
-		border-left: 3px solid #0088cc;
+		border-left: 3px solid #005a8a;
 		border-radius: 0 6px 6px 0;
 		padding: 8px 10px;
 		display: flex;
@@ -263,13 +263,13 @@
 
 		.ogc-preview-title {
 			font-size: 13px;
-			color: #0088cc;
+			color: #005a8a;
 			font-weight: 600;
 		}
 
 		.ogc-preview-site {
 			font-size: 11px;
-			color: #707579;
+			color: #595959;
 		}
 
 		.ogc-preview-desc {

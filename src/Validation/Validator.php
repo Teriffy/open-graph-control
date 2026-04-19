@@ -25,10 +25,14 @@ defined( 'ABSPATH' ) || exit;
  */
 final class Validator {
 
-	private const TITLE_WARN       = 60;
-	private const TITLE_ERROR      = 90;
-	private const DESCRIPTION_WARN = 140;
-	private const DESCRIPTION_MAX  = 200;
+	private const TITLE_WARN          = 60;
+	private const TITLE_ERROR         = 90;
+	private const DESCRIPTION_WARN    = 140;
+	private const DESCRIPTION_MAX     = 200;
+	private const DISCORD_TITLE_MAX   = 256;
+	private const DISCORD_DESC_MAX    = 2048;
+	private const LINKEDIN_MIN_WIDTH  = 1200;
+	private const LINKEDIN_MIN_HEIGHT = 627;
 
 	/**
 	 * @param array<string, string> $tags Flat map keyed "kind:key" as returned by PreviewController.
@@ -54,6 +58,18 @@ final class Validator {
 				$this->check_twitter_handle( 'twitter.creator', (string) $global_settings['platforms']['twitter']['creator'] )
 			);
 		}
+		$warnings = array_merge(
+			$warnings,
+			$this->check_discord_limits(
+				(string) ( $tags['property:og:title'] ?? '' ),
+				(string) ( $tags['property:og:description'] ?? '' ),
+				$global_settings
+			)
+		);
+		$warnings = array_merge(
+			$warnings,
+			$this->check_linkedin_image( $tags, $global_settings )
+		);
 		if ( isset( $global_settings['platforms']['mastodon']['fediverse_creator'] ) ) {
 			$warnings = array_merge(
 				$warnings,
@@ -132,6 +148,64 @@ final class Validator {
 					Warning::WARN,
 					'image',
 					'No image resolved. Facebook and LinkedIn will render a text-only card.'
+				),
+			];
+		}
+		return [];
+	}
+
+	/**
+	 * @param array<string, mixed> $global_settings
+	 * @return array<int, Warning>
+	 */
+	private function check_discord_limits( string $title, string $description, array $global_settings ): array {
+		if ( empty( $global_settings['platforms']['discord']['enabled'] ) ) {
+			return [];
+		}
+		$out = [];
+		if ( mb_strlen( $title ) > self::DISCORD_TITLE_MAX ) {
+			$out[] = new Warning(
+				Warning::WARN,
+				'platforms.discord.title',
+				sprintf( 'Title is %d characters; Discord truncates the embed title at %d.', mb_strlen( $title ), self::DISCORD_TITLE_MAX )
+			);
+		}
+		if ( mb_strlen( $description ) > self::DISCORD_DESC_MAX ) {
+			$out[] = new Warning(
+				Warning::WARN,
+				'platforms.discord.description',
+				sprintf( 'Description is %d characters; Discord truncates the embed description at %d.', mb_strlen( $description ), self::DISCORD_DESC_MAX )
+			);
+		}
+		return $out;
+	}
+
+	/**
+	 * @param array<string, string> $tags
+	 * @param array<string, mixed>  $global_settings
+	 * @return array<int, Warning>
+	 */
+	private function check_linkedin_image( array $tags, array $global_settings ): array {
+		if ( empty( $global_settings['platforms']['linkedin']['enabled'] ) ) {
+			return [];
+		}
+		$width  = isset( $tags['property:og:image:width'] ) ? (int) $tags['property:og:image:width'] : 0;
+		$height = isset( $tags['property:og:image:height'] ) ? (int) $tags['property:og:image:height'] : 0;
+		if ( $width <= 0 || $height <= 0 ) {
+			return [];
+		}
+		if ( $width < self::LINKEDIN_MIN_WIDTH || $height < self::LINKEDIN_MIN_HEIGHT ) {
+			return [
+				new Warning(
+					Warning::WARN,
+					'platforms.linkedin.image',
+					sprintf(
+						'Image is %d×%d; LinkedIn requires at least %d×%d for a large preview.',
+						$width,
+						$height,
+						self::LINKEDIN_MIN_WIDTH,
+						self::LINKEDIN_MIN_HEIGHT
+					)
 				),
 			];
 		}

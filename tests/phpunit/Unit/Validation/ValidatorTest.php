@@ -105,6 +105,68 @@ final class ValidatorTest extends TestCase {
 		self::assertContains( 'platforms.mastodon.fediverse_creator:error', $severities_invalid );
 	}
 
+	public function test_discord_title_truncation_warn(): void {
+		$warnings = ( new Validator() )->validate(
+			[
+				'property:og:title'       => str_repeat( 'A', 300 ),
+				'property:og:description' => 'Ok',
+				'property:og:image'       => 'img.jpg',
+			],
+			[ 'platforms' => [ 'discord' => [ 'enabled' => true ] ] ]
+		);
+		self::assertContains(
+			'platforms.discord.title:warn',
+			$this->fieldSeverities( $warnings )
+		);
+	}
+
+	public function test_discord_checks_skip_when_platform_disabled(): void {
+		$warnings = ( new Validator() )->validate(
+			[
+				'property:og:title'       => str_repeat( 'A', 300 ),
+				'property:og:description' => 'Ok',
+				'property:og:image'       => 'img.jpg',
+			],
+			[ 'platforms' => [ 'discord' => [ 'enabled' => false ] ] ]
+		);
+		self::assertNotContains(
+			'platforms.discord.title:warn',
+			$this->fieldSeverities( $warnings )
+		);
+	}
+
+	public function test_linkedin_image_too_small_warn(): void {
+		$warnings = ( new Validator() )->validate(
+			[
+				'property:og:title'        => 'Ok',
+				'property:og:description'  => 'Ok',
+				'property:og:image'        => 'img.jpg',
+				'property:og:image:width'  => '800',
+				'property:og:image:height' => '400',
+			],
+			[ 'platforms' => [ 'linkedin' => [ 'enabled' => true ] ] ]
+		);
+		self::assertContains(
+			'platforms.linkedin.image:warn',
+			$this->fieldSeverities( $warnings )
+		);
+	}
+
+	public function test_linkedin_check_skipped_when_dimensions_missing(): void {
+		$warnings = ( new Validator() )->validate(
+			[
+				'property:og:title'       => 'Ok',
+				'property:og:description' => 'Ok',
+				'property:og:image'       => 'img.jpg',
+			],
+			[ 'platforms' => [ 'linkedin' => [ 'enabled' => true ] ] ]
+		);
+		self::assertNotContains(
+			'platforms.linkedin.image:warn',
+			$this->fieldSeverities( $warnings )
+		);
+	}
+
 	public function test_warning_to_array_shape(): void {
 		$w = new Warning( Warning::WARN, 'foo', 'bar' );
 		self::assertSame(

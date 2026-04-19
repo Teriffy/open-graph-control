@@ -29,7 +29,8 @@ final class Head {
 		private PlatformRegistry $registry,
 		private TagBuilder $builder,
 		private OptionsRepository $options,
-		private \EvzenLeonenko\OpenGraphControl\PostMeta\Repository $postmeta
+		private \EvzenLeonenko\OpenGraphControl\PostMeta\Repository $postmeta,
+		private Cache $cache
 	) {}
 
 	public function register(): void {
@@ -45,6 +46,12 @@ final class Head {
 			return;
 		}
 
+		$cached = $this->cache->get( $context );
+		if ( null !== $cached ) {
+			echo $cached; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- already-escaped cache payload.
+			return;
+		}
+
 		$tags     = $this->registry->collect_tags( $context );
 		$tag_html = $this->builder->render( $tags );
 		$json_ld  = $this->registry->collect_json_ld( $context );
@@ -55,6 +62,7 @@ final class Head {
 
 		$markers = (bool) $this->options->get_path( 'output.comment_markers' );
 
+		ob_start();
 		if ( $markers ) {
 			printf(
 				"\n<!-- Open Graph Control v%s https://wordpress.org/plugins/open-graph-control/ -->\n",
@@ -70,6 +78,10 @@ final class Head {
 		if ( $markers ) {
 			echo "<!-- /Open Graph Control -->\n";
 		}
+
+		$output = (string) ob_get_clean();
+		$this->cache->set( $context, $output );
+		echo $output; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Composed above from already-escaped pieces.
 	}
 
 	private function detect_context(): Context {

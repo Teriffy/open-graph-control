@@ -167,12 +167,19 @@ final class Bootstrap {
 			}
 		);
 		$container->set(
+			'renderer.cache',
+			static fn ( Container $c ) => new \EvzenLeonenko\OpenGraphControl\Renderer\Cache(
+				$c->get( 'options.repository' )
+			)
+		);
+		$container->set(
 			'renderer.head',
 			static fn ( Container $c ) => new Head(
 				$c->get( 'platform.registry' ),
 				$c->get( 'renderer.tag_builder' ),
 				$c->get( 'options.repository' ),
-				$c->get( 'postmeta.repository' )
+				$c->get( 'postmeta.repository' ),
+				$c->get( 'renderer.cache' )
 			)
 		);
 

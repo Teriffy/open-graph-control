@@ -63,7 +63,9 @@ final class HeadTest extends TestCase {
 				'exclude'     => $exclude,
 			]
 		);
-		return new Head( $registry, new TagBuilder( strict: true ), $opt, $postmeta );
+		$cache = $this->createStub( \EvzenLeonenko\OpenGraphControl\Renderer\Cache::class );
+		$cache->method( 'get' )->willReturn( null );
+		return new Head( $registry, new TagBuilder( strict: true ), $opt, $postmeta, $cache );
 	}
 
 	private function registryWithTags( array $tags ): PlatformRegistry {
