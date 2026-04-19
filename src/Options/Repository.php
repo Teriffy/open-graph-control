@@ -16,7 +16,7 @@ namespace EvzenLeonenko\OpenGraphControl\Options;
  * up new keys when the plugin adds them. Numeric (list-style) arrays are
  * replaced wholesale — users must be able to shorten fallback chains.
  */
-final class Repository {
+class Repository {
 
 	public const OPTION_KEY = 'ogc_settings';
 

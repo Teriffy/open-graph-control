@@ -17,7 +17,7 @@ namespace EvzenLeonenko\OpenGraphControl\PostMeta;
  * a typical post save. If a future feature needs to query posts by a specific
  * override field, we can migrate that field to its own meta key.
  */
-final class Repository {
+class Repository {
 
 	public const META_KEY = '_ogc_meta';
 
