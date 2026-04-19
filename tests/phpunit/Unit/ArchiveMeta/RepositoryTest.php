@@ -133,4 +133,38 @@ final class RepositoryTest extends TestCase {
 		// attachment must be excluded
 		self::assertNotContains( 'term:attachment:_ogc_meta', $registered );
 	}
+
+	public function test_register_meta_resolves_taxonomy_specific_cap(): void {
+		Functions\when( 'get_taxonomies' )->justReturn( [ 'category' => 'category' ] );
+		Functions\when( 'get_taxonomy' )->alias(
+			static function ( string $tax ): ?object {
+				if ( 'category' === $tax ) {
+					return (object) [ 'cap' => (object) [ 'manage_terms' => 'manage_categories' ] ];
+				}
+				return null;
+			}
+		);
+
+		$captured_callback = null;
+		Functions\when( 'register_term_meta' )->alias(
+			static function ( string $tax, string $key, array $args ) use ( &$captured_callback ): void {
+				$captured_callback = $args['auth_callback'] ?? null;
+			}
+		);
+		Functions\when( 'register_meta' )->justReturn( true );
+
+		$invoked_cap = null;
+		Functions\when( 'current_user_can' )->alias(
+			static function ( string $cap ) use ( &$invoked_cap ): bool {
+				$invoked_cap = $cap;
+				return true;
+			}
+		);
+
+		( new Repository() )->register_meta();
+
+		self::assertIsCallable( $captured_callback );
+		$captured_callback( false, '_ogc_meta', 12 );
+		self::assertSame( 'manage_categories', $invoked_cap );
+	}
 }

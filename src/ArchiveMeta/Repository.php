@@ -48,8 +48,11 @@ class Repository {
 					'default'       => [],
 					'auth_callback' => static function ( bool $allowed, string $meta_key, int $object_id ) use ( $taxonomy ): bool {
 						unset( $allowed, $meta_key );
-						// phpcs:ignore WordPress.WP.Capabilities.Unknown -- taxonomy meta-cap mapped by core via map_meta_cap().
-						return current_user_can( 'manage_terms', $taxonomy, $object_id );
+						$tax_object = get_taxonomy( $taxonomy );
+						$cap        = $tax_object && isset( $tax_object->cap->manage_terms )
+							? (string) $tax_object->cap->manage_terms
+							: 'manage_categories';
+						return current_user_can( $cap, $object_id );
 					},
 				]
 			);
