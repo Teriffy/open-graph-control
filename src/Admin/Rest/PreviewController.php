@@ -34,7 +34,8 @@ final class PreviewController extends AbstractController {
 	public function __construct(
 		private PlatformRegistry $registry,
 		private OptionsRepository $options,
-		private Validator $validator
+		private Validator $validator,
+		private RateLimiter $rate_limiter
 	) {}
 
 	public function register_routes(): void {
@@ -63,6 +64,16 @@ final class PreviewController extends AbstractController {
 	}
 
 	public function handle( WP_REST_Request $request ): WP_REST_Response {
+		if ( ! $this->rate_limiter->check( 'preview' ) ) {
+			return new WP_REST_Response(
+				[
+					'code'    => 'rate_limited',
+					'message' => 'Too many preview requests. Please wait a minute.',
+				],
+				429
+			);
+		}
+
 		$post_id = (int) $request->get_param( 'post_id' );
 		$kind    = (string) $request->get_param( 'context' );
 

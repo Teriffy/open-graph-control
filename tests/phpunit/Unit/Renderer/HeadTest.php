@@ -45,7 +45,7 @@ final class HeadTest extends TestCase {
 		Functions\when( 'get_queried_object' )->justReturn( (object) [ 'ID' => 42 ] );
 	}
 
-	private function head( PlatformRegistry $registry, array $options = [] ): Head {
+	private function head( PlatformRegistry $registry, array $options = [], array $exclude = [] ): Head {
 		$opt = $this->createStub( OptionsRepository::class );
 		$opt->method( 'get_path' )->willReturnCallback(
 			static function ( string $path ) use ( $options ) {
@@ -60,7 +60,7 @@ final class HeadTest extends TestCase {
 				'image_id'    => 0,
 				'type'        => '',
 				'platforms'   => [],
-				'exclude'     => [],
+				'exclude'     => $exclude,
 			]
 		);
 		return new Head( $registry, new TagBuilder( strict: true ), $opt, $postmeta );
@@ -136,6 +136,34 @@ final class HeadTest extends TestCase {
 		$output = ob_get_clean();
 		self::assertStringContainsString( '<meta property="og:title"', $output );
 		self::assertStringNotContainsString( '<!-- Open Graph Control', $output );
+	}
+
+	public function test_excluded_post_emits_nothing(): void {
+		$this->stubContextDetection( 'singular' );
+
+		$head = $this->head(
+			$this->registryWithTags( [ new Tag( Tag::KIND_PROPERTY, 'og:title', 'Post' ) ] ),
+			[ 'output.comment_markers' => true ],
+			[ 'all' ]
+		);
+
+		ob_start();
+		$head->render();
+		self::assertSame( '', ob_get_clean() );
+	}
+
+	public function test_non_excluded_post_still_renders(): void {
+		$this->stubContextDetection( 'singular' );
+
+		$head = $this->head(
+			$this->registryWithTags( [ new Tag( Tag::KIND_PROPERTY, 'og:title', 'Post' ) ] ),
+			[ 'output.comment_markers' => false ],
+			[ 'search' ] // Other contexts excluded but not 'all'.
+		);
+
+		ob_start();
+		$head->render();
+		self::assertStringContainsString( '<meta property="og:title"', ob_get_clean() );
 	}
 
 	public function test_render_emits_json_ld_payloads(): void {

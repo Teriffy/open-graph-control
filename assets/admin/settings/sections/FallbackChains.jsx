@@ -1,5 +1,35 @@
 import { __ } from '@wordpress/i18n';
-import { Button, Card, CardBody, CardHeader } from '@wordpress/components';
+import {
+	Button,
+	Card,
+	CardBody,
+	CardHeader,
+	SelectControl,
+} from '@wordpress/components';
+import { useState } from '@wordpress/element';
+
+const FIELD_STEPS = {
+	title: [
+		'post_meta_override',
+		'seo_plugin_title',
+		'post_title',
+		'site_name',
+	],
+	description: [
+		'post_meta_override',
+		'seo_plugin_desc',
+		'post_excerpt',
+		'post_content_trim',
+		'site_description',
+	],
+	image: [
+		'post_meta_override',
+		'featured_image',
+		'first_content_image',
+		'first_block_image',
+		'site_master_image',
+	],
+};
 
 const STEP_LABELS = {
 	post_meta_override: 'Post meta override',
@@ -20,7 +50,29 @@ function stepLabel( step ) {
 	return STEP_LABELS[ step ] || step;
 }
 
-function Chain( { label, steps, onChange } ) {
+function Chain( { label, steps, available, onChange } ) {
+	const [ toAdd, setToAdd ] = useState( '' );
+
+	const missing = available.filter( ( step ) => ! steps.includes( step ) );
+	const addOptions = [
+		{
+			label: __( '— select a step —', 'open-graph-control' ),
+			value: '',
+		},
+		...missing.map( ( step ) => ( {
+			label: stepLabel( step ),
+			value: step,
+		} ) ),
+	];
+
+	const addStep = () => {
+		if ( ! toAdd ) {
+			return;
+		}
+		onChange( [ ...steps, toAdd ] );
+		setToAdd( '' );
+	};
+
 	const move = ( index, delta ) => {
 		const next = [ ...steps ];
 		const target = index + delta;
@@ -85,9 +137,35 @@ function Chain( { label, steps, onChange } ) {
 						</li>
 					) ) }
 				</ol>
+				{ missing.length > 0 && (
+					<div
+						style={ {
+							display: 'flex',
+							alignItems: 'flex-end',
+							gap: '0.5rem',
+							marginTop: '0.5rem',
+						} }
+					>
+						<div style={ { flex: 1 } }>
+							<SelectControl
+								label={ __( 'Add step', 'open-graph-control' ) }
+								value={ toAdd }
+								options={ addOptions }
+								onChange={ ( v ) => setToAdd( v ) }
+							/>
+						</div>
+						<Button
+							variant="secondary"
+							onClick={ addStep }
+							disabled={ ! toAdd }
+						>
+							{ __( 'Add', 'open-graph-control' ) }
+						</Button>
+					</div>
+				) }
 				<p style={ { fontSize: '0.85em', opacity: 0.7 } }>
 					{ __(
-						'First non-empty step wins. Removing a step prevents it from being evaluated.',
+						'First non-empty step wins. Removed steps can be added back from the dropdown above.',
 						'open-graph-control'
 					) }
 				</p>
@@ -116,18 +194,21 @@ export default function FallbackChains( { settings, onChange } ) {
 			<Chain
 				label={ __( 'Title', 'open-graph-control' ) }
 				steps={ chains.title || [] }
+				available={ FIELD_STEPS.title }
 				onChange={ ( steps ) => setChain( 'title', steps ) }
 			/>
 
 			<Chain
 				label={ __( 'Description', 'open-graph-control' ) }
 				steps={ chains.description || [] }
+				available={ FIELD_STEPS.description }
 				onChange={ ( steps ) => setChain( 'description', steps ) }
 			/>
 
 			<Chain
 				label={ __( 'Image', 'open-graph-control' ) }
 				steps={ chains.image || [] }
+				available={ FIELD_STEPS.image }
 				onChange={ ( steps ) => setChain( 'image', steps ) }
 			/>
 		</div>

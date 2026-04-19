@@ -209,6 +209,7 @@ export default function MetaBoxApp( { postId } ) {
 	const [ settings, setSettings ] = useState( null );
 	const [ saveState, setSaveState ] = useState( { kind: 'idle' } );
 	const [ warnings, setWarnings ] = useState( [] );
+	const [ previewData, setPreviewData ] = useState( null );
 
 	const refreshPreview = useCallback( async () => {
 		try {
@@ -217,6 +218,7 @@ export default function MetaBoxApp( { postId } ) {
 				context: 'singular',
 			} );
 			setWarnings( resp.warnings || [] );
+			setPreviewData( resp.tags || {} );
 		} catch ( e ) {
 			// Preview is best-effort; ignore.
 		}
@@ -244,19 +246,29 @@ export default function MetaBoxApp( { postId } ) {
 	}, [ settings ] );
 
 	const previewProps = useMemo( () => {
+		const resolved = previewData || {};
 		return {
-			title: meta?.title || __( 'Your post title', 'open-graph-control' ),
+			title:
+				resolved[ 'property:og:title' ] ||
+				meta?.title ||
+				__( 'Your post title', 'open-graph-control' ),
 			description:
+				resolved[ 'property:og:description' ] ||
 				meta?.description ||
 				__(
 					'Your description will appear here.',
 					'open-graph-control'
 				),
-			image: '',
-			siteName: settings?.site?.name || '',
-			url: 'https://example.com/your-post/',
+			image: resolved[ 'property:og:image' ] || '',
+			siteName:
+				resolved[ 'property:og:site_name' ] ||
+				settings?.site?.name ||
+				'',
+			url:
+				resolved[ 'property:og:url' ] ||
+				'https://example.com/your-post/',
 		};
-	}, [ meta, settings ] );
+	}, [ meta, settings, previewData ] );
 
 	if ( ! meta || ! settings ) {
 		return <Spinner />;

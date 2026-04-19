@@ -5,6 +5,7 @@ namespace EvzenLeonenko\OpenGraphControl\Tests\Unit\Admin\Rest;
 
 use Brain\Monkey;
 use EvzenLeonenko\OpenGraphControl\Admin\Rest\PreviewController;
+use EvzenLeonenko\OpenGraphControl\Admin\Rest\RateLimiter;
 use EvzenLeonenko\OpenGraphControl\Options\Repository as OptionsRepository;
 use EvzenLeonenko\OpenGraphControl\Platforms\Registry as PlatformRegistry;
 use EvzenLeonenko\OpenGraphControl\Renderer\Tag;
@@ -24,6 +25,28 @@ final class PreviewControllerTest extends TestCase {
 		parent::tearDown();
 	}
 
+	private function passThroughLimiter(): RateLimiter {
+		$stub = $this->createStub( RateLimiter::class );
+		$stub->method( 'check' )->willReturn( true );
+		return $stub;
+	}
+
+	public function test_rate_limited_returns_429(): void {
+		$limiter = $this->createStub( RateLimiter::class );
+		$limiter->method( 'check' )->willReturn( false );
+
+		$controller = new PreviewController(
+			$this->createMock( PlatformRegistry::class ),
+			$this->createMock( OptionsRepository::class ),
+			new Validator(),
+			$limiter
+		);
+
+		$response = $controller->handle( new WP_REST_Request() );
+		self::assertSame( 429, $response->get_status() );
+		self::assertSame( 'rate_limited', $response->get_data()['code'] );
+	}
+
 	public function test_handle_returns_tags_json_ld_warnings(): void {
 		$registry = $this->createMock( PlatformRegistry::class );
 		$registry->method( 'collect_tags' )->willReturn(
@@ -37,7 +60,7 @@ final class PreviewControllerTest extends TestCase {
 		$options = $this->createMock( OptionsRepository::class );
 		$options->method( 'get' )->willReturn( [] );
 
-		$controller = new PreviewController( $registry, $options, new Validator() );
+		$controller = new PreviewController( $registry, $options, new Validator(), $this->passThroughLimiter() );
 
 		$request = new WP_REST_Request();
 		$request->set_param( 'context', 'front' );
@@ -71,7 +94,7 @@ final class PreviewControllerTest extends TestCase {
 		$request->set_param( 'post_id', 42 );
 		$request->set_param( 'context', 'singular' );
 
-		( new PreviewController( $registry, $options, new Validator() ) )->handle( $request );
+		( new PreviewController( $registry, $options, new Validator(), $this->passThroughLimiter() ) )->handle( $request );
 
 		self::assertNotNull( $received );
 		self::assertTrue( $received->is_singular() );

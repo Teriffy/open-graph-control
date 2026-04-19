@@ -24,6 +24,7 @@ export default function WarningList( { warnings } ) {
 	}
 	return (
 		<ul
+			aria-label="Validation warnings"
 			style={ {
 				listStyle: 'none',
 				margin: '0.75rem 0 0',
@@ -33,6 +34,7 @@ export default function WarningList( { warnings } ) {
 			{ warnings.map( ( w, idx ) => (
 				<li
 					key={ `${ w.field }-${ idx }` }
+					role={ w.severity === 'error' ? 'alert' : 'status' }
 					style={ {
 						padding: '0.4rem 0.6rem',
 						borderLeft: `4px solid ${

@@ -109,11 +109,21 @@ export default function App() {
 				className="ogc-layout"
 				style={ { display: 'flex', gap: '1.5rem', marginTop: '1rem' } }
 			>
-				<nav className="ogc-nav" style={ { minWidth: '180px' } }>
+				<nav
+					className="ogc-nav"
+					style={ { minWidth: '180px' } }
+					aria-label={ __(
+						'Settings sections',
+						'open-graph-control'
+					) }
+				>
 					{ SECTIONS.map( ( { key, label } ) => (
 						<button
 							key={ key }
 							type="button"
+							aria-current={
+								key === activeKey ? 'page' : undefined
+							}
 							className={ `components-button ${
 								key === activeKey ? 'is-primary' : ''
 							}` }

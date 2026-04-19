@@ -16,6 +16,7 @@ use EvzenLeonenko\OpenGraphControl\Admin\Page;
 use EvzenLeonenko\OpenGraphControl\Admin\Rest\ConflictController;
 use EvzenLeonenko\OpenGraphControl\Admin\Rest\MetaController;
 use EvzenLeonenko\OpenGraphControl\Admin\Rest\PreviewController;
+use EvzenLeonenko\OpenGraphControl\Admin\Rest\RateLimiter;
 use EvzenLeonenko\OpenGraphControl\Admin\Rest\SettingsController;
 use EvzenLeonenko\OpenGraphControl\Images\SizeRegistry;
 use EvzenLeonenko\OpenGraphControl\Integrations\AIOSEO;
@@ -207,11 +208,16 @@ final class Bootstrap {
 			static fn () => new Validator()
 		);
 		$container->set(
+			'rest.rate_limiter',
+			static fn () => new RateLimiter()
+		);
+		$container->set(
 			'rest.preview',
 			static fn ( Container $c ) => new PreviewController(
 				$c->get( 'platform.registry' ),
 				$c->get( 'options.repository' ),
-				$c->get( 'validation.validator' )
+				$c->get( 'validation.validator' ),
+				$c->get( 'rest.rate_limiter' )
 			)
 		);
 		$container->set(
