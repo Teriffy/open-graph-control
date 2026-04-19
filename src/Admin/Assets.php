@@ -48,6 +48,16 @@ final class Assets {
 		wp_set_script_translations( 'ogc-' . $name, 'open-graph-control', OGC_DIR . 'languages' );
 
 		wp_localize_script( 'ogc-' . $name, 'OGC_BOOT', $this->boot_payload() );
+
+		$css_path = OGC_DIR . 'build/admin/' . $name . '.css';
+		if ( file_exists( $css_path ) ) {
+			wp_enqueue_style(
+				'ogc-' . $name,
+				OGC_URL . 'build/admin/' . $name . '.css',
+				[],
+				$asset['version'] ?? OGC_VERSION
+			);
+		}
 	}
 
 	/**

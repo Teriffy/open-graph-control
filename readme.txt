@@ -105,7 +105,9 @@ Yes, GPL-2.0-or-later. Source is on GitHub (URL in the plugin header).
 
 = 0.2.0 =
 * Full React admin UI: 10 settings sections (Overview, Site defaults, Platforms, Post types, Images, Fallback chains, Integrations, Debug/Test, Import/Export, Advanced)
-* Per-post meta box with Base + X / Twitter + Pinterest + Per-platform tabs, live preview for 7 platforms, and inline validation warnings
+* Per-post meta box with Base + X / Twitter + Pinterest + Per-platform tabs, live preview for all 12 platforms, and inline validation warnings
+* MediaUpload picker (WordPress media library modal) for site master image and per-post image overrides
+* One-time admin_notices banner when an SEO competitor is detected, with "Take over" / "Keep their tags" / "Review in settings" actions
 * Validator covering title/description length, missing image, Twitter handle format, Mastodon fediverse:creator format
 * Settings import/export via JSON
 * Debug panel renders current-context tags in a table and links out to Facebook / Twitter / LinkedIn / Pinterest validators

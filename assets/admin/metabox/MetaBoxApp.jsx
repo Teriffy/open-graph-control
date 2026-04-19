@@ -4,6 +4,7 @@ import {
 	Button,
 	Card,
 	CardBody,
+	CheckboxControl,
 	Notice,
 	SelectControl,
 	Spinner,
@@ -109,6 +110,24 @@ function BaseTab( { meta, onChange } ) {
 					{ label: 'profile', value: 'profile' },
 				] }
 				onChange={ ( v ) => onChange( { type: v } ) }
+			/>
+			<CheckboxControl
+				label={ __(
+					'Suppress tags for this post',
+					'open-graph-control'
+				) }
+				help={ __(
+					'Emits no Open Graph tags for this post regardless of other settings. Use for noindex-style posts.',
+					'open-graph-control'
+				) }
+				checked={ ( meta.exclude || [] ).includes( 'all' ) }
+				onChange={ ( enabled ) => {
+					const current = meta.exclude || [];
+					const next = enabled
+						? [ ...current.filter( ( x ) => x !== 'all' ), 'all' ]
+						: current.filter( ( x ) => x !== 'all' );
+					onChange( { exclude: next } );
+				} }
 			/>
 		</>
 	);

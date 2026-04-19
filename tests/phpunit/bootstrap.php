@@ -31,3 +31,61 @@ if ( ! function_exists( 'esc_html' ) ) {
 		return htmlspecialchars( (string) $text, ENT_QUOTES, 'UTF-8' );
 	}
 }
+
+if ( ! function_exists( 'sanitize_text_field' ) ) {
+	function sanitize_text_field( $text ) {
+		return trim( (string) $text );
+	}
+}
+
+if ( ! function_exists( 'sanitize_key' ) ) {
+	function sanitize_key( $key ) {
+		return strtolower( preg_replace( '/[^a-z0-9_\-]/i', '', (string) $key ) );
+	}
+}
+
+if ( ! class_exists( 'WP_REST_Request' ) ) {
+	class WP_REST_Request {
+		/** @var array<string, mixed> */
+		private array $params = [];
+
+		/** @var array<string, mixed>|null */
+		private ?array $json_params = null;
+
+		public function set_param( string $key, $value ): void {
+			$this->params[ $key ] = $value;
+		}
+
+		public function get_param( string $key ) {
+			return $this->params[ $key ] ?? null;
+		}
+
+		/**
+		 * @param array<string, mixed>|null $body
+		 */
+		public function set_json_params( ?array $body ): void {
+			$this->json_params = $body;
+		}
+
+		public function get_json_params() {
+			return $this->json_params;
+		}
+	}
+}
+
+if ( ! class_exists( 'WP_REST_Response' ) ) {
+	class WP_REST_Response {
+		public function __construct(
+			public mixed $data = null,
+			public int $status = 200
+		) {}
+
+		public function get_data() {
+			return $this->data;
+		}
+
+		public function get_status(): int {
+			return $this->status;
+		}
+	}
+}

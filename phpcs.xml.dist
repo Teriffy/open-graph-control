@@ -4,6 +4,9 @@
 
   <file>src</file>
   <file>tests</file>
+
+  <!-- Test bootstrap contains WP polyfills (functions + classes mixed). -->
+  <exclude-pattern>tests/phpunit/bootstrap.php</exclude-pattern>
   <arg name="extensions" value="php"/>
   <arg name="colors"/>
   <arg value="sp"/>

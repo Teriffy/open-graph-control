@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 772 250" width="772" height="250">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2271b1"/>
+      <stop offset="100%" stop-color="#135e96"/>
+    </linearGradient>
+  </defs>
+  <rect width="772" height="250" fill="url(#bg)"/>
+  <g fill="#ffffff" font-family="-apple-system, 'Helvetica Neue', sans-serif">
+    <text x="48" y="110" font-size="44" font-weight="700">Open Graph Control</text>
+    <text x="48" y="150" font-size="20" opacity="0.85">Full control over social meta across 12 platforms.</text>
+    <g transform="translate(48, 180)" font-size="12" opacity="0.75">
+      <text x="0" y="16">Facebook · X · LinkedIn · iMessage · Threads · Mastodon</text>
+      <text x="0" y="36">Bluesky · WhatsApp · Discord · Pinterest · Telegram · Slack</text>
+    </g>
+  </g>
+</svg>

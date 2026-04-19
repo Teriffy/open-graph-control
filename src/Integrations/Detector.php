@@ -19,7 +19,7 @@ use EvzenLeonenko\OpenGraphControl\Options\Repository as OptionsRepository;
  * Expose integrations via ogc_detected_plugins so other plugins can
  * register their own SEO competitor classes.
  */
-final class Detector {
+class Detector {
 
 	/** @var array<int, IntegrationInterface> */
 	private array $integrations = [];

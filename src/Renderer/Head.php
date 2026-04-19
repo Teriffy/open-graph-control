@@ -25,7 +25,8 @@ final class Head {
 	public function __construct(
 		private PlatformRegistry $registry,
 		private TagBuilder $builder,
-		private OptionsRepository $options
+		private OptionsRepository $options,
+		private \EvzenLeonenko\OpenGraphControl\PostMeta\Repository $postmeta
 	) {}
 
 	public function register(): void {
@@ -35,6 +36,9 @@ final class Head {
 	public function render(): void {
 		$context = $this->detect_context();
 		if ( ! $this->is_context_enabled( $context ) ) {
+			return;
+		}
+		if ( $this->is_post_excluded( $context ) ) {
 			return;
 		}
 
@@ -96,6 +100,14 @@ final class Head {
 			return Context::for_archive( $kind );
 		}
 		return Context::for_front();
+	}
+
+	private function is_post_excluded( Context $context ): bool {
+		if ( ! $context->is_singular() || null === $context->post_id() ) {
+			return false;
+		}
+		$meta = $this->postmeta->get( $context->post_id() );
+		return in_array( 'all', $meta['exclude'], true );
 	}
 
 	private function is_context_enabled( Context $context ): bool {

@@ -61,6 +61,21 @@ final class SettingsController extends AbstractController {
 			);
 		}
 
+		if ( isset( $raw['version'] ) && is_numeric( $raw['version'] )
+			&& (int) $raw['version'] > \EvzenLeonenko\OpenGraphControl\Options\DefaultSettings::SCHEMA_VERSION ) {
+			return new WP_REST_Response(
+				[
+					'code'    => 'schema_too_new',
+					'message' => sprintf(
+						'Payload targets schema version %d, but this plugin only understands up to %d. Upgrade the plugin first.',
+						(int) $raw['version'],
+						\EvzenLeonenko\OpenGraphControl\Options\DefaultSettings::SCHEMA_VERSION
+					),
+				],
+				400
+			);
+		}
+
 		/** @var array<string, mixed> $patch */
 		$patch = $this->sanitize( $raw );
 		$this->options->update( $patch );

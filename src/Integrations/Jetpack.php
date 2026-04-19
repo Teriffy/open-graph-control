@@ -28,13 +28,12 @@ final class Jetpack extends AbstractIntegration {
 			return false;
 		}
 		// If enhanced-distribution is not active, Jetpack isn't emitting OG tags.
-		// phpcs:ignore Squiz.PHP.CommentedOutCode.Found -- method_exists check removed since WP stubs type Jetpack.
-		if ( is_callable( [ 'Jetpack', 'is_module_active' ] ) ) {
-			/** @var callable $callable */
-			$callable = [ 'Jetpack', 'is_module_active' ];
-			return (bool) $callable( 'enhanced-distribution' );
+		$callable = [ 'Jetpack', 'is_module_active' ];
+		if ( ! is_callable( $callable ) ) {
+			return true;
 		}
-		return true;
+		/** @var callable(string): bool $callable */
+		return (bool) $callable( 'enhanced-distribution' );
 	}
 
 	public function apply_takeover(): void {

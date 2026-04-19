@@ -1,0 +1,75 @@
+.ogc-app {
+	max-width: 1200px;
+}
+
+.ogc-layout {
+	display: flex;
+	gap: 1.5rem;
+	margin-top: 1rem;
+	align-items: flex-start;
+}
+
+.ogc-nav {
+	min-width: 180px;
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+	position: sticky;
+	top: 46px;
+
+	.ogc-nav-item {
+		display: block;
+		width: 100%;
+		text-align: left;
+		padding: 6px 10px;
+		border: 1px solid transparent;
+		background: transparent;
+		color: #1e1e1e;
+		cursor: pointer;
+		border-radius: 2px;
+
+		&:hover {
+			background: #f0f0f1;
+		}
+
+		&.is-active {
+			background: #2271b1;
+			color: #fff;
+		}
+	}
+}
+
+.ogc-content {
+	flex: 1;
+	min-width: 0;
+
+	h2 {
+		margin-top: 0;
+	}
+
+	.components-card {
+		margin-bottom: 1rem;
+	}
+}
+
+.ogc-platform-card .components-card__body {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+}
+
+.ogc-metabox {
+	display: flex;
+	gap: 1.5rem;
+	padding: 0.5rem;
+
+	> :first-child {
+		flex: 1;
+		min-width: 0;
+	}
+
+	> :last-child {
+		width: 320px;
+		flex-shrink: 0;
+	}
+}

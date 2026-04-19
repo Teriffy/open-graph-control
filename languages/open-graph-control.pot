@@ -2,7 +2,7 @@
 # This file is distributed under the GPL-2.0-or-later.
 msgid ""
 msgstr ""
-"Project-Id-Version: Open Graph Control 0.0.1\n"
+"Project-Id-Version: Open Graph Control 0.2.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/open-graph-control\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -60,7 +60,7 @@ msgstr ""
 msgid "Advanced"
 msgstr ""
 
-#. Common buttons.
+#. Common buttons / states.
 msgid "Save changes"
 msgstr ""
 
@@ -71,6 +71,18 @@ msgid "Saving…"
 msgstr ""
 
 msgid "Saved."
+msgstr ""
+
+msgid "Remove"
+msgstr ""
+
+msgid "Select image"
+msgstr ""
+
+msgid "Replace image"
+msgstr ""
+
+msgid "Site master image"
 msgstr ""
 
 #. Meta box tabs.
@@ -86,7 +98,70 @@ msgstr ""
 msgid "Per-platform"
 msgstr ""
 
-#. Validation severities.
+msgid "Preview"
+msgstr ""
+
+#. Site defaults section.
+msgid "Site name"
+msgstr ""
+
+msgid "Site description"
+msgstr ""
+
+msgid "Locale"
+msgstr ""
+
+msgid "Default OG type"
+msgstr ""
+
+msgid "Discord theme color"
+msgstr ""
+
+#. Platform section fields.
+msgid "Enabled"
+msgstr ""
+
+msgid "Facebook App ID (optional)"
+msgstr ""
+
+msgid "Card type"
+msgstr ""
+
+msgid "Site handle"
+msgstr ""
+
+msgid "Default creator handle"
+msgstr ""
+
+msgid "fediverse:creator"
+msgstr ""
+
+msgid "Rich Pin schema"
+msgstr ""
+
+msgid "Prefer square image"
+msgstr ""
+
+#. Meta box fields.
+msgid "Title override"
+msgstr ""
+
+msgid "Description override"
+msgstr ""
+
+msgid "Image override"
+msgstr ""
+
+msgid "og:type override"
+msgstr ""
+
+msgid "(use default)"
+msgstr ""
+
+msgid "Suppress tags for this post"
+msgstr ""
+
+#. Validation messages.
 msgid "Title is empty."
 msgstr ""
 
@@ -94,4 +169,78 @@ msgid "Description is empty."
 msgstr ""
 
 msgid "No image resolved. Facebook and LinkedIn will render a text-only card."
+msgstr ""
+
+#. Integrations section.
+msgid "Take over Open Graph output"
+msgstr ""
+
+msgid "Keep their tags, disable mine"
+msgstr ""
+
+msgid "Review in settings"
+msgstr ""
+
+msgid "active"
+msgstr ""
+
+msgid "not installed"
+msgstr ""
+
+msgid "No competing SEO plugins detected."
+msgstr ""
+
+#. Debug section.
+msgid "Context"
+msgstr ""
+
+msgid "Post ID"
+msgstr ""
+
+msgid "Render tags"
+msgstr ""
+
+msgid "Emitted meta tags"
+msgstr ""
+
+msgid "JSON-LD payload"
+msgstr ""
+
+msgid "External validators"
+msgstr ""
+
+msgid "Key"
+msgstr ""
+
+msgid "Content"
+msgstr ""
+
+#. Import / Export section.
+msgid "Export"
+msgstr ""
+
+msgid "Import"
+msgstr ""
+
+msgid "Download settings JSON"
+msgstr ""
+
+#. Advanced section.
+msgid "Strict mode"
+msgstr ""
+
+msgid "HTML comment markers"
+msgstr ""
+
+msgid "Output cache TTL (seconds)"
+msgstr ""
+
+#. Error messages.
+msgid "Insufficient permissions."
+msgstr ""
+
+msgid "Your post title"
+msgstr ""
+
+msgid "Your description will appear here."
 msgstr ""

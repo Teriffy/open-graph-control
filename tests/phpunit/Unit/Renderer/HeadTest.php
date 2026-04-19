@@ -52,7 +52,18 @@ final class HeadTest extends TestCase {
 				return array_key_exists( $path, $options ) ? $options[ $path ] : null;
 			}
 		);
-		return new Head( $registry, new TagBuilder( strict: true ), $opt );
+		$postmeta = $this->createStub( \EvzenLeonenko\OpenGraphControl\PostMeta\Repository::class );
+		$postmeta->method( 'get' )->willReturn(
+			[
+				'title'       => '',
+				'description' => '',
+				'image_id'    => 0,
+				'type'        => '',
+				'platforms'   => [],
+				'exclude'     => [],
+			]
+		);
+		return new Head( $registry, new TagBuilder( strict: true ), $opt, $postmeta );
 	}
 
 	private function registryWithTags( array $tags ): PlatformRegistry {

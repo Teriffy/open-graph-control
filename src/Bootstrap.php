@@ -165,7 +165,8 @@ final class Bootstrap {
 			static fn ( Container $c ) => new Head(
 				$c->get( 'platform.registry' ),
 				$c->get( 'renderer.tag_builder' ),
-				$c->get( 'options.repository' )
+				$c->get( 'options.repository' ),
+				$c->get( 'postmeta.repository' )
 			)
 		);
 
