@@ -24,6 +24,7 @@ final class Plugin {
 	}
 
 	public function on_init(): void {
+		$this->container->get( 'postmeta.repository' )->register();
 		$this->container->get( 'images.size_registry' )->register();
 		$this->container->get( 'integrations.detector' )->run();
 		$this->container->get( 'renderer.cache' )->register();
@@ -40,6 +41,10 @@ final class Plugin {
 			$this->container->get( 'admin.assets' )->register();
 			$this->container->get( 'admin.meta_box' )->register();
 			$this->container->get( 'admin.notices' )->register();
+		}
+
+		if ( defined( 'WP_CLI' ) && \WP_CLI ) {
+			\WP_CLI::add_command( 'ogc', $this->container->get( 'cli.commands' ) );
 		}
 	}
 

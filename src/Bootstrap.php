@@ -22,6 +22,7 @@ use EvzenLeonenko\OpenGraphControl\Admin\Rest\PreviewController;
 use EvzenLeonenko\OpenGraphControl\Admin\Rest\RateLimiter;
 use EvzenLeonenko\OpenGraphControl\Admin\Rest\RegenerateController;
 use EvzenLeonenko\OpenGraphControl\Admin\Rest\SettingsController;
+use EvzenLeonenko\OpenGraphControl\Cli\Commands as CliCommands;
 use EvzenLeonenko\OpenGraphControl\Images\Regenerator;
 use EvzenLeonenko\OpenGraphControl\Images\SizeRegistry;
 use EvzenLeonenko\OpenGraphControl\Integrations\AIOSEO;
@@ -247,6 +248,17 @@ final class Bootstrap {
 		$container->set(
 			'rest.regenerate',
 			static fn ( Container $c ) => new RegenerateController( $c->get( 'images.regenerator' ) )
+		);
+
+		$container->set(
+			'cli.commands',
+			static fn ( Container $c ) => new CliCommands(
+				$c->get( 'platform.registry' ),
+				$c->get( 'renderer.tag_builder' ),
+				$c->get( 'options.repository' ),
+				$c->get( 'validation.validator' ),
+				$c->get( 'images.regenerator' )
+			)
 		);
 
 		// Integrations.

@@ -96,11 +96,58 @@ final class SettingsController extends AbstractController {
 			);
 		}
 
+		$problem = $this->validate_shape( $raw );
+		if ( null !== $problem ) {
+			return new WP_REST_Response(
+				[
+					'code'    => 'invalid_settings',
+					'message' => $problem,
+				],
+				400
+			);
+		}
+
 		/** @var array<string, mixed> $patch */
 		$patch = $this->sanitize( $raw );
 		$this->options->update( $patch );
 
 		return new WP_REST_Response( $this->options->get(), 200 );
+	}
+
+	/**
+	 * Returns a human-readable problem string, or null when the payload is OK.
+	 *
+	 * @param array<mixed, mixed> $data
+	 */
+	private function validate_shape( array $data ): ?string {
+		if ( isset( $data['output']['cache_ttl'] ) && (int) $data['output']['cache_ttl'] < 0 ) {
+			return 'output.cache_ttl must be >= 0.';
+		}
+		if ( isset( $data['site']['theme_color'] ) ) {
+			$color = (string) $data['site']['theme_color'];
+			if ( '' !== $color && ! preg_match( '/^#(?:[0-9a-fA-F]{3}){1,2}$/', $color ) ) {
+				return 'site.theme_color must be a hex color like #2271b1.';
+			}
+		}
+		if ( isset( $data['platforms']['twitter']['site'] ) ) {
+			$handle = (string) $data['platforms']['twitter']['site'];
+			if ( '' !== $handle && ! str_starts_with( $handle, '@' ) ) {
+				return 'platforms.twitter.site must start with @.';
+			}
+		}
+		if ( isset( $data['platforms']['twitter']['creator'] ) ) {
+			$handle = (string) $data['platforms']['twitter']['creator'];
+			if ( '' !== $handle && ! str_starts_with( $handle, '@' ) ) {
+				return 'platforms.twitter.creator must start with @.';
+			}
+		}
+		if ( isset( $data['platforms']['mastodon']['fediverse_creator'] ) ) {
+			$value = (string) $data['platforms']['mastodon']['fediverse_creator'];
+			if ( '' !== $value && ! preg_match( '/^@[^@\s]+@[^@\s]+\.[^@\s]+$/', $value ) ) {
+				return 'platforms.mastodon.fediverse_creator must be in @user@instance format.';
+			}
+		}
+		return null;
 	}
 
 	/**

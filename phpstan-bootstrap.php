@@ -20,3 +20,14 @@ if ( ! defined( 'OGC_DIR' ) ) {
 if ( ! defined( 'OGC_URL' ) ) {
 	define( 'OGC_URL', 'https://example.test/wp-content/plugins/open-graph-control/' );
 }
+
+if ( ! class_exists( 'WP_CLI' ) ) {
+	// phpcs:ignore Universal.Files.SeparateFunctionsFromOO.Mixed -- PHPStan stub.
+	class WP_CLI {
+		public static function add_command( string $name, $handler ): void {}
+		public static function line( string $message = '' ): void {}
+		public static function success( string $message ): void {}
+		public static function warning( string $message ): void {}
+		public static function error( string $message ): void {}
+	}
+}

@@ -27,6 +27,27 @@ class Repository {
 	/** @var array<int, string> */
 	private const ALLOWED_KEYS = [ 'title', 'description', 'image_id', 'type', 'platforms', 'exclude' ];
 
+	public function register(): void {
+		add_action( 'init', [ $this, 'register_meta' ], 5 );
+	}
+
+	public function register_meta(): void {
+		register_post_meta(
+			'',
+			self::META_KEY,
+			[
+				'single'        => true,
+				'type'          => 'object',
+				'show_in_rest'  => false,
+				'default'       => [],
+				'auth_callback' => static function ( bool $allowed, string $meta_key, int $object_id ): bool {
+					unset( $allowed, $meta_key );
+					return current_user_can( 'edit_post', $object_id );
+				},
+			]
+		);
+	}
+
 	/**
 	 * @return array{
 	 *   title: string,

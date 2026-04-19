@@ -73,6 +73,45 @@ final class SettingsControllerTest extends TestCase {
 		self::assertSame( 200, $response->get_status() );
 	}
 
+	public function test_post_rejects_negative_cache_ttl(): void {
+		$options = $this->createMock( OptionsRepository::class );
+		$options->expects( self::never() )->method( 'update' );
+
+		$request = new WP_REST_Request();
+		$request->set_json_params( [ 'output' => [ 'cache_ttl' => -5 ] ] );
+
+		$response = ( new SettingsController( $options ) )->post( $request );
+		self::assertSame( 400, $response->get_status() );
+		self::assertSame( 'invalid_settings', $response->get_data()['code'] );
+	}
+
+	public function test_post_rejects_bad_hex_color(): void {
+		$options = $this->createMock( OptionsRepository::class );
+		$request = new WP_REST_Request();
+		$request->set_json_params( [ 'site' => [ 'theme_color' => 'notacolor' ] ] );
+
+		$response = ( new SettingsController( $options ) )->post( $request );
+		self::assertSame( 400, $response->get_status() );
+	}
+
+	public function test_post_rejects_twitter_handle_without_at(): void {
+		$options = $this->createMock( OptionsRepository::class );
+		$request = new WP_REST_Request();
+		$request->set_json_params( [ 'platforms' => [ 'twitter' => [ 'site' => 'example' ] ] ] );
+
+		$response = ( new SettingsController( $options ) )->post( $request );
+		self::assertSame( 400, $response->get_status() );
+	}
+
+	public function test_post_rejects_bad_fediverse_creator(): void {
+		$options = $this->createMock( OptionsRepository::class );
+		$request = new WP_REST_Request();
+		$request->set_json_params( [ 'platforms' => [ 'mastodon' => [ 'fediverse_creator' => 'me' ] ] ] );
+
+		$response = ( new SettingsController( $options ) )->post( $request );
+		self::assertSame( 400, $response->get_status() );
+	}
+
 	public function test_post_preserves_booleans_and_ints(): void {
 		$captured = null;
 		$options  = $this->createMock( OptionsRepository::class );
