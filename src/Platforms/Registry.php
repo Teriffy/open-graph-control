@@ -19,7 +19,7 @@ use EvzenLeonenko\OpenGraphControl\Resolvers\Context;
  * og:* tag (e.g. both Facebook and Pinterest want og:title) — the first
  * platform wins, keeping output stable.
  */
-final class Registry {
+class Registry {
 
 	/** @var array<string, PlatformInterface> */
 	private array $platforms = [];
