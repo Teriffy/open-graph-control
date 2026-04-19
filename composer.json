@@ -28,6 +28,7 @@
   },
   "scripts": {
     "test": "phpunit",
+    "coverage": "phpunit --coverage-text=coverage/summary.txt --coverage-html=coverage/html",
     "stan": "phpstan analyse --memory-limit=1G",
     "cs": "phpcs",
     "cs:fix": "phpcbf"

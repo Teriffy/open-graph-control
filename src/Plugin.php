@@ -37,6 +37,8 @@ final class Plugin {
 		$this->container->get( 'rest.preview' )->register();
 		$this->container->get( 'rest.conflicts' )->register();
 		$this->container->get( 'rest.meta' )->register();
+		$this->container->get( 'rest.regenerate' )->register();
+		$this->container->get( 'images.regenerator' )->register();
 
 		if ( is_admin() ) {
 			$this->container->get( 'admin.page' )->register();

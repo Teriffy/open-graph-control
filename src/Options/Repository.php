@@ -32,7 +32,10 @@ class Repository {
 		}
 
 		/** @var array<string, mixed> $stored */
-		$stored      = get_option( self::OPTION_KEY, [] );
+		$stored = get_option( self::OPTION_KEY, [] );
+		if ( [] !== $stored ) {
+			$stored = ( new Migrator() )->migrate( $stored );
+		}
 		$this->cache = $this->deep_merge( DefaultSettings::all(), $stored );
 
 		return $this->cache;

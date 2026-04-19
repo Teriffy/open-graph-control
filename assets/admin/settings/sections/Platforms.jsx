@@ -1,5 +1,6 @@
 import { __ } from '@wordpress/i18n';
 import {
+	Button,
 	Card,
 	CardBody,
 	CardHeader,
@@ -41,9 +42,37 @@ export default function Platforms( { settings, onChange } ) {
 		onChange( { platforms: { [ slug ]: patch } } );
 	};
 
+	const bulkToggle = ( enabled ) => {
+		const patch = {};
+		Object.keys( PLATFORM_LABELS ).forEach( ( slug ) => {
+			patch[ slug ] = { enabled };
+		} );
+		onChange( { platforms: patch } );
+	};
+
 	return (
 		<div className="ogc-section-platforms">
 			<h2>{ __( 'Platforms', 'open-graph-control' ) }</h2>
+			<div
+				style={ {
+					display: 'flex',
+					gap: '0.5rem',
+					marginBottom: '1rem',
+				} }
+			>
+				<Button
+					variant="secondary"
+					onClick={ () => bulkToggle( true ) }
+				>
+					{ __( 'Enable all', 'open-graph-control' ) }
+				</Button>
+				<Button
+					variant="secondary"
+					onClick={ () => bulkToggle( false ) }
+				>
+					{ __( 'Disable all', 'open-graph-control' ) }
+				</Button>
+			</div>
 			{ Object.keys( PLATFORM_LABELS ).map( ( slug ) => {
 				const config = platforms[ slug ] || { enabled: false };
 				return (

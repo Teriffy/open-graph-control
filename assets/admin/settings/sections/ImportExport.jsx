@@ -30,12 +30,46 @@ export default function ImportExport( { settings } ) {
 		URL.revokeObjectURL( url );
 	};
 
+	const validate = ( parsed ) => {
+		if (
+			! parsed ||
+			typeof parsed !== 'object' ||
+			Array.isArray( parsed )
+		) {
+			return 'JSON root must be an object.';
+		}
+		if (
+			'version' in parsed &&
+			( ! Number.isInteger( parsed.version ) || parsed.version < 1 )
+		) {
+			return 'version must be a positive integer.';
+		}
+		const expected = [
+			'version',
+			'site',
+			'platforms',
+			'post_types',
+			'non_post_pages',
+			'integrations',
+			'output',
+			'fallback_chains',
+		];
+		const unknown = Object.keys( parsed ).filter(
+			( k ) => ! expected.includes( k )
+		);
+		if ( unknown.length ) {
+			return `Unknown top-level keys: ${ unknown.join( ', ' ) }.`;
+		}
+		return null;
+	};
+
 	const runImport = async () => {
 		setState( { kind: 'working' } );
 		try {
 			const parsed = JSON.parse( importText );
-			if ( ! parsed || typeof parsed !== 'object' ) {
-				throw new Error( 'JSON root must be an object.' );
+			const problem = validate( parsed );
+			if ( problem ) {
+				throw new Error( problem );
 			}
 			await api.saveSettings( parsed );
 			setState( {

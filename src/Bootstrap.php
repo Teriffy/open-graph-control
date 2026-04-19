@@ -17,7 +17,9 @@ use EvzenLeonenko\OpenGraphControl\Admin\Rest\ConflictController;
 use EvzenLeonenko\OpenGraphControl\Admin\Rest\MetaController;
 use EvzenLeonenko\OpenGraphControl\Admin\Rest\PreviewController;
 use EvzenLeonenko\OpenGraphControl\Admin\Rest\RateLimiter;
+use EvzenLeonenko\OpenGraphControl\Admin\Rest\RegenerateController;
 use EvzenLeonenko\OpenGraphControl\Admin\Rest\SettingsController;
+use EvzenLeonenko\OpenGraphControl\Images\Regenerator;
 use EvzenLeonenko\OpenGraphControl\Images\SizeRegistry;
 use EvzenLeonenko\OpenGraphControl\Integrations\AIOSEO;
 use EvzenLeonenko\OpenGraphControl\Integrations\Detector;
@@ -227,6 +229,14 @@ final class Bootstrap {
 		$container->set(
 			'rest.meta',
 			static fn ( Container $c ) => new MetaController( $c->get( 'postmeta.repository' ) )
+		);
+		$container->set(
+			'images.regenerator',
+			static fn () => new Regenerator()
+		);
+		$container->set(
+			'rest.regenerate',
+			static fn ( Container $c ) => new RegenerateController( $c->get( 'images.regenerator' ) )
 		);
 
 		// Integrations.

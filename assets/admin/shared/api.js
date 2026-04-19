@@ -57,4 +57,7 @@ export const api = {
 	getPostMeta: ( postId ) => request( `meta/${ postId }` ),
 	savePostMeta: ( postId, data ) =>
 		request( `meta/${ postId }`, { method: 'POST', body: data } ),
+	regenerateStart: () => request( 'images/regenerate', { method: 'POST' } ),
+	regenerateStatus: () => request( 'images/regenerate' ),
+	resetSettings: () => request( 'settings/reset', { method: 'POST' } ),
 };

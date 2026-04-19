@@ -18,5 +18,14 @@
     <include>
       <directory>src</directory>
     </include>
+    <exclude>
+      <!-- Admin glue (Page, MetaBox, Assets, Notices, Lifecycle) wires WP
+           hooks; covered by E2E, not unit tests. -->
+      <file>src/Admin/Page.php</file>
+      <file>src/Admin/MetaBox.php</file>
+      <file>src/Admin/Assets.php</file>
+      <file>src/Admin/Notices.php</file>
+      <file>src/Lifecycle.php</file>
+    </exclude>
   </source>
 </phpunit>

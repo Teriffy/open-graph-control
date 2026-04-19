@@ -1,16 +1,52 @@
 import { __ } from '@wordpress/i18n';
 import {
+	Button,
 	Card,
 	CardBody,
+	Notice,
 	TextControl,
 	ToggleControl,
 } from '@wordpress/components';
+import { useState } from '@wordpress/element';
+
+import { api } from '../../shared/api.js';
 
 export default function Advanced( { settings, onChange } ) {
 	const output = settings?.output || {};
+	const [ resetting, setResetting ] = useState( false );
+	const [ resetNotice, setResetNotice ] = useState( null );
 
 	const update = ( key, value ) => {
 		onChange( { output: { [ key ]: value } } );
+	};
+
+	const reset = async () => {
+		if (
+			// eslint-disable-next-line no-alert
+			! window.confirm(
+				__(
+					'Reset ALL plugin settings to defaults? Per-post overrides are NOT affected.',
+					'open-graph-control'
+				)
+			)
+		) {
+			return;
+		}
+		setResetting( true );
+		try {
+			await api.resetSettings();
+			setResetNotice( {
+				status: 'success',
+				message: __(
+					'Settings reset. Reload the page to see the defaults.',
+					'open-graph-control'
+				),
+			} );
+		} catch ( e ) {
+			setResetNotice( { status: 'error', message: e.message } );
+		} finally {
+			setResetting( false );
+		}
 	};
 
 	return (
@@ -54,6 +90,38 @@ export default function Advanced( { settings, onChange } ) {
 							update( 'cache_ttl', parseInt( v, 10 ) || 0 )
 						}
 					/>
+				</CardBody>
+			</Card>
+
+			<Card>
+				<CardBody>
+					<h3 style={ { marginTop: 0 } }>
+						{ __( 'Reset to defaults', 'open-graph-control' ) }
+					</h3>
+					<p>
+						{ __(
+							'Deletes the stored settings row and reseeds from the plugin defaults. Per-post overrides stay untouched.',
+							'open-graph-control'
+						) }
+					</p>
+					<Button
+						variant="secondary"
+						isDestructive
+						onClick={ reset }
+						disabled={ resetting }
+					>
+						{ resetting
+							? __( 'Resetting…', 'open-graph-control' )
+							: __( 'Reset all settings', 'open-graph-control' ) }
+					</Button>
+					{ resetNotice && (
+						<Notice
+							status={ resetNotice.status }
+							isDismissible={ false }
+						>
+							{ resetNotice.message }
+						</Notice>
+					) }
 				</CardBody>
 			</Card>
 		</div>

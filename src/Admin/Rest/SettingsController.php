@@ -42,6 +42,23 @@ final class SettingsController extends AbstractController {
 				],
 			]
 		);
+		register_rest_route(
+			self::NAMESPACE_BASE,
+			'/settings/reset',
+			[
+				'methods'             => 'POST',
+				'callback'            => [ $this, 'reset' ],
+				'permission_callback' => [ $this, 'require_manage_options' ],
+			]
+		);
+	}
+
+	public function reset( WP_REST_Request $request ): WP_REST_Response {
+		unset( $request );
+		// Delete the option entirely; next get() seeds from DefaultSettings.
+		delete_option( \EvzenLeonenko\OpenGraphControl\Options\Repository::OPTION_KEY );
+		$this->options->flush_cache();
+		return new WP_REST_Response( $this->options->get(), 200 );
 	}
 
 	public function get( WP_REST_Request $request ): WP_REST_Response {
