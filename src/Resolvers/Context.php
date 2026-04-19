@@ -98,6 +98,10 @@ final class Context {
 			&& is_int( $this->extra['archive_term_id'] ?? null );
 	}
 
+	public function is_author(): bool {
+		return self::TYPE_AUTHOR === $this->type;
+	}
+
 	public function post_id(): ?int {
 		return $this->post_id;
 	}
@@ -112,6 +116,12 @@ final class Context {
 		$term_id = $this->extra['archive_term_id'] ?? null;
 
 		return is_int( $term_id ) ? $term_id : null;
+	}
+
+	public function user_id(): ?int {
+		$user_id = $this->extra['user_id'] ?? null;
+
+		return is_int( $user_id ) ? $user_id : null;
 	}
 
 	public function extra( string $key, mixed $fallback = null ): mixed {

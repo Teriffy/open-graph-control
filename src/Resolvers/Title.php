@@ -12,20 +12,22 @@ namespace EvzenLeonenko\OpenGraphControl\Resolvers;
 
 defined( 'ABSPATH' ) || exit;
 
+use EvzenLeonenko\OpenGraphControl\ArchiveMeta\Repository as ArchiveMetaRepository;
 use EvzenLeonenko\OpenGraphControl\Options\Repository as OptionsRepository;
 use EvzenLeonenko\OpenGraphControl\PostMeta\Repository as PostMetaRepository;
 
 /**
  * Walks the title fallback chain and returns the first non-empty value.
  *
- * Chain steps (by default): post_meta_override, seo_plugin_title, post_title, site_name.
+ * Chain steps (by default): post_meta_override, archive_override, seo_plugin_title, post_title, site_name.
  * SEO plugin integrations hook into 'ogc_seo_plugin_title' in Phase 15.
  */
 class Title implements ResolverInterface {
 
 	public function __construct(
 		private PostMetaRepository $postmeta,
-		private OptionsRepository $options
+		private OptionsRepository $options,
+		private ArchiveMetaRepository $archive
 	) {}
 
 	public function resolve( Context $context ): ?string {
@@ -48,6 +50,7 @@ class Title implements ResolverInterface {
 	private function step( string $step, Context $context ): ?string {
 		return match ( $step ) {
 			'post_meta_override' => $this->from_post_meta( $context ),
+			'archive_override'   => $this->from_archive_override( $context ),
 			'seo_plugin_title'   => $this->from_seo_plugin( $context ),
 			'post_title'         => $context->is_singular() && null !== $context->post_id() ? (string) get_the_title( $context->post_id() ) : null,
 			'site_name'          => (string) get_bloginfo( 'name' ),
@@ -62,6 +65,26 @@ class Title implements ResolverInterface {
 		}
 		$title = $this->postmeta->get( $post_id )['title'];
 		return '' === $title ? null : $title;
+	}
+
+	private function from_archive_override( Context $context ): ?string {
+		if ( $context->is_author() ) {
+			$user_id = $context->user_id();
+			if ( null === $user_id || $user_id <= 0 ) {
+				return null;
+			}
+			$title = $this->archive->get_for_user( $user_id )['title'];
+			return '' === $title ? null : $title;
+		}
+		if ( $context->is_archive_term() ) {
+			$term_id = $context->archive_term_id();
+			if ( null === $term_id || $term_id <= 0 ) {
+				return null;
+			}
+			$title = $this->archive->get_for_term( $term_id )['title'];
+			return '' === $title ? null : $title;
+		}
+		return null;
 	}
 
 	private function from_seo_plugin( Context $context ): ?string {

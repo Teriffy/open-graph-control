@@ -12,13 +12,14 @@ namespace EvzenLeonenko\OpenGraphControl\Resolvers;
 
 defined( 'ABSPATH' ) || exit;
 
+use EvzenLeonenko\OpenGraphControl\ArchiveMeta\Repository as ArchiveMetaRepository;
 use EvzenLeonenko\OpenGraphControl\Options\Repository as OptionsRepository;
 use EvzenLeonenko\OpenGraphControl\PostMeta\Repository as PostMetaRepository;
 
 /**
  * Walks the description fallback chain and returns the first non-empty value.
  *
- * Chain (by default): post_meta_override, seo_plugin_desc, post_excerpt,
+ * Chain (by default): post_meta_override, archive_override, seo_plugin_desc, post_excerpt,
  * post_content_trim (160-char trimmed body), site_description.
  */
 class Description implements ResolverInterface {
@@ -27,7 +28,8 @@ class Description implements ResolverInterface {
 
 	public function __construct(
 		private PostMetaRepository $postmeta,
-		private OptionsRepository $options
+		private OptionsRepository $options,
+		private ArchiveMetaRepository $archive
 	) {}
 
 	public function resolve( Context $context ): ?string {
@@ -50,6 +52,7 @@ class Description implements ResolverInterface {
 	private function step( string $step, Context $context ): ?string {
 		return match ( $step ) {
 			'post_meta_override' => $this->from_post_meta( $context ),
+			'archive_override'   => $this->from_archive_override( $context ),
 			'seo_plugin_desc'    => $this->from_seo_plugin( $context ),
 			'post_excerpt'       => $context->is_singular() ? $this->nullable_string( get_the_excerpt( $context->post_id() ) ) : null,
 			'post_content_trim'  => $this->from_post_content( $context ),
@@ -65,6 +68,26 @@ class Description implements ResolverInterface {
 		}
 		$desc = $this->postmeta->get( $post_id )['description'];
 		return '' === $desc ? null : $desc;
+	}
+
+	private function from_archive_override( Context $context ): ?string {
+		if ( $context->is_author() ) {
+			$user_id = $context->user_id();
+			if ( null === $user_id || $user_id <= 0 ) {
+				return null;
+			}
+			$desc = $this->archive->get_for_user( $user_id )['description'];
+			return '' === $desc ? null : $desc;
+		}
+		if ( $context->is_archive_term() ) {
+			$term_id = $context->archive_term_id();
+			if ( null === $term_id || $term_id <= 0 ) {
+				return null;
+			}
+			$desc = $this->archive->get_for_term( $term_id )['description'];
+			return '' === $desc ? null : $desc;
+		}
+		return null;
 	}
 
 	private function from_seo_plugin( Context $context ): ?string {

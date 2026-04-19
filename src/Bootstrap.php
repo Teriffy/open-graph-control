@@ -88,21 +88,24 @@ final class Bootstrap {
 			'resolver.title',
 			static fn ( Container $c ) => new Title(
 				$c->get( 'postmeta.repository' ),
-				$c->get( 'options.repository' )
+				$c->get( 'options.repository' ),
+				$c->get( 'archivemeta.repository' )
 			)
 		);
 		$container->set(
 			'resolver.description',
 			static fn ( Container $c ) => new Description(
 				$c->get( 'postmeta.repository' ),
-				$c->get( 'options.repository' )
+				$c->get( 'options.repository' ),
+				$c->get( 'archivemeta.repository' )
 			)
 		);
 		$container->set(
 			'resolver.image',
 			static fn ( Container $c ) => new Image(
 				$c->get( 'postmeta.repository' ),
-				$c->get( 'options.repository' )
+				$c->get( 'options.repository' ),
+				$c->get( 'archivemeta.repository' )
 			)
 		);
 		$container->set(

@@ -6,6 +6,7 @@ namespace EvzenLeonenko\OpenGraphControl\Tests\Unit\Resolvers;
 use Brain\Monkey;
 use Brain\Monkey\Filters;
 use Brain\Monkey\Functions;
+use EvzenLeonenko\OpenGraphControl\ArchiveMeta\Repository as ArchiveMetaRepository;
 use EvzenLeonenko\OpenGraphControl\Options\Repository as OptionsRepository;
 use EvzenLeonenko\OpenGraphControl\PostMeta\Repository as PostMetaRepository;
 use EvzenLeonenko\OpenGraphControl\Resolvers\Context;
@@ -28,7 +29,7 @@ final class ImageTest extends TestCase {
 	 * @param array<string, mixed> $postmeta
 	 * @param array<string, mixed> $options
 	 */
-	private function resolver( array $postmeta = [], ?array $chain = null, array $options = [] ): Image {
+	private function resolver( array $postmeta = [], ?array $chain = null, array $options = [], ?ArchiveMetaRepository $archive = null ): Image {
 		$post_repo = $this->createStub( PostMetaRepository::class );
 		$post_repo->method( 'get' )->willReturn(
 			array_merge(
@@ -48,7 +49,7 @@ final class ImageTest extends TestCase {
 		$opt_repo->method( 'get_path' )->willReturnCallback(
 			static function ( string $path ) use ( $chain, $options ) {
 				if ( 'fallback_chains.image' === $path ) {
-					return $chain ?? [ 'post_meta_override', 'featured_image', 'first_content_image', 'first_block_image', 'site_master_image' ];
+					return $chain ?? [ 'post_meta_override', 'archive_override', 'featured_image', 'first_content_image', 'first_block_image', 'site_master_image' ];
 				}
 				if ( 'site.master_image_id' === $path ) {
 					return $options['site_master_image_id'] ?? 0;
@@ -57,7 +58,7 @@ final class ImageTest extends TestCase {
 			}
 		);
 
-		return new Image( $post_repo, $opt_repo );
+		return new Image( $post_repo, $opt_repo, $archive ?? $this->createStub( ArchiveMetaRepository::class ) );
 	}
 
 	public function test_post_meta_override_returns_attachment_id_as_string(): void {
@@ -145,5 +146,50 @@ final class ImageTest extends TestCase {
 		Filters\expectApplied( 'ogc_resolve_image_chain' )->andReturnFirstArg();
 		$r = $this->resolver( [], [ 'site_master_image' ] );
 		self::assertNull( $r->resolve( Context::for_front() ) );
+	}
+
+	public function test_archive_override_returns_meta_for_archive_term(): void {
+		Filters\expectApplied( 'ogc_resolve_image_chain' )->andReturnFirstArg();
+		Filters\expectApplied( 'ogc_resolve_image_value' )->andReturnFirstArg();
+
+		$archive = $this->createStub( ArchiveMetaRepository::class );
+		$archive->method( 'get_for_term' )->willReturn(
+			[
+				'title'       => '',
+				'description' => '',
+				'image_id'    => 42,
+				'exclude'     => [],
+			]
+		);
+
+		$r = $this->resolver( [], [ 'archive_override' ], [], $archive );
+		self::assertSame( '42', $r->resolve( Context::for_archive_term( 'category', 12 ) ) );
+	}
+
+	public function test_archive_override_returns_meta_for_author(): void {
+		Filters\expectApplied( 'ogc_resolve_image_chain' )->andReturnFirstArg();
+		Filters\expectApplied( 'ogc_resolve_image_value' )->andReturnFirstArg();
+
+		$archive = $this->createStub( ArchiveMetaRepository::class );
+		$archive->method( 'get_for_user' )->willReturn(
+			[
+				'title'       => '',
+				'description' => '',
+				'image_id'    => 77,
+				'exclude'     => [],
+			]
+		);
+
+		$r = $this->resolver( [], [ 'archive_override' ], [], $archive );
+		self::assertSame( '77', $r->resolve( Context::for_author( 3 ) ) );
+	}
+
+	public function test_archive_override_null_on_post_context(): void {
+		Filters\expectApplied( 'ogc_resolve_image_chain' )->andReturnFirstArg();
+
+		$archive = $this->createStub( ArchiveMetaRepository::class );
+
+		$r = $this->resolver( [], [ 'archive_override' ], [], $archive );
+		self::assertNull( $r->resolve( Context::for_post( 1 ) ) );
 	}
 }

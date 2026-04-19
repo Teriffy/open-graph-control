@@ -6,6 +6,7 @@ namespace EvzenLeonenko\OpenGraphControl\Tests\Unit\Resolvers;
 use Brain\Monkey;
 use Brain\Monkey\Filters;
 use Brain\Monkey\Functions;
+use EvzenLeonenko\OpenGraphControl\ArchiveMeta\Repository as ArchiveMetaRepository;
 use EvzenLeonenko\OpenGraphControl\Options\Repository as OptionsRepository;
 use EvzenLeonenko\OpenGraphControl\PostMeta\Repository as PostMetaRepository;
 use EvzenLeonenko\OpenGraphControl\Resolvers\Context;
@@ -27,7 +28,7 @@ final class DescriptionTest extends TestCase {
 	/**
 	 * @param array<string, mixed> $postmeta
 	 */
-	private function resolver( array $postmeta = [], ?array $chain = null ): Description {
+	private function resolver( array $postmeta = [], ?array $chain = null, ?ArchiveMetaRepository $archive = null ): Description {
 		$post_repo = $this->createStub( PostMetaRepository::class );
 		$post_repo->method( 'get' )->willReturn(
 			array_merge(
@@ -45,10 +46,10 @@ final class DescriptionTest extends TestCase {
 
 		$opt_repo = $this->createStub( OptionsRepository::class );
 		$opt_repo->method( 'get_path' )->willReturn(
-			$chain ?? [ 'post_meta_override', 'seo_plugin_desc', 'post_excerpt', 'post_content_trim', 'site_description' ]
+			$chain ?? [ 'post_meta_override', 'archive_override', 'seo_plugin_desc', 'post_excerpt', 'post_content_trim', 'site_description' ]
 		);
 
-		return new Description( $post_repo, $opt_repo );
+		return new Description( $post_repo, $opt_repo, $archive ?? $this->createStub( ArchiveMetaRepository::class ) );
 	}
 
 	public function test_post_meta_override_wins(): void {
@@ -107,5 +108,53 @@ final class DescriptionTest extends TestCase {
 
 		$r = $this->resolver();
 		self::assertSame( 'Yoast desc', $r->resolve( Context::for_post( 1 ) ) );
+	}
+
+	public function test_archive_override_returns_meta_for_archive_term(): void {
+		Filters\expectApplied( 'ogc_resolve_description_chain' )->andReturnFirstArg();
+		Filters\expectApplied( 'ogc_resolve_description_value' )->andReturnFirstArg();
+
+		$archive = $this->createStub( ArchiveMetaRepository::class );
+		$archive->method( 'get_for_term' )->willReturn(
+			[
+				'title'       => '',
+				'description' => 'Category description override',
+				'image_id'    => 0,
+				'exclude'     => [],
+			]
+		);
+
+		$r = $this->resolver( [], [ 'archive_override' ], $archive );
+		self::assertSame(
+			'Category description override',
+			$r->resolve( Context::for_archive_term( 'category', 12 ) )
+		);
+	}
+
+	public function test_archive_override_returns_meta_for_author(): void {
+		Filters\expectApplied( 'ogc_resolve_description_chain' )->andReturnFirstArg();
+		Filters\expectApplied( 'ogc_resolve_description_value' )->andReturnFirstArg();
+
+		$archive = $this->createStub( ArchiveMetaRepository::class );
+		$archive->method( 'get_for_user' )->willReturn(
+			[
+				'title'       => '',
+				'description' => 'Author bio override',
+				'image_id'    => 0,
+				'exclude'     => [],
+			]
+		);
+
+		$r = $this->resolver( [], [ 'archive_override' ], $archive );
+		self::assertSame( 'Author bio override', $r->resolve( Context::for_author( 3 ) ) );
+	}
+
+	public function test_archive_override_null_on_post_context(): void {
+		Filters\expectApplied( 'ogc_resolve_description_chain' )->andReturnFirstArg();
+
+		$archive = $this->createStub( ArchiveMetaRepository::class );
+
+		$r = $this->resolver( [], [ 'archive_override' ], $archive );
+		self::assertNull( $r->resolve( Context::for_post( 1 ) ) );
 	}
 }

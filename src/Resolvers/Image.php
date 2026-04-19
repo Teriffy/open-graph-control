@@ -12,6 +12,7 @@ namespace EvzenLeonenko\OpenGraphControl\Resolvers;
 
 defined( 'ABSPATH' ) || exit;
 
+use EvzenLeonenko\OpenGraphControl\ArchiveMeta\Repository as ArchiveMetaRepository;
 use EvzenLeonenko\OpenGraphControl\Options\Repository as OptionsRepository;
 use EvzenLeonenko\OpenGraphControl\PostMeta\Repository as PostMetaRepository;
 
@@ -22,14 +23,15 @@ use EvzenLeonenko\OpenGraphControl\PostMeta\Repository as PostMetaRepository;
  *   resolve to the right registered image size), or
  * - an absolute URL string when extracted from raw post content.
  *
- * Chain (by default): post_meta_override, featured_image, first_content_image,
- * first_block_image, site_master_image.
+ * Chain (by default): post_meta_override, archive_override, featured_image,
+ * first_content_image, first_block_image, site_master_image.
  */
 class Image implements ResolverInterface {
 
 	public function __construct(
 		private PostMetaRepository $postmeta,
-		private OptionsRepository $options
+		private OptionsRepository $options,
+		private ArchiveMetaRepository $archive
 	) {}
 
 	public function resolve( Context $context ): ?string {
@@ -52,6 +54,7 @@ class Image implements ResolverInterface {
 	private function step( string $step, Context $context ): ?string {
 		return match ( $step ) {
 			'post_meta_override'  => $this->from_post_meta( $context ),
+			'archive_override'    => $this->from_archive_override( $context ),
 			'featured_image'      => $this->from_featured( $context ),
 			'first_content_image' => $this->from_content_img( $context ),
 			'first_block_image'   => $this->from_block_image( $context ),
@@ -67,6 +70,26 @@ class Image implements ResolverInterface {
 		}
 		$id = $this->postmeta->get( $post_id )['image_id'];
 		return $id > 0 ? (string) $id : null;
+	}
+
+	private function from_archive_override( Context $context ): ?string {
+		if ( $context->is_author() ) {
+			$user_id = $context->user_id();
+			if ( null === $user_id || $user_id <= 0 ) {
+				return null;
+			}
+			$id = $this->archive->get_for_user( $user_id )['image_id'];
+			return $id > 0 ? (string) $id : null;
+		}
+		if ( $context->is_archive_term() ) {
+			$term_id = $context->archive_term_id();
+			if ( null === $term_id || $term_id <= 0 ) {
+				return null;
+			}
+			$id = $this->archive->get_for_term( $term_id )['image_id'];
+			return $id > 0 ? (string) $id : null;
+		}
+		return null;
 	}
 
 	private function from_featured( Context $context ): ?string {
