@@ -29,6 +29,7 @@ export default defineConfig( {
 	testIgnore: [
 		...( runWpSuite ? [ '**/fixtures-*.spec.ts' ] : [ '**/0[0-9]-*.spec.ts' ] ),
 		...( process.env.OGC_E2E_SNAPSHOT ? [] : [ '**/fixtures-snapshot.spec.ts' ] ),
+		...( process.env.OGC_WPORG_SCREENSHOTS ? [] : [ '**/wporg-screenshots.spec.ts' ] ),
 	],
 	use: {
 		baseURL: runWpSuite
