@@ -18,6 +18,9 @@
 
 declare(strict_types=1);
 
+use EvzenLeonenko\OpenGraphControl\Container;
+use EvzenLeonenko\OpenGraphControl\Plugin;
+
 defined( 'ABSPATH' ) || exit;
 
 // PSR-4 autoload.
@@ -28,3 +31,11 @@ define( 'OGC_VERSION', '0.0.1' );
 define( 'OGC_FILE', __FILE__ );
 define( 'OGC_DIR', plugin_dir_path( __FILE__ ) );
 define( 'OGC_URL', plugin_dir_url( __FILE__ ) );
+
+add_action(
+	'plugins_loaded',
+	static function (): void {
+		$container = new Container();
+		( new Plugin( $container ) )->boot();
+	}
+);
