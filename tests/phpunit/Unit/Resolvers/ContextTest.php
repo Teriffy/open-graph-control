@@ -41,4 +41,18 @@ final class ContextTest extends TestCase {
 		self::assertSame( Context::TYPE_SEARCH, Context::for_search()->type() );
 		self::assertSame( Context::TYPE_404, Context::for_404()->type() );
 	}
+
+	public function test_for_archive_term_stores_taxonomy_and_term_id(): void {
+		$context = Context::for_archive_term( 'category', 42 );
+		self::assertTrue( $context->is_archive() );
+		self::assertTrue( $context->is_archive_term() );
+		self::assertSame( 42, $context->archive_term_id() );
+		self::assertSame( 'category', $context->archive_kind() );
+	}
+
+	public function test_for_archive_returns_null_term_id(): void {
+		$context = Context::for_archive( 'post_type' );
+		self::assertFalse( $context->is_archive_term() );
+		self::assertNull( $context->archive_term_id() );
+	}
 }

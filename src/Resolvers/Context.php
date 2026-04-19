@@ -54,6 +54,17 @@ final class Context {
 		return new self( self::TYPE_ARCHIVE, null, [ 'archive_kind' => $archive_kind ] );
 	}
 
+	public static function for_archive_term( string $taxonomy, int $term_id ): self {
+		return new self(
+			self::TYPE_ARCHIVE,
+			null,
+			[
+				'archive_kind'    => $taxonomy,
+				'archive_term_id' => $term_id,
+			]
+		);
+	}
+
 	public static function for_author( int $user_id ): self {
 		return new self( self::TYPE_AUTHOR, null, [ 'user_id' => $user_id ] );
 	}
@@ -78,8 +89,28 @@ final class Context {
 		return self::TYPE_SINGULAR === $this->type;
 	}
 
+	public function is_archive(): bool {
+		return self::TYPE_ARCHIVE === $this->type;
+	}
+
+	public function is_archive_term(): bool {
+		return is_int( $this->extra['archive_term_id'] ?? null );
+	}
+
 	public function post_id(): ?int {
 		return $this->post_id;
+	}
+
+	public function archive_kind(): ?string {
+		$kind = $this->extra['archive_kind'] ?? null;
+
+		return is_string( $kind ) ? $kind : null;
+	}
+
+	public function archive_term_id(): ?int {
+		$term_id = $this->extra['archive_term_id'] ?? null;
+
+		return is_int( $term_id ) ? $term_id : null;
 	}
 
 	public function extra( string $key, mixed $fallback = null ): mixed {
