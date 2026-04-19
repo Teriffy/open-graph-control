@@ -16,6 +16,7 @@ use EvzenLeonenko\OpenGraphControl\Admin\Assets;
 use EvzenLeonenko\OpenGraphControl\Admin\MetaBox;
 use EvzenLeonenko\OpenGraphControl\Admin\Notices;
 use EvzenLeonenko\OpenGraphControl\Admin\Page;
+use EvzenLeonenko\OpenGraphControl\Admin\Rest\ArchiveMetaController;
 use EvzenLeonenko\OpenGraphControl\Admin\Rest\ConflictController;
 use EvzenLeonenko\OpenGraphControl\Admin\Rest\MetaController;
 use EvzenLeonenko\OpenGraphControl\Admin\Rest\PreviewController;
@@ -249,6 +250,10 @@ final class Bootstrap {
 		$container->set(
 			'rest.meta',
 			static fn ( Container $c ) => new MetaController( $c->get( 'postmeta.repository' ) )
+		);
+		$container->set(
+			'rest.archive_meta',
+			static fn ( Container $c ) => new ArchiveMetaController( $c->get( 'archivemeta.repository' ) )
 		);
 		$container->set(
 			'images.regenerator',
