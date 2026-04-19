@@ -4,6 +4,7 @@
 
 # Build output
 /build/
+/dist/
 
 # Env / editor
 .DS_Store
