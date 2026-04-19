@@ -1,6 +1,6 @@
 import { __ } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
-import { MediaUpload, MediaUploadCheck } from '@wordpress/media-utils';
+import { MediaUpload, MediaUploadCheck } from '@wordpress/block-editor';
 import { useEffect, useState } from '@wordpress/element';
 
 /**

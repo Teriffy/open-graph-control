@@ -7,17 +7,45 @@ test( 'site name saved via Settings persists across reload', async ( {
 	await login( page );
 	await gotoSettings( page );
 
-	// Switch to Site defaults section.
-	await page.click( 'button:has-text("Site defaults")' );
+	// React app mounts under #ogc-settings-root. Wait for sidebar nav to render.
+	await expect( page.locator( '.ogc-nav' ) ).toBeVisible( {
+		timeout: 15_000,
+	} );
 
-	const input = page.locator( 'input[type="text"]' ).first();
+	// Switch to Site defaults section and wait for its heading.
+	await page
+		.locator( '.ogc-nav button', { hasText: /^Site defaults$/ } )
+		.click();
+	// Give React a moment to re-render the section.
+	await page.waitForTimeout( 500 );
+	await expect(
+		page.getByRole( 'heading', { name: 'Site defaults' } )
+	).toBeVisible( { timeout: 10_000 } );
+
+	// Fill the first input under Site defaults section.
+	const input = page
+		.locator( '.ogc-section-site-defaults input' )
+		.first();
+	await expect( input ).toBeVisible();
 	await input.fill( 'E2E Test Site' );
 
-	await page.click( 'button:has-text("Save changes")' );
-	await expect( page.locator( 'text=Saved.' ) ).toBeVisible();
+	await page
+		.locator( 'main button', { hasText: 'Save changes' } )
+		.click();
+	await expect( page.getByText( 'Saved.' ) ).toBeVisible( {
+		timeout: 10_000,
+	} );
 
-	// Reload, value is still there.
 	await page.reload();
-	await page.click( 'button:has-text("Site defaults")' );
-	await expect( page.locator( 'input[value="E2E Test Site"]' ) ).toBeVisible();
+	await expect( page.locator( '.ogc-nav' ) ).toBeVisible( {
+		timeout: 15_000,
+	} );
+	await page
+		.locator( '.ogc-nav button', { hasText: /^Site defaults$/ } )
+		.click();
+	// Give React a moment to re-render the section.
+	await page.waitForTimeout( 500 );
+	await expect(
+		page.locator( 'input[value="E2E Test Site"]' )
+	).toBeVisible( { timeout: 10_000 } );
 } );

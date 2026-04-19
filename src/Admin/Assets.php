@@ -40,6 +40,11 @@ final class Assets {
 		/** @var array{dependencies?: array<int, string>, version?: string} $asset */
 		$asset = include $asset_file;
 
+		// wp-media-utils needs the core media modal loaded before it works.
+		if ( in_array( 'wp-media-utils', $asset['dependencies'] ?? [], true ) ) {
+			wp_enqueue_media();
+		}
+
 		wp_enqueue_script(
 			'ogc-' . $name,
 			OGC_URL . 'build/admin/' . $name . '.js',

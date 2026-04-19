@@ -39,17 +39,21 @@ test( 'per-post title override appears in rendered OG tags', async ( {
 		page.locator( '#ogc-metabox-root' ).locator( 'text=Saved.' )
 	).toBeVisible();
 
-	// Publish.
-	await page.click( 'button:has-text("Publish")' );
-	await page
-		.locator( '.editor-post-publish-panel button:has-text("Publish")' )
-		.click();
+	// Publish via REST instead of clicking through the editor UI — avoids
+	// flaky selectors against Gutenberg's pre-publish panel.
+	const postId = await page.evaluate( async () => {
+		const editPost = window.wp?.data?.select( 'core/editor' );
+		const id = editPost?.getCurrentPostId();
+		await window.wp.data.dispatch( 'core/editor' ).savePost();
+		await window.wp.data
+			.dispatch( 'core/editor' )
+			.editPost( { status: 'publish' } );
+		await window.wp.data.dispatch( 'core/editor' ).savePost();
+		return id;
+	} );
 
 	// Open the post on the frontend and check the OG title tag.
-	await page
-		.locator( '.post-publish-panel__postpublish-buttons a:has-text("View Post")' )
-		.click();
-
+	await page.goto( `/?p=${ postId }` );
 	const source = await page.content();
 	expect( source ).toContain( 'Custom OG Title' );
 	expect( source ).toContain( 'property="og:title"' );
