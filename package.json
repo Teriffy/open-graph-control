@@ -9,7 +9,9 @@
     "start": "wp-scripts start --webpack-src-dir=assets/admin",
     "lint:js": "wp-scripts lint-js assets/admin",
     "format": "wp-scripts format assets/admin",
-    "e2e": "playwright test"
+    "e2e": "playwright test",
+    "e2e:wp": "OGC_E2E_WP=1 playwright test",
+    "e2e:update-snapshots": "playwright test --update-snapshots"
   },
   "devDependencies": {
     "@wordpress/scripts": "^27.9.0",
@@ -21,6 +23,7 @@
     "@wordpress/icons": "^10.0.0",
     "@wordpress/media-utils": "^5.0.0",
     "@wordpress/block-editor": "^14.0.0",
-    "@playwright/test": "^1.44.0"
+    "@playwright/test": "^1.44.0",
+    "http-server": "^14.1.1"
   }
 }

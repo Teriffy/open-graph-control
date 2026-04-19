@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<title>OGC — Preview fixtures</title>
+	<style>
+		body {
+			font-family: -apple-system, 'Helvetica Neue', sans-serif;
+			background: #f0f0f1;
+			padding: 24px;
+			margin: 0;
+			color: #1d2327;
+		}
+
+		h1 {
+			font-size: 18px;
+			font-weight: 600;
+			margin: 0 0 16px;
+		}
+
+		.grid {
+			display: grid;
+			grid-template-columns: repeat( 3, 1fr );
+			gap: 16px;
+			max-width: 1200px;
+		}
+
+		.item {
+			background: #fff;
+			padding: 12px;
+			border-radius: 6px;
+			box-shadow: 0 1px 2px rgba( 0, 0, 0, 0.04 );
+		}
+
+		.item h2 {
+			font-size: 12px;
+			color: #50575e;
+			text-transform: uppercase;
+			letter-spacing: 0.5px;
+			margin: 0 0 8px;
+		}
+
+		.ogc-preview-card {
+			background: #fff;
+			border-radius: 6px;
+			overflow: hidden;
+		}
+
+		.ogc-preview-img {
+			background: linear-gradient( 135deg, #6366f1, #a855f7, #ec4899 );
+			aspect-ratio: 1200 / 630;
+		}
+
+		.ogc-preview-img.square { aspect-ratio: 1 / 1; }
+		.ogc-preview-img.vertical { aspect-ratio: 1000 / 1500; }
+
+		.ogc-preview-body { padding: 10px 12px; }
+
+		/* Facebook */
+		.is-facebook { border: 1px solid #dcdfe4; }
+		.is-facebook .ogc-preview-body { background: #f2f3f5; }
+		.is-facebook .site { font-size: 10px; color: #606770; text-transform: uppercase; }
+		.is-facebook .title { font-size: 15px; color: #1d2129; font-weight: 600; margin: 2px 0; }
+		.is-facebook .desc { font-size: 12px; color: #606770; }
+
+		/* Twitter */
+		.is-twitter { border: 1px solid #cfd9de; border-radius: 16px; }
+		.is-twitter .ogc-preview-img { position: relative; }
+		.is-twitter .domain {
+			position: absolute; bottom: 8px; left: 8px;
+			background: rgba( 0, 0, 0, 0.7 ); color: #fff;
+			padding: 2px 6px; font-size: 10px; border-radius: 3px;
+		}
+		.is-twitter .title { font-size: 13px; color: #0f1419; }
+
+		/* LinkedIn */
+		.is-linkedin { border: 1px solid #d6d9dc; }
+		.is-linkedin .title { font-size: 14px; color: #000; font-weight: 600; }
+		.is-linkedin .site { font-size: 11px; color: #666; }
+
+		/* iMessage */
+		.is-imessage {
+			background: #e5e5ea; padding: 10px; border-radius: 14px;
+			max-width: 260px; margin: 0 auto;
+		}
+		.is-imessage .inner { background: #fff; border-radius: 10px; overflow: hidden; }
+		.is-imessage .ogc-preview-img { aspect-ratio: 16 / 10; }
+		.is-imessage .title { font-size: 13px; color: #000; }
+		.is-imessage .site { font-size: 10px; color: #8e8e93; margin-top: 2px; }
+
+		/* Mastodon */
+		.is-mastodon { border: 1px solid #d9e1e8; border-radius: 8px; display: flex; }
+		.is-mastodon .ogc-preview-img {
+			width: 100px; aspect-ratio: 1 / 1; flex-shrink: 0;
+		}
+		.is-mastodon .ogc-preview-body { flex: 1; }
+		.is-mastodon .site { font-size: 10px; color: #606984; text-transform: uppercase; }
+		.is-mastodon .title { font-size: 13px; font-weight: 600; }
+		.is-mastodon .desc { font-size: 11px; color: #606984; }
+
+		/* Pinterest */
+		.is-pinterest { border-radius: 16px; max-width: 200px; margin: 0 auto; box-shadow: 0 1px 2px rgba( 0, 0, 0, 0.1 ); }
+		.is-pinterest .title { font-size: 12px; font-weight: 600; }
+		.is-pinterest .site { font-size: 10px; color: #767676; }
+
+		/* Discord */
+		.is-discord {
+			background: #2b2d31; color: #dcddde;
+			border-left: 4px solid #2271b1; border-radius: 4px; padding: 12px;
+		}
+		.is-discord .site { font-size: 11px; color: #b5bac1; }
+		.is-discord .title { font-size: 15px; color: #00a8fc; font-weight: 600; margin: 4px 0; }
+		.is-discord .desc { font-size: 12px; margin-bottom: 8px; }
+		.is-discord .ogc-preview-img { border-radius: 4px; }
+
+		/* Threads / Bluesky / WhatsApp / Telegram / Slack basic */
+		.is-threads { border: 1px solid #e0e0e0; border-radius: 12px; }
+		.is-threads .title { font-size: 14px; font-weight: 500; }
+		.is-threads .site { font-size: 11px; color: #666; }
+
+		.is-bluesky { border: 1px solid #d1d5db; border-radius: 10px; }
+		.is-bluesky .site { font-size: 11px; color: #6b7280; }
+		.is-bluesky .title { font-size: 13px; color: #0f172a; }
+
+		.is-whatsapp {
+			background: #dcf8c6; padding: 6px; border-radius: 8px;
+			max-width: 260px; margin: 0 auto;
+		}
+		.is-whatsapp .inner { background: #fff; border-radius: 6px; overflow: hidden; }
+		.is-whatsapp .ogc-preview-img { aspect-ratio: 16 / 9; }
+		.is-whatsapp .ogc-preview-body { border-left: 3px solid #25d366; }
+		.is-whatsapp .title { font-size: 13px; color: #111; }
+		.is-whatsapp .desc { font-size: 11px; color: #667781; }
+		.is-whatsapp .site { font-size: 10px; color: #8696a0; }
+
+		.is-telegram {
+			background: #ecf4fb; border-left: 3px solid #0088cc;
+			border-radius: 0 6px 6px 0; padding: 8px 10px; display: flex; gap: 8px;
+		}
+		.is-telegram .ogc-preview-img { width: 60px; aspect-ratio: 1 / 1; border-radius: 4px; flex-shrink: 0; }
+		.is-telegram .ogc-preview-body { flex: 1; padding: 0; }
+		.is-telegram .title { font-size: 13px; color: #0088cc; font-weight: 600; }
+		.is-telegram .site { font-size: 11px; color: #707579; }
+		.is-telegram .desc { font-size: 11px; color: #000; }
+
+		.is-slack {
+			border-left: 3px solid #dcdcde; background: #fff;
+			padding: 4px 10px; box-shadow: none;
+		}
+		.is-slack .site { font-size: 12px; color: #1264a3; font-weight: 600; }
+		.is-slack .title { font-size: 13px; color: #1d1c1d; font-weight: 700; margin: 2px 0; }
+		.is-slack .desc { font-size: 12px; color: #1d1c1d; margin-bottom: 6px; }
+	</style>
+</head>
+<body>
+	<h1>Open Graph Control — preview card fixtures</h1>
+	<div class="grid">
+		<div class="item" data-platform="facebook">
+			<h2>Facebook</h2>
+			<div class="ogc-preview-card is-facebook">
+				<div class="ogc-preview-img"></div>
+				<div class="ogc-preview-body">
+					<div class="site">example.com</div>
+					<div class="title">How I ship WordPress plugins</div>
+					<div class="desc">A short overview of the workflow.</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="item" data-platform="twitter">
+			<h2>X / Twitter</h2>
+			<div class="ogc-preview-card is-twitter">
+				<div class="ogc-preview-img">
+					<span class="domain">example.com</span>
+				</div>
+				<div class="ogc-preview-body">
+					<div class="title">How I ship WordPress plugins</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="item" data-platform="linkedin">
+			<h2>LinkedIn</h2>
+			<div class="ogc-preview-card is-linkedin">
+				<div class="ogc-preview-img"></div>
+				<div class="ogc-preview-body">
+					<div class="title">How I ship WordPress plugins</div>
+					<div class="site">example.com</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="item" data-platform="imessage">
+			<h2>iMessage</h2>
+			<div class="ogc-preview-card is-imessage">
+				<div class="inner">
+					<div class="ogc-preview-img"></div>
+					<div class="ogc-preview-body">
+						<div class="title">How I ship WordPress plugins</div>
+						<div class="site">example.com</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="item" data-platform="threads">
+			<h2>Threads</h2>
+			<div class="ogc-preview-card is-threads">
+				<div class="ogc-preview-img"></div>
+				<div class="ogc-preview-body">
+					<div class="title">How I ship WordPress plugins</div>
+					<div class="site">example.com</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="item" data-platform="mastodon">
+			<h2>Mastodon</h2>
+			<div class="ogc-preview-card is-mastodon">
+				<div class="ogc-preview-img square"></div>
+				<div class="ogc-preview-body">
+					<div class="site">example.com</div>
+					<div class="title">How I ship WordPress plugins</div>
+					<div class="desc">A short overview.</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="item" data-platform="bluesky">
+			<h2>Bluesky</h2>
+			<div class="ogc-preview-card is-bluesky">
+				<div class="ogc-preview-img"></div>
+				<div class="ogc-preview-body">
+					<div class="site">example.com</div>
+					<div class="title">How I ship WordPress plugins</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="item" data-platform="whatsapp">
+			<h2>WhatsApp</h2>
+			<div class="ogc-preview-card is-whatsapp">
+				<div class="inner">
+					<div class="ogc-preview-img"></div>
+					<div class="ogc-preview-body">
+						<div class="title">How I ship WordPress plugins</div>
+						<div class="desc">A short overview.</div>
+						<div class="site">example.com</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="item" data-platform="discord">
+			<h2>Discord</h2>
+			<div class="ogc-preview-card is-discord">
+				<div class="site">example.com</div>
+				<div class="title">How I ship WordPress plugins</div>
+				<div class="desc">A short overview.</div>
+				<div class="ogc-preview-img"></div>
+			</div>
+		</div>
+
+		<div class="item" data-platform="pinterest">
+			<h2>Pinterest</h2>
+			<div class="ogc-preview-card is-pinterest">
+				<div class="ogc-preview-img vertical"></div>
+				<div class="ogc-preview-body">
+					<div class="title">How I ship WordPress plugins</div>
+					<div class="site">example.com</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="item" data-platform="telegram">
+			<h2>Telegram</h2>
+			<div class="ogc-preview-card is-telegram">
+				<div class="ogc-preview-img"></div>
+				<div class="ogc-preview-body">
+					<div class="title">example.com</div>
+					<div class="site">example.com</div>
+					<div class="desc">How I ship WordPress plugins</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="item" data-platform="slack">
+			<h2>Slack</h2>
+			<div class="ogc-preview-card is-slack">
+				<div class="site">example.com</div>
+				<div class="title">How I ship WordPress plugins</div>
+				<div class="desc">A short overview.</div>
+				<div class="ogc-preview-img"></div>
+			</div>
+		</div>
+	</div>
+</body>
+</html>
