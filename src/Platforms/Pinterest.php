@@ -7,7 +7,10 @@
 
 declare(strict_types=1);
 
+
 namespace EvzenLeonenko\OpenGraphControl\Platforms;
+
+defined( 'ABSPATH' ) || exit;
 
 use EvzenLeonenko\OpenGraphControl\Images\SizeRegistry;
 use EvzenLeonenko\OpenGraphControl\Renderer\Tag;

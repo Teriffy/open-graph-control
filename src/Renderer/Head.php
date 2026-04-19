@@ -7,7 +7,10 @@
 
 declare(strict_types=1);
 
+
 namespace EvzenLeonenko\OpenGraphControl\Renderer;
+
+defined( 'ABSPATH' ) || exit;
 
 use EvzenLeonenko\OpenGraphControl\Options\Repository as OptionsRepository;
 use EvzenLeonenko\OpenGraphControl\Platforms\Registry as PlatformRegistry;

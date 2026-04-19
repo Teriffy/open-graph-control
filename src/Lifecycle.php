@@ -7,7 +7,10 @@
 
 declare(strict_types=1);
 
+
 namespace EvzenLeonenko\OpenGraphControl;
+
+defined( 'ABSPATH' ) || exit;
 
 use EvzenLeonenko\OpenGraphControl\Options\DefaultSettings;
 

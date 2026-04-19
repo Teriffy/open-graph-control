@@ -7,7 +7,10 @@
 
 declare(strict_types=1);
 
+
 namespace EvzenLeonenko\OpenGraphControl\Admin\Rest;
+
+defined( 'ABSPATH' ) || exit;
 
 use EvzenLeonenko\OpenGraphControl\Images\Regenerator;
 use WP_REST_Request;

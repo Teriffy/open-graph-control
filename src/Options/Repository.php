@@ -7,7 +7,10 @@
 
 declare(strict_types=1);
 
+
 namespace EvzenLeonenko\OpenGraphControl\Options;
+
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Reads and writes the ogc_settings option.

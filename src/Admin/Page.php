@@ -7,7 +7,10 @@
 
 declare(strict_types=1);
 
+
 namespace EvzenLeonenko\OpenGraphControl\Admin;
+
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Registers the top-level "Open Graph Control" admin menu item and renders

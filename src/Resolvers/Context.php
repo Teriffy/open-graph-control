@@ -7,7 +7,10 @@
 
 declare(strict_types=1);
 
+
 namespace EvzenLeonenko\OpenGraphControl\Resolvers;
+
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Immutable value object describing the current request for tag rendering.

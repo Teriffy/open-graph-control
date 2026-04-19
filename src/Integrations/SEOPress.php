@@ -7,7 +7,10 @@
 
 declare(strict_types=1);
 
+
 namespace EvzenLeonenko\OpenGraphControl\Integrations;
+
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Detects SEOPress and disables its Open Graph + Twitter Card output

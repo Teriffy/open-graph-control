@@ -7,7 +7,10 @@
 
 declare(strict_types=1);
 
+
 namespace EvzenLeonenko\OpenGraphControl\Images;
+
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Registers the three platform-optimized image sizes via add_image_size.

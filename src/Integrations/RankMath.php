@@ -7,7 +7,10 @@
 
 declare(strict_types=1);
 
+
 namespace EvzenLeonenko\OpenGraphControl\Integrations;
+
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Detects Rank Math and disables its Facebook and Twitter Open Graph

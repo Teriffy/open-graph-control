@@ -7,7 +7,10 @@
 
 declare(strict_types=1);
 
+
 namespace EvzenLeonenko\OpenGraphControl\Integrations;
+
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Detects Slim SEO and clears its Open Graph tag output via

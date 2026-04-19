@@ -7,7 +7,10 @@
 
 declare(strict_types=1);
 
+
 namespace EvzenLeonenko\OpenGraphControl\Admin\Rest;
+
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Counts requests per user per key in a transient and rejects traffic that

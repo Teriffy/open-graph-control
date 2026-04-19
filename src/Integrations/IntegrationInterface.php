@@ -7,7 +7,10 @@
 
 declare(strict_types=1);
 
+
 namespace EvzenLeonenko\OpenGraphControl\Integrations;
+
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Each integration represents one SEO/social plugin we detect and

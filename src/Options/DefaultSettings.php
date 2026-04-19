@@ -7,7 +7,10 @@
 
 declare(strict_types=1);
 
+
 namespace EvzenLeonenko\OpenGraphControl\Options;
+
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Canonical shape and default values for the ogc_settings option.

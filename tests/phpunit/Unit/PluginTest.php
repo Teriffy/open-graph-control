@@ -21,8 +21,8 @@ final class PluginTest extends TestCase {
 		parent::tearDown();
 	}
 
-	public function test_boot_registers_init_actions(): void {
-		Actions\expectAdded( 'init' )->twice();
+	public function test_boot_registers_init_action(): void {
+		Actions\expectAdded( 'init' )->once();
 		$plugin = new Plugin( new Container() );
 		$plugin->boot();
 		self::assertInstanceOf( Plugin::class, $plugin );

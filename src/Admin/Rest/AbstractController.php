@@ -7,7 +7,10 @@
 
 declare(strict_types=1);
 
+
 namespace EvzenLeonenko\OpenGraphControl\Admin\Rest;
+
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Shared namespace + capability helpers for plugin REST endpoints.

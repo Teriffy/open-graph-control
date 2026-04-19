@@ -7,7 +7,10 @@
 
 declare(strict_types=1);
 
+
 namespace EvzenLeonenko\OpenGraphControl\Validation;
+
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Inspects the resolved tag stream + source values for common mistakes:

@@ -7,7 +7,10 @@
 
 declare(strict_types=1);
 
+
 namespace EvzenLeonenko\OpenGraphControl\Admin;
+
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Enqueues the compiled React bundles on the plugin's settings page and on

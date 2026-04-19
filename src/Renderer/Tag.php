@@ -7,7 +7,10 @@
 
 declare(strict_types=1);
 
+
 namespace EvzenLeonenko\OpenGraphControl\Renderer;
+
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Immutable description of a single <meta> tag, consumed by TagBuilder.

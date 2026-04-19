@@ -7,7 +7,10 @@
 
 declare(strict_types=1);
 
+
 namespace EvzenLeonenko\OpenGraphControl\Images;
+
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Walks the media library in batches and calls wp_generate_attachment_metadata

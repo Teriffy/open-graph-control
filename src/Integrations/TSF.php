@@ -7,7 +7,10 @@
 
 declare(strict_types=1);
 
+
 namespace EvzenLeonenko\OpenGraphControl\Integrations;
+
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Detects The SEO Framework (TSF) and disables its Open Graph output

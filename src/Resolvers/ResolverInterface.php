@@ -7,7 +7,10 @@
 
 declare(strict_types=1);
 
+
 namespace EvzenLeonenko\OpenGraphControl\Resolvers;
+
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Returns a single resolved value for a given context, or null if nothing

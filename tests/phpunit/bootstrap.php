@@ -11,6 +11,12 @@
 
 declare(strict_types=1);
 
+// Plugin source files guard against direct access via ABSPATH. Declare it
+// here so autoloaded classes don't trigger exit() during test runs.
+if ( ! defined( 'ABSPATH' ) ) {
+	define( 'ABSPATH', __DIR__ . '/' );
+}
+
 require __DIR__ . '/../../vendor/autoload.php';
 
 if ( ! function_exists( 'esc_attr' ) ) {

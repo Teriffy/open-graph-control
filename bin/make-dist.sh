@@ -64,7 +64,6 @@ rsync -a \
   --exclude 'webpack.config.js' \
   --exclude 'package.json' \
   --exclude 'package-lock.json' \
-  --exclude 'composer.json' \
   --exclude 'README.md' \
   ./ "$STAGE/"
 

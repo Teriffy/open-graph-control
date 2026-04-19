@@ -7,7 +7,10 @@
 
 declare(strict_types=1);
 
+
 namespace EvzenLeonenko\OpenGraphControl\Options;
+
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Applies per-version migration callbacks to the stored ogc_settings option

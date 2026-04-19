@@ -7,7 +7,10 @@
 
 declare(strict_types=1);
 
+
 namespace EvzenLeonenko\OpenGraphControl;
+
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Plugin entry point. Holds the service container and wires WP hooks.
@@ -18,15 +21,6 @@ final class Plugin {
 
 	public function boot(): void {
 		add_action( 'init', [ $this, 'on_init' ] );
-		add_action( 'init', [ $this, 'load_textdomain' ], 1 );
-	}
-
-	public function load_textdomain(): void {
-		load_plugin_textdomain(
-			'open-graph-control',
-			false,
-			dirname( plugin_basename( OGC_FILE ) ) . '/languages'
-		);
 	}
 
 	public function on_init(): void {

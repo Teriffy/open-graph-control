@@ -7,7 +7,10 @@
 
 declare(strict_types=1);
 
+
 namespace EvzenLeonenko\OpenGraphControl\Validation;
+
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Lightweight struct describing a single validation issue surfaced to the

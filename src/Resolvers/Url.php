@@ -7,7 +7,10 @@
 
 declare(strict_types=1);
 
+
 namespace EvzenLeonenko\OpenGraphControl\Resolvers;
+
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Resolves og:url. Uses get_permalink for singulars, home_url with the

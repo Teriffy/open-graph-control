@@ -7,7 +7,10 @@
 
 declare(strict_types=1);
 
+
 namespace EvzenLeonenko\OpenGraphControl;
+
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Minimal PSR-11-inspired service container.
@@ -39,7 +42,7 @@ final class Container {
 			return $this->instances[ $id ];
 		}
 		if ( ! isset( $this->factories[ $id ] ) ) {
-			throw new \OutOfBoundsException( sprintf( 'Service "%s" is not registered.', $id ) );
+			throw new \OutOfBoundsException( esc_html( sprintf( 'Service "%s" is not registered.', $id ) ) );
 		}
 		$instance               = ( $this->factories[ $id ] )( $this );
 		$this->instances[ $id ] = $instance;

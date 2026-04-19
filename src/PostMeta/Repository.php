@@ -7,7 +7,10 @@
 
 declare(strict_types=1);
 
+
 namespace EvzenLeonenko\OpenGraphControl\PostMeta;
+
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Reads and writes the _ogc_meta post meta blob.

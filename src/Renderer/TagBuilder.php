@@ -7,7 +7,10 @@
 
 declare(strict_types=1);
 
+
 namespace EvzenLeonenko\OpenGraphControl\Renderer;
+
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Turns Tag[] into escaped <meta> HTML.
