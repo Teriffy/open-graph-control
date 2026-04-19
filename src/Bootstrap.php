@@ -9,6 +9,9 @@ declare(strict_types=1);
 
 namespace EvzenLeonenko\OpenGraphControl;
 
+use EvzenLeonenko\OpenGraphControl\Admin\Assets;
+use EvzenLeonenko\OpenGraphControl\Admin\MetaBox;
+use EvzenLeonenko\OpenGraphControl\Admin\Page;
 use EvzenLeonenko\OpenGraphControl\Admin\Rest\ConflictController;
 use EvzenLeonenko\OpenGraphControl\Admin\Rest\PreviewController;
 use EvzenLeonenko\OpenGraphControl\Admin\Rest\SettingsController;
@@ -167,6 +170,20 @@ final class Bootstrap {
 		$container->set(
 			'images.size_registry',
 			static fn () => new SizeRegistry()
+		);
+
+		// Admin UI shells.
+		$container->set(
+			'admin.page',
+			static fn () => new Page()
+		);
+		$container->set(
+			'admin.assets',
+			static fn () => new Assets()
+		);
+		$container->set(
+			'admin.meta_box',
+			static fn ( Container $c ) => new MetaBox( $c->get( 'options.repository' ) )
 		);
 
 		// REST controllers.

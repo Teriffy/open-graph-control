@@ -27,6 +27,12 @@ final class Plugin {
 		$this->container->get( 'rest.settings' )->register();
 		$this->container->get( 'rest.preview' )->register();
 		$this->container->get( 'rest.conflicts' )->register();
+
+		if ( is_admin() ) {
+			$this->container->get( 'admin.page' )->register();
+			$this->container->get( 'admin.assets' )->register();
+			$this->container->get( 'admin.meta_box' )->register();
+		}
 	}
 
 	public function container(): Container {
