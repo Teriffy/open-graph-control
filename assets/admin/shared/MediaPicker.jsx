@@ -41,16 +41,9 @@ export default function MediaPicker( { value, onChange, label, help } ) {
 	}, [ value ] );
 
 	return (
-		<div className="ogc-media-picker" style={ { marginBottom: '1rem' } }>
+		<div className="ogc-media-picker">
 			{ label && (
-				<div
-					style={ {
-						fontWeight: 500,
-						marginBottom: '0.25rem',
-					} }
-				>
-					{ label }
-				</div>
+				<div className="ogc-media-picker__label">{ label }</div>
 			) }
 
 			<MediaUploadCheck>
@@ -59,24 +52,12 @@ export default function MediaPicker( { value, onChange, label, help } ) {
 					value={ value || undefined }
 					onSelect={ ( media ) => onChange( media.id || 0 ) }
 					render={ ( { open } ) => (
-						<div
-							style={ {
-								display: 'flex',
-								gap: '0.5rem',
-								alignItems: 'center',
-							} }
-						>
+						<div className="ogc-media-picker__row">
 							{ preview && (
 								<img
 									src={ preview.url }
 									alt={ preview.alt }
-									style={ {
-										width: '80px',
-										height: '80px',
-										objectFit: 'cover',
-										borderRadius: '4px',
-										border: '1px solid #dcdcde',
-									} }
+									className="ogc-media-picker__preview"
 								/>
 							) }
 							<Button variant="secondary" onClick={ open }>
@@ -104,17 +85,7 @@ export default function MediaPicker( { value, onChange, label, help } ) {
 				/>
 			</MediaUploadCheck>
 
-			{ help && (
-				<p
-					style={ {
-						fontSize: '0.85em',
-						color: '#50575e',
-						marginTop: '0.25rem',
-					} }
-				>
-					{ help }
-				</p>
-			) }
+			{ help && <p className="ogc-media-picker__help">{ help }</p> }
 		</div>
 	);
 }

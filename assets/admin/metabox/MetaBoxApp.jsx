@@ -44,14 +44,12 @@ function status( text, kind ) {
 function CharCount( { value, kind } ) {
 	const severity = status( value, kind );
 	const limit = LIMITS[ kind ]?.error;
-	let color = '#50575e';
-	if ( severity === 'error' ) {
-		color = '#d63638';
-	} else if ( severity === 'warn' ) {
-		color = '#dba617';
-	}
+	const severityClass =
+		severity === 'error' || severity === 'warn'
+			? ` ogc-charcount--${ severity }`
+			: '';
 	return (
-		<span style={ { color, fontSize: '0.85em' } }>
+		<span className={ `ogc-charcount${ severityClass }` }>
 			{ sprintf(
 				/* translators: 1: length, 2: recommended upper limit. */
 				__( '%1$d / %2$d characters', 'open-graph-control' ),
@@ -305,11 +303,8 @@ export default function MetaBoxApp( { postId } ) {
 	];
 
 	return (
-		<div
-			className="ogc-metabox"
-			style={ { display: 'flex', gap: '1.5rem', padding: '0.5rem' } }
-		>
-			<div style={ { flex: 1, minWidth: 0 } }>
+		<div className="ogc-metabox">
+			<div>
 				<TabPanel className="ogc-metabox-tabs" tabs={ tabs }>
 					{ ( tab ) => {
 						if ( tab.name === 'base' ) {
@@ -368,7 +363,7 @@ export default function MetaBoxApp( { postId } ) {
 					} }
 				</TabPanel>
 
-				<div style={ { marginTop: '1rem' } }>
+				<div className="ogc-section-footer">
 					<Button
 						variant="primary"
 						onClick={ save }
@@ -379,12 +374,7 @@ export default function MetaBoxApp( { postId } ) {
 							: __( 'Save overrides', 'open-graph-control' ) }
 					</Button>
 					{ saveState.kind === 'saved' && (
-						<span
-							style={ {
-								marginLeft: '1rem',
-								color: '#00a32a',
-							} }
-						>
+						<span className="ogc-section-footer__status ogc-section-footer__status--saved">
 							{ __( 'Saved.', 'open-graph-control' ) }
 						</span>
 					) }
@@ -396,7 +386,7 @@ export default function MetaBoxApp( { postId } ) {
 				</div>
 			</div>
 
-			<div style={ { width: '320px', flexShrink: 0 } }>
+			<div className="ogc-metabox__preview-pane">
 				<Preview { ...previewProps } />
 				<WarningList warnings={ warnings } />
 			</div>

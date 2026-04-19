@@ -82,7 +82,7 @@ export default function Security() {
 					{ __( 'No data leaves your server', 'open-graph-control' ) }
 				</CardHeader>
 				<CardBody>
-					<p style={ { margin: 0 } }>
+					<p className="ogc-security__lead">
 						{ __(
 							'Open Graph Control never calls an external API, never phones home, and never ships telemetry. Everything you see in the tags is resolved and rendered inside your WordPress install.',
 							'open-graph-control'
@@ -96,11 +96,11 @@ export default function Security() {
 					{ __( 'Layered defenses', 'open-graph-control' ) }
 				</CardHeader>
 				<CardBody>
-					<ul style={ { margin: 0, paddingLeft: '1.2rem' } }>
+					<ul className="ogc-security__list">
 						{ DEFENSES.map( ( { label, detail } ) => (
 							<li
 								key={ label }
-								style={ { marginBottom: '0.5rem' } }
+								className="ogc-security__list-item"
 							>
 								<strong>{ label }.</strong> { detail }
 							</li>
@@ -120,7 +120,7 @@ export default function Security() {
 					<table className="wp-list-table widefat striped">
 						<thead>
 							<tr>
-								<th style={ { width: '30%' } }>
+								<th className="ogc-security__owasp-risk">
 									{ __( 'Risk', 'open-graph-control' ) }
 								</th>
 								<th>
@@ -142,14 +142,7 @@ export default function Security() {
 							) ) }
 						</tbody>
 					</table>
-					<p
-						style={ {
-							marginTop: '0.75rem',
-							marginBottom: 0,
-							fontSize: '0.85em',
-							color: '#50575e',
-						} }
-					>
+					<p className="ogc-muted ogc-security__footnote">
 						{ __(
 							'Not applicable to this plugin: A02 Cryptographic Failures, A07 Auth (delegated to WP core), A09 Logging (delegated to host).',
 							'open-graph-control'
@@ -163,23 +156,15 @@ export default function Security() {
 					{ __( 'Audit trail', 'open-graph-control' ) }
 				</CardHeader>
 				<CardBody>
-					<ul style={ { margin: 0, paddingLeft: '1.2rem' } }>
+					<ul className="ogc-security__list">
 						{ AUDIT_LOG.map( ( entry ) => (
 							<li
 								key={ entry.ref }
-								style={ { marginBottom: '0.5rem' } }
+								className="ogc-security__list-item"
 							>
 								<code>{ entry.date }</code> —{ ' ' }
 								<strong>{ entry.title }</strong>{ ' ' }
-								<span
-									style={ {
-										padding: '1px 6px',
-										borderRadius: '3px',
-										background: '#fbeaea',
-										color: '#8a2424',
-										fontSize: '0.8em',
-									} }
-								>
+								<span className="ogc-security-badge">
 									{ entry.severity }
 								</span>
 								<br />
@@ -202,13 +187,13 @@ export default function Security() {
 					{ __( 'Responsible disclosure', 'open-graph-control' ) }
 				</CardHeader>
 				<CardBody>
-					<p style={ { marginTop: 0 } }>
+					<p className="ogc-security__lead">
 						{ __(
 							'Found a vulnerability? Please don\u2019t open a public issue. Use the private advisory form on GitHub or email the address in SECURITY.md.',
 							'open-graph-control'
 						) }
 					</p>
-					<p style={ { marginBottom: 0 } }>
+					<p className="ogc-security__links">
 						<a
 							href="https://github.com/Teriffy/open-graph-control/security/advisories/new"
 							target="_blank"
@@ -231,14 +216,7 @@ export default function Security() {
 							) }
 						</a>
 					</p>
-					<p
-						style={ {
-							marginTop: '0.75rem',
-							marginBottom: 0,
-							fontSize: '0.85em',
-							color: '#50575e',
-						} }
-					>
+					<p className="ogc-muted ogc-security__footnote">
 						{ __(
 							'Response SLA: 3 business days. Fix SLA: 30 days for confirmed valid reports. Credit given in release notes unless you prefer anonymity.',
 							'open-graph-control'

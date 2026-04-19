@@ -107,13 +107,9 @@ export default function App() {
 				{ __( 'Open Graph Control', 'open-graph-control' ) }
 			</h1>
 
-			<div
-				className="ogc-layout"
-				style={ { display: 'flex', gap: '1.5rem', marginTop: '1rem' } }
-			>
+			<div className="ogc-layout">
 				<nav
 					className="ogc-nav"
-					style={ { minWidth: '180px' } }
 					aria-label={ __(
 						'Settings sections',
 						'open-graph-control'
@@ -126,15 +122,9 @@ export default function App() {
 							aria-current={
 								key === activeKey ? 'page' : undefined
 							}
-							className={ `components-button ${
+							className={ `components-button ogc-nav-item ${
 								key === activeKey ? 'is-primary' : ''
 							}` }
-							style={ {
-								display: 'block',
-								width: '100%',
-								marginBottom: '4px',
-								textAlign: 'left',
-							} }
 							onClick={ () => setActiveKey( key ) }
 						>
 							{ label }
@@ -142,14 +132,14 @@ export default function App() {
 					) ) }
 				</nav>
 
-				<main className="ogc-content" style={ { flex: 1 } }>
+				<main className="ogc-content">
 					<SectionComponent
 						settings={ settings }
 						conflicts={ conflicts }
 						onChange={ applyPatch }
 					/>
 
-					<div style={ { marginTop: '1.5rem' } }>
+					<div className="ogc-section-footer">
 						<Button
 							variant="primary"
 							onClick={ save }
@@ -160,22 +150,12 @@ export default function App() {
 								: __( 'Save changes', 'open-graph-control' ) }
 						</Button>
 						{ status.kind === 'saved' && (
-							<span
-								style={ {
-									marginLeft: '1rem',
-									color: '#00a32a',
-								} }
-							>
+							<span className="ogc-section-footer__status ogc-section-footer__status--saved">
 								{ __( 'Saved.', 'open-graph-control' ) }
 							</span>
 						) }
 						{ status.kind === 'error' && (
-							<span
-								style={ {
-									marginLeft: '1rem',
-									color: '#d63638',
-								} }
-							>
+							<span className="ogc-section-footer__status ogc-section-footer__status--error">
 								{ status.message }
 							</span>
 						) }

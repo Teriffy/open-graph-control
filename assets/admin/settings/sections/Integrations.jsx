@@ -44,13 +44,11 @@ export default function Integrations( { settings, conflicts, onChange } ) {
 					<CardHeader>
 						<strong>{ integration.label }</strong>
 						<span
-							style={ {
-								marginLeft: '0.5rem',
-								fontSize: '0.85em',
-								color: integration.active
-									? '#d63638'
-									: '#50575e',
-							} }
+							className={ `ogc-inline-marker ${
+								integration.active
+									? 'ogc-inline-marker--active'
+									: 'ogc-inline-marker--muted'
+							}` }
 						>
 							{ integration.active
 								? __( 'active', 'open-graph-control' )
