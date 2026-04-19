@@ -95,19 +95,14 @@ function Chain( { label, steps, available, onChange } ) {
 				<strong>{ label }</strong>
 			</CardHeader>
 			<CardBody>
-				<ol style={ { paddingLeft: '1.5rem' } }>
+				<ol className="ogc-chain-list">
 					{ steps.map( ( step, idx ) => (
 						<li
 							key={ `${ step }-${ idx }` }
-							style={ {
-								marginBottom: '0.25rem',
-								display: 'flex',
-								alignItems: 'center',
-								gap: '0.5rem',
-							} }
+							className="ogc-chain-step"
 						>
 							<code>{ step }</code>
-							<span style={ { flex: 1, opacity: 0.7 } }>
+							<span className="ogc-chain-step__label">
 								{ stepLabel( step ) }
 							</span>
 							<Button
@@ -138,15 +133,8 @@ function Chain( { label, steps, available, onChange } ) {
 					) ) }
 				</ol>
 				{ missing.length > 0 && (
-					<div
-						style={ {
-							display: 'flex',
-							alignItems: 'flex-end',
-							gap: '0.5rem',
-							marginTop: '0.5rem',
-						} }
-					>
-						<div style={ { flex: 1 } }>
+					<div className="ogc-chain-add">
+						<div className="ogc-fill">
 							<SelectControl
 								label={ __( 'Add step', 'open-graph-control' ) }
 								value={ toAdd }
@@ -163,7 +151,7 @@ function Chain( { label, steps, available, onChange } ) {
 						</Button>
 					</div>
 				) }
-				<p style={ { fontSize: '0.85em', opacity: 0.7 } }>
+				<p className="ogc-hint">
 					{ __(
 						'First non-empty step wins. Removed steps can be added back from the dropdown above.',
 						'open-graph-control'

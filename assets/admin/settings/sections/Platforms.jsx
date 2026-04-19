@@ -53,13 +53,7 @@ export default function Platforms( { settings, onChange } ) {
 	return (
 		<div className="ogc-section-platforms">
 			<h2>{ __( 'Platforms', 'open-graph-control' ) }</h2>
-			<div
-				style={ {
-					display: 'flex',
-					gap: '0.5rem',
-					marginBottom: '1rem',
-				} }
-			>
+			<div className="ogc-toolbar">
 				<Button
 					variant="secondary"
 					onClick={ () => bulkToggle( true ) }

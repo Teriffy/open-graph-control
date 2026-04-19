@@ -138,6 +138,64 @@
 	}
 }
 
+// Most CardBody blocks open with a heading; neutralise the default <h3>
+// margin so it sits against the card's own top padding instead of
+// gaining a phantom 0.83em gap.
+.components-card__body h3:first-child {
+	margin-top: 0;
+}
+
+// Preformatted JSON / code block (Debug JSON-LD preview, Import/Export
+// settings dump).
+.ogc-code-block {
+	background: var(--ogc-color-surface-hover);
+	padding: 0.75rem;
+	overflow: auto;
+	max-height: 20rem;
+}
+
+// Horizontal button toolbar (Enable/Disable all, etc.).
+.ogc-toolbar {
+	display: flex;
+	gap: var(--ogc-space-sm);
+	margin-bottom: var(--ogc-space-md);
+}
+
+// Column that expands to fill available flex space.
+.ogc-fill {
+	flex: 1;
+}
+
+// Footer-sized muted note (smaller than .ogc-muted for dense copy).
+.ogc-hint {
+	font-size: var(--ogc-font-size-sm);
+	opacity: 0.7;
+}
+
+// FallbackChains — ordered list of resolver steps.
+.ogc-chain-list {
+	padding-left: 1.5rem;
+}
+
+.ogc-chain-step {
+	display: flex;
+	align-items: center;
+	gap: var(--ogc-space-sm);
+	margin-bottom: var(--ogc-space-xs);
+
+	&__label {
+		flex: 1;
+		opacity: 0.7;
+	}
+}
+
+.ogc-chain-add {
+	display: flex;
+	align-items: flex-end;
+	gap: var(--ogc-space-sm);
+	margin-top: var(--ogc-space-sm);
+}
+
 // Media picker — shared across settings + meta box.
 .ogc-media-picker {
 	margin-bottom: var(--ogc-space-md);

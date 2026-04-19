@@ -80,7 +80,7 @@ export default function Images() {
 
 			<Card>
 				<CardBody>
-					<h3 style={ { marginTop: 0 } }>
+					<h3>
 						{ __(
 							'Regenerate existing attachments',
 							'open-graph-control'

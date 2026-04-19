@@ -95,9 +95,7 @@ export default function Advanced( { settings, onChange } ) {
 
 			<Card>
 				<CardBody>
-					<h3 style={ { marginTop: 0 } }>
-						{ __( 'Reset to defaults', 'open-graph-control' ) }
-					</h3>
+					<h3>{ __( 'Reset to defaults', 'open-graph-control' ) }</h3>
 					<p>
 						{ __(
 							'Deletes the stored settings row and reseeds from the plugin defaults. Per-post overrides stay untouched.',

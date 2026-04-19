@@ -76,13 +76,13 @@ export default function Debug() {
 			{ state.kind === 'ok' && result && (
 				<Card>
 					<CardBody>
-						<h3 style={ { marginTop: 0 } }>
+						<h3>
 							{ __( 'Emitted meta tags', 'open-graph-control' ) }
 						</h3>
-						<table className="wp-list-table widefat striped">
+						<table className="wp-list-table widefat striped ogc-debug-tag-table">
 							<thead>
 								<tr>
-									<th style={ { width: '25%' } }>
+									<th>
 										{ __( 'Key', 'open-graph-control' ) }
 									</th>
 									<th>
@@ -115,14 +115,7 @@ export default function Debug() {
 										'open-graph-control'
 									) }
 								</h3>
-								<pre
-									style={ {
-										background: '#f0f0f1',
-										padding: '0.75rem',
-										overflow: 'auto',
-										maxHeight: '20rem',
-									} }
-								>
+								<pre className="ogc-code-block">
 									{ result.json_ld.join( '\n\n' ) }
 								</pre>
 							</>
@@ -133,7 +126,7 @@ export default function Debug() {
 
 			<Card>
 				<CardBody>
-					<h3 style={ { marginTop: 0 } }>
+					<h3>
 						{ __( 'External validators', 'open-graph-control' ) }
 					</h3>
 					<p>

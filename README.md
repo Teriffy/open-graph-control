@@ -4,7 +4,7 @@
 ![PHP](https://img.shields.io/badge/PHP-%3E%3D8.1-blue)
 ![WordPress](https://img.shields.io/badge/WordPress-%3E%3D6.2-blue)
 ![License](https://img.shields.io/badge/License-GPL--2.0--or--later-green)
-![Tests](https://img.shields.io/badge/tests-173%20unit%20%7C%2018%20E2E%20%7C%204%20WP-brightgreen)
+![Tests](https://img.shields.io/badge/tests-173%20unit%20%7C%2018%20E2E%20%7C%208%20WP-brightgreen)
 ![PHPStan](https://img.shields.io/badge/PHPStan-level%208-blueviolet)
 [![Security policy](https://img.shields.io/badge/security-policy-informational)](SECURITY.md)
 
@@ -36,10 +36,11 @@ A WordPress plugin that emits Open Graph and social meta tags for 12 platforms, 
 
 **Quality gates (CI)**
 
-- PHP 8.1–8.4 matrix × PHPUnit (170 tests, 327 assertions) + PHPStan level 8 + WPCS
+- PHP 8.1–8.4 matrix × PHPUnit (173 tests, 335 assertions) + PHPStan level 8 + WPCS
 - Code coverage uploaded as artifact
 - JS lint (`@wordpress/scripts` ESLint + Prettier) + Webpack build
 - Playwright fixture suite (18 tests: rendering + `@axe-core` WCAG 2 A/AA scan)
+- Playwright WP suite (8 tests: activation, settings save, metabox override, frontend tags, axe on live wp-admin, responsive layout ≤782px) — opt-in via `OGC_E2E_WP=1`
 - [WordPress/plugin-check-action](https://github.com/WordPress/plugin-check-action) against the built dist zip on every push
 
 ## Security
