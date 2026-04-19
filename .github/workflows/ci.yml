@@ -57,15 +57,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          coverage: none
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
-      - name: Build production plugin zip
-        run: |
-          npm install --no-audit --no-fund --prefer-offline
-          npm run build
+      - name: Build production plugin directory
+        run: bash bin/make-dist.sh
       - uses: WordPress/plugin-check-action@v1
         with:
-          build-dir: './'
-          exclude-directories: 'node_modules,tests,docs,bin,.github,.wordpress-org,.superpowers,assets/admin'
-          categories: 'plugin_repo,security,performance,accessibility,general'
+          build-dir: './dist/open-graph-control'
+          categories: 'plugin_repo,security,accessibility,general'
