@@ -196,6 +196,23 @@
 	margin-top: var(--ogc-space-sm);
 }
 
+// Small inline badge used in list tables to label "fields set" on archive
+// overrides. Neutral info surface by default, error surface for `exclude`.
+.ogc-pill {
+	display: inline-block;
+	padding: 1px 6px;
+	border-radius: 3px;
+	font-size: var(--ogc-font-size-xs);
+	margin-right: var(--ogc-space-xs);
+	background: var(--ogc-color-info-surface);
+	color: var(--ogc-color-info-strong);
+
+	&--error {
+		background: var(--ogc-color-error-surface);
+		color: var(--ogc-color-error-strong);
+	}
+}
+
 // Media picker — shared across settings + meta box.
 .ogc-media-picker {
 	margin-bottom: var(--ogc-space-md);

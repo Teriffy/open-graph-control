@@ -7,6 +7,7 @@ import Overview from './sections/Overview.jsx';
 import SiteDefaults from './sections/SiteDefaults.jsx';
 import Platforms from './sections/Platforms.jsx';
 import PostTypes from './sections/PostTypes.jsx';
+import ArchiveOverrides from './sections/ArchiveOverrides.jsx';
 import Images from './sections/Images.jsx';
 import FallbackChains from './sections/FallbackChains.jsx';
 import Integrations from './sections/Integrations.jsx';
@@ -20,6 +21,11 @@ const SECTIONS = [
 	{ key: 'site', label: 'Site defaults', Component: SiteDefaults },
 	{ key: 'platforms', label: 'Platforms', Component: Platforms },
 	{ key: 'post-types', label: 'Post types', Component: PostTypes },
+	{
+		key: 'archive-overrides',
+		label: 'Archive overrides',
+		Component: ArchiveOverrides,
+	},
 	{ key: 'images', label: 'Images', Component: Images },
 	{ key: 'fallback', label: 'Fallback chains', Component: FallbackChains },
 	{ key: 'integrations', label: 'Integrations', Component: Integrations },
