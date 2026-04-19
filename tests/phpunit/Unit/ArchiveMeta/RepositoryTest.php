@@ -102,4 +102,35 @@ final class RepositoryTest extends TestCase {
 		Functions\expect( 'update_term_meta' )->never();
 		self::assertTrue( ( new Repository() )->save( 'user', 3, array( 'title' => 'Evžen' ) ) );
 	}
+
+	public function test_register_meta_iterates_public_taxonomies(): void {
+		$registered = [];
+		Functions\when( 'get_taxonomies' )->justReturn(
+			[
+				'category'       => 'category',
+				'post_tag'       => 'post_tag',
+				'portfolio_type' => 'portfolio_type',
+				'attachment'     => 'attachment',
+			]
+		);
+		Functions\when( 'register_term_meta' )->alias(
+			static function ( string $tax, string $key ) use ( &$registered ): void {
+				$registered[] = "term:{$tax}:{$key}";
+			}
+		);
+		Functions\when( 'register_meta' )->alias(
+			static function ( string $type, string $key ) use ( &$registered ): void {
+				$registered[] = "{$type}:{$key}";
+			}
+		);
+
+		( new Repository() )->register_meta();
+
+		self::assertContains( 'term:category:_ogc_meta', $registered );
+		self::assertContains( 'term:post_tag:_ogc_meta', $registered );
+		self::assertContains( 'term:portfolio_type:_ogc_meta', $registered );
+		self::assertContains( 'user:_ogc_meta', $registered );
+		// attachment must be excluded
+		self::assertNotContains( 'term:attachment:_ogc_meta', $registered );
+	}
 }

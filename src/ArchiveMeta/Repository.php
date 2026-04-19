@@ -26,6 +26,51 @@ class Repository {
 	/** @var array<int, string> */
 	private const ALLOWED_KEYS = array( 'title', 'description', 'image_id', 'exclude' );
 
+	public function register(): void {
+		add_action( 'init', [ $this, 'register_meta' ], 5 );
+	}
+
+	public function register_meta(): void {
+		/** @var array<string, string> $taxonomies */
+		$taxonomies = get_taxonomies( [ 'public' => true ], 'names' );
+		foreach ( $taxonomies as $taxonomy ) {
+			$taxonomy = (string) $taxonomy;
+			if ( 'attachment' === $taxonomy ) {
+				continue;
+			}
+			register_term_meta(
+				$taxonomy,
+				self::META_KEY,
+				[
+					'single'        => true,
+					'type'          => 'object',
+					'show_in_rest'  => false,
+					'default'       => [],
+					'auth_callback' => static function ( bool $allowed, string $meta_key, int $object_id ) use ( $taxonomy ): bool {
+						unset( $allowed, $meta_key );
+						// phpcs:ignore WordPress.WP.Capabilities.Unknown -- taxonomy meta-cap mapped by core via map_meta_cap().
+						return current_user_can( 'manage_terms', $taxonomy, $object_id );
+					},
+				]
+			);
+		}//end foreach
+
+		register_meta(
+			'user',
+			self::META_KEY,
+			[
+				'single'        => true,
+				'type'          => 'object',
+				'show_in_rest'  => false,
+				'default'       => [],
+				'auth_callback' => static function ( bool $allowed, string $meta_key, int $object_id ): bool {
+					unset( $allowed, $meta_key );
+					return current_user_can( 'edit_user', $object_id );
+				},
+			]
+		);
+	}
+
 	/**
 	 * @return array{title: string, description: string, image_id: int, exclude: array<int, string>}
 	 */

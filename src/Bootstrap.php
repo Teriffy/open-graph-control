@@ -22,6 +22,7 @@ use EvzenLeonenko\OpenGraphControl\Admin\Rest\PreviewController;
 use EvzenLeonenko\OpenGraphControl\Admin\Rest\RateLimiter;
 use EvzenLeonenko\OpenGraphControl\Admin\Rest\RegenerateController;
 use EvzenLeonenko\OpenGraphControl\Admin\Rest\SettingsController;
+use EvzenLeonenko\OpenGraphControl\ArchiveMeta\Repository as ArchiveMetaRepository;
 use EvzenLeonenko\OpenGraphControl\Cli\Commands as CliCommands;
 use EvzenLeonenko\OpenGraphControl\Images\Regenerator;
 use EvzenLeonenko\OpenGraphControl\Images\SizeRegistry;
@@ -76,6 +77,10 @@ final class Bootstrap {
 		$container->set(
 			'postmeta.repository',
 			static fn () => new PostMetaRepository()
+		);
+		$container->set(
+			'archivemeta.repository',
+			static fn () => new ArchiveMetaRepository()
 		);
 
 		// Resolvers.
