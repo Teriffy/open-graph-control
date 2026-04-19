@@ -53,4 +53,8 @@ export const api = {
 		request( 'settings', { method: 'POST', body: patch } ),
 	preview: ( data ) => request( 'preview', { method: 'POST', body: data } ),
 	conflicts: () => request( 'conflicts' ),
+	postTypes: () => request( 'post-types' ),
+	getPostMeta: ( postId ) => request( `meta/${ postId }` ),
+	savePostMeta: ( postId, data ) =>
+		request( `meta/${ postId }`, { method: 'POST', body: data } ),
 };

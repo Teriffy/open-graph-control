@@ -6,11 +6,25 @@ import { api } from '../shared/api.js';
 import Overview from './sections/Overview.jsx';
 import SiteDefaults from './sections/SiteDefaults.jsx';
 import Platforms from './sections/Platforms.jsx';
+import PostTypes from './sections/PostTypes.jsx';
+import Images from './sections/Images.jsx';
+import FallbackChains from './sections/FallbackChains.jsx';
+import Integrations from './sections/Integrations.jsx';
+import Debug from './sections/Debug.jsx';
+import ImportExport from './sections/ImportExport.jsx';
+import Advanced from './sections/Advanced.jsx';
 
 const SECTIONS = [
 	{ key: 'overview', label: 'Overview', Component: Overview },
 	{ key: 'site', label: 'Site defaults', Component: SiteDefaults },
 	{ key: 'platforms', label: 'Platforms', Component: Platforms },
+	{ key: 'post-types', label: 'Post types', Component: PostTypes },
+	{ key: 'images', label: 'Images', Component: Images },
+	{ key: 'fallback', label: 'Fallback chains', Component: FallbackChains },
+	{ key: 'integrations', label: 'Integrations', Component: Integrations },
+	{ key: 'debug', label: 'Debug / Test', Component: Debug },
+	{ key: 'import-export', label: 'Import / Export', Component: ImportExport },
+	{ key: 'advanced', label: 'Advanced', Component: Advanced },
 ];
 
 /**

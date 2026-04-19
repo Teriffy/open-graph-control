@@ -13,6 +13,7 @@ use EvzenLeonenko\OpenGraphControl\Admin\Assets;
 use EvzenLeonenko\OpenGraphControl\Admin\MetaBox;
 use EvzenLeonenko\OpenGraphControl\Admin\Page;
 use EvzenLeonenko\OpenGraphControl\Admin\Rest\ConflictController;
+use EvzenLeonenko\OpenGraphControl\Admin\Rest\MetaController;
 use EvzenLeonenko\OpenGraphControl\Admin\Rest\PreviewController;
 use EvzenLeonenko\OpenGraphControl\Admin\Rest\SettingsController;
 use EvzenLeonenko\OpenGraphControl\Images\SizeRegistry;
@@ -198,6 +199,10 @@ final class Bootstrap {
 		$container->set(
 			'rest.conflicts',
 			static fn ( Container $c ) => new ConflictController( $c->get( 'integrations.detector' ) )
+		);
+		$container->set(
+			'rest.meta',
+			static fn ( Container $c ) => new MetaController( $c->get( 'postmeta.repository' ) )
 		);
 
 		// Integrations.
