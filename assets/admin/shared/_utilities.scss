@@ -5,6 +5,34 @@
 
 @import './tokens';
 
+// Metabox layout — used in both bundles (the settings-page preview mirrors
+// the editor-screen metabox) and carries its own responsive breakpoint so
+// the preview pane stacks below the form on mobile wp-admin (≤782px).
+.ogc-metabox {
+	display: flex;
+	gap: var(--ogc-space-lg);
+	padding: var(--ogc-space-sm);
+
+	> :first-child {
+		flex: 1;
+		min-width: 0;
+	}
+
+	&__preview-pane {
+		width: 320px;
+		flex-shrink: 0;
+	}
+
+	@media (max-width: 782px) {
+		flex-direction: column;
+		gap: var(--ogc-space-md);
+
+		&__preview-pane {
+			width: 100%;
+		}
+	}
+}
+
 // Small muted caption (replaces ad-hoc `fontSize: 0.85em; color: #50575e`).
 .ogc-muted {
 	color: var(--ogc-color-text-muted);
