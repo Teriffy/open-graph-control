@@ -4,7 +4,9 @@
 ![PHP](https://img.shields.io/badge/PHP-%3E%3D8.1-blue)
 ![WordPress](https://img.shields.io/badge/WordPress-%3E%3D6.2-blue)
 ![License](https://img.shields.io/badge/License-GPL--2.0--or--later-green)
-![Tests](https://img.shields.io/badge/tests-170%20%7C%2018%20E2E-brightgreen)
+![Tests](https://img.shields.io/badge/tests-173%20unit%20%7C%2018%20E2E%20%7C%204%20WP-brightgreen)
+![PHPStan](https://img.shields.io/badge/PHPStan-level%208-blueviolet)
+[![Security policy](https://img.shields.io/badge/security-policy-informational)](SECURITY.md)
 
 A WordPress plugin that emits Open Graph and social meta tags for 12 platforms, with per-platform rules, SEO-plugin conflict handling, Pinterest Rich Pins, output cache and live per-post preview.
 
@@ -39,6 +41,40 @@ A WordPress plugin that emits Open Graph and social meta tags for 12 platforms, 
 - JS lint (`@wordpress/scripts` ESLint + Prettier) + Webpack build
 - Playwright fixture suite (18 tests: rendering + `@axe-core` WCAG 2 A/AA scan)
 - [WordPress/plugin-check-action](https://github.com/WordPress/plugin-check-action) against the built dist zip on every push
+
+## Security
+
+Open Graph Control is built so **no user data leaves your server**. The plugin does not call any external API, does not phone home, and does not ship telemetry. See [SECURITY.md](SECURITY.md) for the full defensive posture and disclosure process.
+
+**Layered defenses**
+
+- Capability checks on every REST endpoint (`manage_options` for site-wide settings, `edit_post` per post ID for the meta box — no public or subscriber-level write path)
+- Nonce enforcement via `check_admin_referer` on admin-post actions and WP core's `X-WP-Nonce` for REST
+- Output escaping at the edge: `esc_attr` on every tag attribute, `esc_url_raw` on every URL, `esc_html` on admin surfaces
+- JSON-LD payloads encoded with `JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT` + second-layer `str_replace('</', '<\/')` — no string value can break out of the surrounding `<script>` tag
+- Post meta writes allowlist-filtered to six documented keys; arbitrary keys dropped
+- URL scheme filter via `wp_allowed_protocols()` — `javascript:` / `data:` rejected before reaching any meta output
+- Rate-limited `/preview` REST endpoint (20 req/min per user)
+- PHPStan level 8 + 173 PHPUnit tests + Playwright suite gated on every push
+
+**OWASP Top 10 (2021) coverage**
+
+| Risk | Applicable | How we handle it |
+|---|---|---|
+| A01 Broken Access Control | ✓ | Capability + per-object checks on every write path |
+| A02 Cryptographic Failures | — | Plugin does not handle secrets or crypto |
+| A03 Injection (SQL/XSS) | ✓ | WP APIs only (no raw `$wpdb`); output escaping + JSON_HEX_TAG |
+| A04 Insecure Design | ✓ | Deep-merge schema, allowlist-filtered meta, no mass-assignment |
+| A05 Security Misconfiguration | ✓ | Safe defaults, strict mode opt-in, no debug output in production |
+| A06 Vulnerable Components | ✓ | Dependabot + `composer audit` gated in CI |
+| A07 Identification & Authentication | — | Delegated to WordPress core |
+| A08 Software & Data Integrity | ✓ | Import/export signed with schema version; downgrade rejected |
+| A09 Logging & Monitoring | — | Delegated to host/site logging |
+| A10 SSRF | — | Plugin does not issue outbound HTTP requests |
+
+**Responsible disclosure** — please don't open a public issue for security problems. Use the [private advisory form](https://github.com/Teriffy/open-graph-control/security/advisories/new) or email the address in `SECURITY.md`. Response SLA: 3 business days; fix SLA: 30 days.
+
+Public security fixes are tagged `security:` in their commit subject. Latest: [`d330319`](https://github.com/Teriffy/open-graph-control/commit/d330319) — stored XSS via JSON-LD script-tag breakout.
 
 ## Quick start
 
