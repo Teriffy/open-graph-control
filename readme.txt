@@ -4,7 +4,7 @@ Tags: open graph, social meta, twitter cards, pinterest, mastodon
 Requires at least: 6.2
 Tested up to: 6.7
 Requires PHP: 8.0
-Stable tag: 0.0.1
+Stable tag: 0.2.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -37,11 +37,11 @@ Open Graph Control emits correctly-escaped Open Graph, Twitter Card, and platfor
 
 = What it doesn't do (yet) =
 
-* Per-post UI (admin meta box) — on the roadmap for v0.2
 * Per-archive and per-author editor UI — v0.3
 * Dynamic OG image generation from templates — v0.4
+* Playwright end-to-end test suite — v0.3
 
-For now, per-post overrides can be set programmatically via the `ogc_resolve_{title,description,image,type,url,locale}_value` filters or by writing to the `_ogc_meta` post meta key directly.
+Per-post overrides can additionally be set programmatically via the `ogc_resolve_{title,description,image,type,url,locale}_value` filters or by writing to the `_ogc_meta` post meta key directly.
 
 = Not an SEO plugin =
 
@@ -103,10 +103,19 @@ Yes, GPL-2.0-or-later. Source is on GitHub (URL in the plugin header).
 
 == Changelog ==
 
+= 0.2.0 =
+* Full React admin UI: 10 settings sections (Overview, Site defaults, Platforms, Post types, Images, Fallback chains, Integrations, Debug/Test, Import/Export, Advanced)
+* Per-post meta box with Base + X / Twitter + Pinterest + Per-platform tabs, live preview for 7 platforms, and inline validation warnings
+* Validator covering title/description length, missing image, Twitter handle format, Mastodon fediverse:creator format
+* Settings import/export via JSON
+* Debug panel renders current-context tags in a table and links out to Facebook / Twitter / LinkedIn / Pinterest validators
+* REST endpoints: /settings (GET+POST), /preview (POST), /conflicts (GET), /post-types (GET), /meta/{id} (GET+POST)
+* Seeded i18n POT
+
 = 0.0.1 =
-* Initial development snapshot. Backend rendering pipeline complete (12 platforms, 7 SEO integrations, Pinterest Rich Pins JSON-LD). Admin UI shipping in v0.2.
+* Initial development snapshot. Backend rendering pipeline (12 platforms, 7 SEO integrations, Pinterest Rich Pins JSON-LD).
 
 == Upgrade Notice ==
 
-= 0.0.1 =
-First public development snapshot. Back up before upgrading; schema version 1 is not yet considered stable.
+= 0.2.0 =
+First release with a functional admin UI. Schema version 1 is considered stable.
