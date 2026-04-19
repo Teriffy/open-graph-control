@@ -7,8 +7,11 @@ export async function login( page: Page, user = ADMIN ) {
 	await page.goto( '/wp-login.php' );
 	await page.fill( '#user_login', user.username );
 	await page.fill( '#user_pass', user.password );
-	await page.click( '#wp-submit' );
-	await expect( page ).toHaveURL( /\/wp-admin\/?/ );
+	await Promise.all( [
+		page.waitForURL( /\/wp-admin\// ),
+		page.click( '#wp-submit' ),
+	] );
+	await expect( page ).toHaveURL( /\/wp-admin\// );
 }
 
 export async function activatePlugin( page: Page, slug: string ) {

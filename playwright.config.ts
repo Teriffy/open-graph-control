@@ -23,10 +23,11 @@ export default defineConfig( {
 	timeout: 30_000,
 	expect: { timeout: 5_000, toHaveScreenshot: { maxDiffPixelRatio: 0.02 } },
 	fullyParallel: false,
+	workers: runWpSuite ? 1 : undefined,
 	retries: process.env.CI ? 2 : 0,
 	reporter: process.env.CI ? 'github' : 'list',
 	testIgnore: [
-		...( runWpSuite ? [] : [ '**/0[1-4]-*.spec.ts' ] ),
+		...( runWpSuite ? [ '**/fixtures-*.spec.ts' ] : [ '**/0[1-4]-*.spec.ts' ] ),
 		...( process.env.OGC_E2E_SNAPSHOT ? [] : [ '**/fixtures-snapshot.spec.ts' ] ),
 	],
 	use: {
