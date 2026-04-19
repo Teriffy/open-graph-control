@@ -1,0 +1,32 @@
+# Dependencies
+/node_modules/
+/vendor/
+
+# Build output
+/build/
+
+# Env / editor
+.DS_Store
+.idea/
+.vscode/
+*.swp
+
+# Tests
+/coverage/
+/.phpunit.cache/
+/.phpunit.result.cache
+/.playwright/
+/test-results/
+/playwright-report/
+
+# wp-env
+.wp-env.override.json
+
+# Local tools
+/.superpowers/
+
+# Logs
+*.log
+
+# Lock files (keep composer.lock for apps; plugin = exclude)
+/composer.lock
