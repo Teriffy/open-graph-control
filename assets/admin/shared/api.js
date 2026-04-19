@@ -60,4 +60,16 @@ export const api = {
 	regenerateStart: () => request( 'images/regenerate', { method: 'POST' } ),
 	regenerateStatus: () => request( 'images/regenerate' ),
 	resetSettings: () => request( 'settings/reset', { method: 'POST' } ),
+	archive: {
+		getTerm: ( tax, id ) => request( `archive-meta/term/${ tax }/${ id }` ),
+		saveTerm: ( tax, id, body ) =>
+			request( `archive-meta/term/${ tax }/${ id }`, {
+				method: 'POST',
+				body,
+			} ),
+		getUser: ( id ) => request( `archive-meta/user/${ id }` ),
+		saveUser: ( id, body ) =>
+			request( `archive-meta/user/${ id }`, { method: 'POST', body } ),
+		listOverrides: () => request( 'archive-overrides' ),
+	},
 };
