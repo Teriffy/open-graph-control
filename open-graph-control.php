@@ -18,6 +18,7 @@
 
 declare(strict_types=1);
 
+use EvzenLeonenko\OpenGraphControl\Bootstrap;
 use EvzenLeonenko\OpenGraphControl\Container;
 use EvzenLeonenko\OpenGraphControl\Plugin;
 
@@ -39,6 +40,7 @@ add_action(
 	'plugins_loaded',
 	static function (): void {
 		$container = new Container();
+		Bootstrap::register( $container );
 		( new Plugin( $container ) )->boot();
 	}
 );
