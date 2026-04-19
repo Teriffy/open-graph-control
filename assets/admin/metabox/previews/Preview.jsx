@@ -211,6 +211,8 @@ function Card( { platform, title, description, image, siteName, url } ) {
 
 export default function Preview( props ) {
 	const [ active, setActive ] = useState( 'facebook' );
+	const activeLabel =
+		PLATFORM_OPTIONS.find( ( o ) => o.value === active )?.label || active;
 	return (
 		<div className="ogc-preview">
 			<SelectControl
@@ -219,7 +221,13 @@ export default function Preview( props ) {
 				options={ PLATFORM_OPTIONS }
 				onChange={ ( v ) => setActive( v ) }
 			/>
-			<Card platform={ active } { ...props } />
+			<div
+				aria-live="polite"
+				aria-atomic="true"
+				aria-label={ `${ activeLabel } preview` }
+			>
+				<Card platform={ active } { ...props } />
+			</div>
 		</div>
 	);
 }

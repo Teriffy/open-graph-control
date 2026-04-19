@@ -27,7 +27,7 @@ export default defineConfig( {
 	retries: process.env.CI ? 2 : 0,
 	reporter: process.env.CI ? 'github' : 'list',
 	testIgnore: [
-		...( runWpSuite ? [ '**/fixtures-*.spec.ts' ] : [ '**/0[1-4]-*.spec.ts' ] ),
+		...( runWpSuite ? [ '**/fixtures-*.spec.ts' ] : [ '**/0[0-9]-*.spec.ts' ] ),
 		...( process.env.OGC_E2E_SNAPSHOT ? [] : [ '**/fixtures-snapshot.spec.ts' ] ),
 	],
 	use: {
