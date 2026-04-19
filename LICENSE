@@ -1,4 +1,4 @@
-GNU GENERAL PUBLIC LICENSE
+                    GNU GENERAL PUBLIC LICENSE
                        Version 2, June 1991
 
  Copyright (C) 1989, 1991 Free Software Foundation, Inc.,
@@ -63,7 +63,7 @@ modification follow.
 a notice placed by the copyright holder saying it may be distributed
 under the terms of this General Public License.  The "Program", below,
 refers to any such program or work, and a "work based on the Program"
-means either the Program or a derivative work under copyright law:
+means either the Program or any derivative work under copyright law:
 that is to say, a work containing the Program or a portion of it,
 either verbatim or with modifications and/or translated into another
 language.  (Hereinafter, translation is included without limitation in
@@ -101,15 +101,15 @@ above, provided that you also meet all of these conditions:
     parties under the terms of this License.
 
     c) If the modified program normally reads commands interactively
-    when run, you must cause it, when started running in the most
-    ordinary way, to print or display an announcement including an
-    appropriate copyright notice and a notice that there is no warranty
-    (or else, saying that you provide a warranty) and that users may
-    redistribute the program under these conditions, and telling the
-    user how to view a copy of this License.  (Exception: if the Program
-    itself is interactive but does not normally print such an
-    announcement, your work based on the Program is not required to print
-    an announcement.)
+    when run, you must cause it, when started running for such
+    interactive use in the most ordinary way, to print or display an
+    announcement including an appropriate copyright notice and a
+    notice that there is no warranty (or else, saying that you provide
+    a warranty) and that users may redistribute the program under
+    these conditions, and telling the user how to view a copy of this
+    License.  (Exception: if the Program itself is interactive but
+    does not normally print such an announcement, your work based on
+    the Program is not required to print an announcement.)
 
 These requirements apply to the modified work as a whole.  If
 identifiable sections of that work are not derived from the Program,
@@ -118,8 +118,8 @@ themselves, then this License, and its terms, do not apply to those
 sections when you distribute them as separate works.  But when you
 distribute the same sections as part of a whole which is a work based
 on the Program, the distribution of the whole must be on the terms of
-this License, whose permissions extend to the entire whole, and thus to
-every part regardless of who wrote it.
+this License, whose permissions for other licensees extend to the
+entire whole, and thus to each and every part regardless of who wrote it.
 
 Thus, it is not the intent of this section to claim rights or contest
 your rights to work written entirely by you; rather, the intent is to
@@ -179,7 +179,7 @@ parties remain in full compliance.
 
   5. You are not required to accept this License, since you have not
 signed it.  However, nothing else grants you permission to modify or
-distribute the Program (or any part of it).  These actions are
+distribute the Program or its derivative works.  These actions are
 prohibited by law if you do not accept this License.  Therefore, by
 modifying or distributing the Program (or any work based on the
 Program), you indicate your acceptance of this License to do so, and
@@ -191,12 +191,12 @@ Program), the recipient automatically receives a license from the
 original licensor to copy, distribute or modify the Program subject to
 these terms and conditions.  You may not impose any further
 restrictions on the recipients' exercise of the rights granted herein.
-You are not responsible for enforcing compliance by third parties with
+You are not responsible for enforcing compliance by third parties to
 this License.
 
   7. If, as a consequence of a court judgment or allegation of patent
 infringement or for any other reason (not limited to patent issues),
-conditions are imposed on you (whether by court order, settlement or
+conditions are imposed on you (whether by court order, agreement or
 otherwise) that contradict the conditions of this License, they do not
 excuse you from the conditions of this License.  If you cannot
 distribute so as to satisfy simultaneously your obligations under this
@@ -214,13 +214,14 @@ circumstances.
 
 It is not the purpose of this section to induce you to infringe any
 patents or other property right claims or to contest validity of any
-such claims; this section is solely to protect the integrity of the
-free software distribution system, which is implemented by public
-license practices.  Many people have made generous contributions to
-the wide range of software distributed through that system in reliance
-on consistent application of that system; it is up to the author/donor
-to decide if he or she is willing to distribute software through any
-other system and a licensee cannot impose that choice.
+such claims; this section has the sole purpose of protecting the
+integrity of the free software distribution system, which is
+implemented by public license practices.  Many people have made
+generous contributions to the wide range of software distributed
+through that system in reliance on consistent application of that
+system; it is up to the author/donor to decide if he or she is willing
+to distribute software through any other system and a licensee cannot
+impose that choice.
 
 This section is intended to make thoroughly clear what is believed to
 be a consequence of the rest of this License.
@@ -243,17 +244,16 @@ specifies a version number of this License which applies to it and "any
 later version", you have the option of following the terms and conditions
 either of that version or of any later version published by the Free
 Software Foundation.  If the Program does not specify a version number of
-this License which applies to it, you may choose any version ever
-published by the Free Software Foundation.
+this License, you may choose any version ever published by the Free Software
+Foundation.
 
   10. If you wish to incorporate parts of the Program into other free
-programs whose distribution conditions are incompatible with these,
-write to the author to ask for permission.  For software which is
-copyrighted by the Free Software Foundation, write to the Free
-Software Foundation; we sometimes make exceptions for this.  Our
-decision will be guided by the two goals of preserving the free status
-of all derivatives of our free software and of promoting the sharing
-and reuse of software generally.
+programs whose distribution conditions are different, write to the author
+to ask for permission.  For software which is copyrighted by the Free
+Software Foundation, write to the Free Software Foundation; we sometimes
+make exceptions for this.  Our decision will be guided by the two goals
+of preserving the free status of all derivatives of our free software and
+of promoting the sharing and reuse of software generally.
 
                             NO WARRANTY
 
@@ -267,14 +267,15 @@ TO THE QUALITY AND PERFORMANCE OF THE PROGRAM IS WITH YOU.  SHOULD THE
 PROGRAM PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL NECESSARY SERVICING,
 REPAIR OR CORRECTION.
 
-  12. IN NO EVENT SHALL ANY COPYRIGHT HOLDER OR ANY OTHER PARTY WHO MAY
-MODIFY AND/OR REDISTRIBUTE THE PROGRAM AS PERMITTED ABOVE BE LIABLE TO YOU
-FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL OR CONSEQUENTIAL
-DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE PROGRAM (INCLUDING
-BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING RENDERED INACCURATE OR LOSSES
-SUSTAINED BY YOU OR THIRD PARTIES OR A FAILURE OF THE PROGRAM TO OPERATE
-WITH ANY OTHER PROGRAMS), EVEN IF SUCH HOLDER OR OTHER PARTY HAS BEEN
-ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+  12. IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+REDISTRIBUTE THE PROGRAM AS PERMITTED ABOVE, BE LIABLE TO YOU FOR DAMAGES,
+INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES ARISING
+OUT OF THE USE OR INABILITY TO USE THE PROGRAM (INCLUDING BUT NOT LIMITED
+TO LOSS OF DATA OR DATA BEING RENDERED INACCURATE OR LOSSES SUSTAINED BY
+YOU OR THIRD PARTIES OR A FAILURE OF THE PROGRAM TO OPERATE WITH ANY OTHER
+PROGRAMS), EVEN IF SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE
+POSSIBILITY OF SUCH DAMAGES.
 
                      END OF TERMS AND CONDITIONS
 
@@ -282,13 +283,12 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
 
   If you develop a new program, and you want it to be of the greatest
 possible use to the public, the best way to achieve this is to make it
-free software which everyone can redistribute and change under these
-terms.
+free software which everyone can redistribute and change under these terms.
 
   To do so, attach the following notices to the program.  It is safest
 to attach them to the start of each source file to most effectively
-convey the exclusion of warranty; and each file should have the
-"copyright" line and a pointer to where the full notice is found.
+convey the exclusion of warranty; and each file should have at least
+the "copyright" line and a pointer to where the full notice is found.
 
     <one line to give the program's name and a brief idea of what it does.>
     Copyright (C) <year>  <name of author>
@@ -318,22 +318,21 @@ when it starts in an interactive mode:
 
 The hypothetical commands `show w' and `show c' should show the appropriate
 parts of the General Public License.  Of course, the commands you use may
-be as simple as `show w' and `show c'; they can even be
+be called something other than `show w' and `show c'; they could even be
 mouse-clicks or menu items--whatever suits your program.
 
 You should also get your employer (if you work as a programmer) or your
 school, if any, to sign a "copyright disclaimer" for the program, if
 necessary.  Here is a sample; alter the names:
 
-  Yoyodyne, Inc., hereby disclaims all copyright interest in the
-  program `Gnomovision' (which makes passes at compilers) written
-  by James Hacker.
+  Yoyodyne, Inc., hereby disclaims all copyright interest in the program
+  `Gnomovision' (which makes passes at compilers) written by James Hacker.
 
-  <signature of Ty Coon>, 1 April 1989
-  Ty Coon, President of Vice
+  <signature of Moe Ghoul>, 1 April 1989
+  Moe Ghoul, President of Vice
 
-This General Public License does not permit incorporating your program
-into proprietary programs.  If your program is a subroutine library, you
-may consider it more useful to permit linking proprietary applications
-with the library.  If this is what you want to do, use the GNU Lesser
-General Public License instead of this License.
+This General Public License does not permit incorporating your program into
+proprietary programs.  If your program is a subroutine library, you may
+consider it more useful to permit linking proprietary applications with the
+library.  If this is what you want to do, use the GNU Lesser General
+Public License instead of this License.
