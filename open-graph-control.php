@@ -32,6 +32,9 @@ define( 'OGC_FILE', __FILE__ );
 define( 'OGC_DIR', plugin_dir_path( __FILE__ ) );
 define( 'OGC_URL', plugin_dir_url( __FILE__ ) );
 
+register_activation_hook( __FILE__, [ \EvzenLeonenko\OpenGraphControl\Lifecycle::class, 'activate' ] );
+register_deactivation_hook( __FILE__, [ \EvzenLeonenko\OpenGraphControl\Lifecycle::class, 'deactivate' ] );
+
 add_action(
 	'plugins_loaded',
 	static function (): void {
