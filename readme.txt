@@ -4,7 +4,7 @@ Tags: open graph, social meta, twitter cards, pinterest, mastodon
 Requires at least: 6.2
 Tested up to: 6.9
 Requires PHP: 8.1
-Stable tag: 0.2.0
+Stable tag: 0.2.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -46,6 +46,25 @@ Per-post overrides can additionally be set programmatically via the `ogc_resolve
 = Not an SEO plugin =
 
 This plugin handles social/share meta tags only. It does not manage titles or descriptions for Google; use alongside your favorite SEO plugin. If that SEO plugin already emits Open Graph tags, Open Graph Control will offer to take over so you don't end up with duplicate tags.
+
+== Security ==
+
+Open Graph Control is built so **no user data leaves your server**. The plugin does not call any external API, does not phone home, does not ship telemetry, and does not load assets from third-party CDNs.
+
+**What the plugin protects against:**
+
+* **XSS in social meta tags** — every tag attribute is escaped with `esc_attr`, every URL with `esc_url_raw`. The Pinterest Rich Pins JSON-LD payload uses `JSON_HEX_TAG` flags so no post title or author name can break out of the surrounding `<script>` tag.
+* **Privilege escalation** — every REST endpoint is gated by `manage_options` (site settings) or `edit_post` per post ID (meta box). No anonymous or subscriber-level write path exists.
+* **CSRF** — admin-post actions use `check_admin_referer`; REST relies on WordPress core's `X-WP-Nonce` cookie check.
+* **Mass-assignment** — per-post overrides are allowlist-filtered to six documented keys; arbitrary keys are dropped.
+* **Dangerous URL schemes** — image URLs extracted from post content are filtered through `wp_allowed_protocols()`, so `javascript:` / `data:` never reach the output.
+* **Abuse of the preview endpoint** — rate-limited to 20 calls/minute per user.
+
+**Supply-chain hygiene:** PHP 8.1+, zero Composer runtime dependencies, JavaScript build only pulls packages from the `@wordpress/*` and `@axe-core/playwright` namespaces. PHPStan level 8 + 173 PHPUnit unit tests + Playwright integration suite run on every push.
+
+**Responsible disclosure:** please email security reports to the address in `SECURITY.md` on GitHub, or open a private [security advisory](https://github.com/Teriffy/open-graph-control/security/advisories/new). Response SLA: 3 business days; fix SLA: 30 days for confirmed valid reports.
+
+Public security fixes are tagged `security:` in the commit subject and surface in the changelog.
 
 == Installation ==
 
@@ -103,6 +122,11 @@ Yes, GPL-2.0-or-later. Source is on GitHub (URL in the plugin header).
 
 == Changelog ==
 
+= 0.2.1 =
+* security: prevent stored XSS via JSON-LD `<script>` tag breakout in the Pinterest Rich Pins payload. Encodes with `JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT`; adds a second-layer `str_replace` in the renderer. Reachable by an Author-role user via the post title before the fix; no exploitation known in the wild. Regression tests added.
+* security: reject non-http(s) URL schemes (`javascript:`, `data:`, `vbscript:`) extracted from post content before they can reach any meta tag output.
+* docs: add `SECURITY.md` defensive-posture section, OWASP Top 10 coverage table, and a "Security" panel in the admin settings UI.
+
 = 0.2.0 =
 * Full React admin UI: 10 settings sections (Overview, Site defaults, Platforms, Post types, Images, Fallback chains, Integrations, Debug/Test, Import/Export, Advanced)
 * Per-post meta box with Base + X / Twitter + Pinterest + Per-platform tabs, live preview for all 12 platforms, and inline validation warnings
@@ -118,6 +142,9 @@ Yes, GPL-2.0-or-later. Source is on GitHub (URL in the plugin header).
 * Initial development snapshot. Backend rendering pipeline (12 platforms, 7 SEO integrations, Pinterest Rich Pins JSON-LD).
 
 == Upgrade Notice ==
+
+= 0.2.1 =
+Security release. Patches a stored XSS in the Pinterest Rich Pins JSON-LD (author-role exploitable before 0.2.1). Upgrade recommended; no data migration needed.
 
 = 0.2.0 =
 First release with a functional admin UI. Schema version 1 is considered stable.

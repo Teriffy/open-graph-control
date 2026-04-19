@@ -13,6 +13,7 @@ import Integrations from './sections/Integrations.jsx';
 import Debug from './sections/Debug.jsx';
 import ImportExport from './sections/ImportExport.jsx';
 import Advanced from './sections/Advanced.jsx';
+import Security from './sections/Security.jsx';
 
 const SECTIONS = [
 	{ key: 'overview', label: 'Overview', Component: Overview },
@@ -22,6 +23,7 @@ const SECTIONS = [
 	{ key: 'images', label: 'Images', Component: Images },
 	{ key: 'fallback', label: 'Fallback chains', Component: FallbackChains },
 	{ key: 'integrations', label: 'Integrations', Component: Integrations },
+	{ key: 'security', label: 'Security', Component: Security },
 	{ key: 'debug', label: 'Debug / Test', Component: Debug },
 	{ key: 'import-export', label: 'Import / Export', Component: ImportExport },
 	{ key: 'advanced', label: 'Advanced', Component: Advanced },
