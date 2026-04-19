@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<ruleset name="Open Graph Control">
+  <description>WordPress Coding Standards for OGC.</description>
+  <file>src</file>
+  <file>tests</file>
+  <arg name="extensions" value="php"/>
+  <arg name="colors"/>
+
+  <config name="minimum_supported_wp_version" value="6.2"/>
+  <config name="testVersion" value="8.0-"/>
+
+  <rule ref="WordPress"/>
+  <rule ref="WordPress.NamingConventions.ValidVariableName">
+    <properties>
+      <property name="allowed_custom_properties" type="array">
+        <element value="openGraphControl"/>
+      </property>
+    </properties>
+  </rule>
+  <rule ref="WordPress.WP.I18n">
+    <properties>
+      <property name="text_domain" type="array">
+        <element value="open-graph-control"/>
+      </property>
+    </properties>
+  </rule>
+</ruleset>
