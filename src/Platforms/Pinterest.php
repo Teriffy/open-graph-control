@@ -56,7 +56,14 @@ final class Pinterest extends AbstractPlatform {
 		/** @var array<string, mixed> $payload */
 		$payload = apply_filters( 'ogc_pinterest_rich_pin_payload', $payload, $type, $context );
 
-		$encoded = wp_json_encode( $payload, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE );
+		// JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT prevent
+		// an attacker-controlled string (post title, author name, etc.) from
+		// breaking out of the surrounding <script type="application/ld+json">
+		// tag via an embedded </script> sequence.
+		$encoded = wp_json_encode(
+			$payload,
+			JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_UNICODE
+		);
 		return false === $encoded ? null : $encoded;
 	}
 
