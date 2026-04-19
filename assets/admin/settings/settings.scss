@@ -61,6 +61,31 @@
 	}
 }
 
+// Mobile wp-admin (≤782px). WP's own admin bar collapses at this breakpoint
+// and the layout is thumbs-first. We stack the side nav above the content,
+// let it scroll horizontally if sections overflow, and bump hit targets to
+// roughly 44px so taps are reliable.
+@media (max-width: 782px) {
+	.ogc-layout {
+		flex-direction: column;
+		gap: var(--ogc-space-md);
+	}
+
+	.ogc-nav {
+		position: static;
+		min-width: 0;
+		flex-direction: row;
+		flex-wrap: wrap;
+		gap: var(--ogc-space-xs);
+
+		.ogc-nav-item {
+			width: auto;
+			padding: 10px 14px;
+			min-height: 44px;
+		}
+	}
+}
+
 .ogc-content {
 	flex: 1;
 	min-width: 0;
@@ -80,21 +105,9 @@
 	gap: var(--ogc-space-sm);
 }
 
-.ogc-metabox {
-	display: flex;
-	gap: var(--ogc-space-lg);
-	padding: var(--ogc-space-sm);
-
-	> :first-child {
-		flex: 1;
-		min-width: 0;
-	}
-
-	&__preview-pane {
-		width: 320px;
-		flex-shrink: 0;
-	}
-}
+// Note: .ogc-metabox layout lives in shared/_utilities.scss so it's
+// bundled into both settings AND metabox entry points (the rules need
+// to apply inside post-new.php / post.php, whose bundle is metabox.css).
 
 // Images section — dimensions/slug monospace + progress copy.
 .ogc-images__dimensions {
