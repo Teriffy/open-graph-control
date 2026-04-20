@@ -1,6 +1,6 @@
 # Open Graph Control — status & roadmap
 
-> Živý přehled k **2026-04-19**. Plugin běží na **v0.3.0**, zatím není submitnutý na wordpress.org.
+> Živý přehled k **2026-04-20**. Plugin běží na **v0.3.0**, zatím není submitnutý na wordpress.org. **v0.4** (Dynamic OG image generation) — design schválen, čeká na implementační plán.
 
 | | |
 |---|---|
@@ -116,16 +116,116 @@
 
 ## Roadmapa — co nás čeká dál
 
-### v0.4 — Dynamic OG image generation (Project B)
+### v0.4 — Dynamic OG image generation (design schválen)
 
-- 🔲 **Server-side render OG obrázku z template** — title + description + logo + pozadí → PNG, když uživatel nemá vlastní. Pokrývá 80 % blogů co dnes posílají site-master image nebo nic.
-- 🔲 **Volba stack** — PHP GD (vestavěné) vs Imagick vs headless Chromium. Potřebuje vlastní brainstorm.
-- 🔲 **Template editor UI** — bg upload, font picker, position tweaks, preview
-- 🔲 **Disk cache + invalidace** — renderované obrázky v uploads/
-- 🔲 **Font management** — hostované v pluginu, žádné dynamic fetchování za běhu
-- 🔲 **Size variants pipeline** — jeden template → 3 sizes automaticky
+**Co to dělá:** server-side renderuje OG kartu 1200×630 PNG z bundled template (title + description + logo + pozadí) pro každý post / archive / author bez vlastní OG image. Pokrývá ~80 % blogů které dnes posílají site-master image nebo nic. Auto-card je dnes paywall feature u Yoast/RankMath/AIOSEO Pro — náš v0.4 ji odemkne zadarmo s pokrytím 12 platforem.
 
-**Odhad:** 5+ dní práce. Vlastní spec + plán potřebný před implementací.
+#### Architectural decisions (zafixované)
+
+| # | Decision | Rationale |
+|---|---|---|
+| 1 | **Trigger:** fallback only — generuje jen když všechny earlier image chain steps vrátí null | Lowest surprise; uživatel s explicitní imagery dostane svou |
+| 2 | **Timing:** render-on-save v `shutdown` hooku + WP-Cron backfill (5 postů/tick) | Predictable UX pro OG scrapery; nikdy neblokuje editor save |
+| 3 | **Template:** single fixed layout, customizable colors / bg / logo only | YAGNI — multi-preset + editor jsou v0.5+ |
+| 4 | **Render stack:** GD default, Imagick opt-in přes `RendererInterface` + filter | GD universally available; Imagick bez code branch |
+| 5 | **Fonts:** jeden bundled font (Inter, 400 + 700 weights, SIL OFL, ~250 KB) | Predictable metrics → reliable text-fit; zero attack surface |
+
+#### Co se vyrenderuje
+
+```
+┌─────────────────────────────────────────────────────────┐
+│  [logo] SITE NAME                                       │
+│                                                         │
+│   How to ship a WordPress plugin in 2026                │
+│   (auto-shrink 60→52→44→36px, max 3 lines + ellipsis)  │
+│                                                         │
+│   A practical guide to wp.org submission                │
+│   (Inter Regular 28px, max 2 lines + ellipsis)         │
+│                                                         │
+│   example.com · April 2026                              │
+└─────────────────────────────────────────────────────────┘
+                                                  1200×630
+```
+
+Customizable: `bg_type` (gradient/solid/image), `bg_color`, `bg_gradient_to`, `bg_image_id`, `text_color`, `logo_id`, `show_site_name`, `show_meta_line`. Layout / pozice / fonty jsou locked.
+
+#### Scope split
+
+- **Plán A — Dynamic OG card rendering** (~50 tasků, ~2 týdny)
+  Renderer interface + GD + Imagick + Template + Payload + CardStore + CardGenerator + Scheduler + BackfillCron + GcCron + ResolverHook + 5 REST endpointů + 4 WP-CLI commands + admin React tab + per-post/per-archive status badge + bundled Inter font + golden cards CI + perf bench
+
+- **Plán B — Dynamic field sources** (~15 tasků, ~3–4 dny, samostatně)
+  ACF + JetEngine resolvers v `ogc_resolve_title_chain` / `_description_chain` + Settings → Integrations → Dynamic field sources sub-tab s per-post-type dropdownem. Profituje karta i běžné OG meta tagy.
+
+#### Výkonový profil (z designu)
+
+**Per-visitor (návštěvník):**
+
+| Metric | Bez v0.4 | S v0.4 | Delta |
+|---|---|---|---|
+| Single-post render (PHP) | 0.396 ms | ~0.45 ms | **+0.05 ms** (1× `file_exists()`) |
+| Memory per request | baseline | baseline | **0** |
+| Extra HTTP / DB | 0 | 0 | **0** |
+| PNG download | — | static asset (nginx/Apache, žádný PHP) | — |
+
+**Per-save (editor):** 0 ms perceived — render je deferred do `shutdown` hooku (po response).
+
+**Per-render (background):**
+
+| Resource | GD (default) | Imagick (opt-in) |
+|---|---|---|
+| CPU time | 150–200 ms median | 80–100 ms median |
+| Memory peak | ~15 MB | ~25 MB |
+| Disk write | ~50 KB PNG | ~50 KB PNG |
+| Network | 0 | 0 |
+
+**Cron load:** ~1 sec/den backfill + < 0.5 sec/den GC.
+
+**Disk usage:**
+
+| Site | Footprint | Notes |
+|---|---|---|
+| 100 postů | ~5 MB | nepoznáš |
+| 1 000 postů | ~50 MB | běžný blog |
+| 10 000 postů | ~500 MB | admin warning v UI |
+
+#### Plánované test pokrytí (z designu)
+
+| Vrstva | Stávající | +v0.4 | Po dokončení |
+|---|---|---|---|
+| **PHPUnit** | 218 testů, 429 assertions | **+~60** (Payload, Template, CardStore, Scheduler, ResolverHook, BackfillCron, GdRenderer) | ~278 testů |
+| **Playwright fixture** | 18 | **+2** (card-template-settings, field-sources-settings → plán B) | 20 |
+| **Playwright WP E2E** | 12 | **+2** (card-generation, field-source-takeover → plán B) | 14 |
+| **A11y (axe-core)** | settings shell + Security + Archive | **+1 surface** (Card template tab) | + |
+| **Golden cards** | — | **NEW** image-diff job s pinned Docker (Ubuntu + GD + Inter), 5 % tolerance | — |
+| **PHPStan L8** | enforced v CI | enforced | enforced |
+
+**Performance bench targets** (rozšíření `wp ogc bench`):
+
+| Measurement | Target |
+|---|---|
+| Card render (GD, 1200×630) | < 200 ms median |
+| Card render (Imagick) | < 100 ms median |
+| Resolver chain w/ ACF step | < 1 ms median |
+
+#### Co plán **NENÍ** (out of scope, → v0.5+)
+
+- Multi-template presety (Bold / Editorial / Minimal / Vivid)
+- Drag-and-drop / position-tweakable editor
+- Square (600×600) + Pinterest (1000×1500) auto-render
+- User-uploaded fonty
+- Headless Chromium / Node-based rendering (zakázáno wp.org pravidly)
+- ACF repeater traversal, JetEngine dynamic-tag macros
+- Pods / MetaBox / CMB2 field sources
+
+#### Status
+
+- ✅ **Brainstorm dokončen** (5 architectural decisions zafixovaných)
+- ✅ **Design spec napsaný + reviewer-approved** (lokální `docs/superpowers/specs/2026-04-20-dynamic-og-image-design.md`)
+- ⏳ **Implementační plán** — A first, B následně
+- ⏳ **Implementace plán A** — ~2 týdny, ~50 commitů (TDD per task)
+- ⏳ **Implementace plán B** — ~3–4 dny, ~15 commitů
+- ⏳ **Tag v0.4.0** — po A; B případně 0.4.1 nebo 0.5.0
 
 ### v0.3.x — drobné doplňky (backlog)
 
@@ -155,4 +255,4 @@
 
 ---
 
-_Generováno 2026-04-19._
+_Generováno 2026-04-19, aktualizováno 2026-04-20 o v0.4 design._
