@@ -96,6 +96,8 @@ final class Template {
 	/**
 	 * Converts the template to an associative array.
 	 *
+	 * Note: key order is normalized via ksort() in hash(), so callers can rely on any order.
+	 *
 	 * @return array<string,mixed>
 	 */
 	public function to_array(): array {
@@ -117,8 +119,10 @@ final class Template {
 	 * @return string 8-character lowercase hex string.
 	 */
 	public function hash(): string {
-		// phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.serialize_serialize -- Hashing config snapshot, not unserializing untrusted data.
-		return substr( md5( serialize( $this->to_array() ) ), 0, 8 );
+		$data = $this->to_array();
+		ksort( $data );
+		// phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.serialize_serialize -- safe: only typed scalar values from to_array(), no objects/closures.
+		return substr( md5( serialize( $data ) ), 0, 8 );
 	}
 
 	/**
