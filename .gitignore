@@ -28,6 +28,7 @@
 # Local-only (not published)
 /.superpowers/
 /docs/
+/.worktrees/
 
 # Logs
 *.log
