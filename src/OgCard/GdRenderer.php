@@ -35,18 +35,10 @@ final class GdRenderer implements RendererInterface {
 	 *
 	 * @param FontProvider $fonts Font provider for text rendering.
 	 */
-	public function __construct( private readonly FontProvider $fonts ) {}
-
-	/**
-	 * Gets the font provider.
-	 *
-	 * @return FontProvider The font provider for text rendering.
-	 *
-	 * @internal Used in Tasks 2.4+ for title and description rendering.
-	 */
-	protected function get_fonts(): FontProvider {
-		return $this->fonts;
-	}
+	public function __construct(
+		/** @phpstan-ignore property.onlyWritten */
+		private readonly FontProvider $fonts
+	) {}
 
 	/**
 	 * Renders a card to PNG bytes.
@@ -76,8 +68,6 @@ final class GdRenderer implements RendererInterface {
 		ob_start();
 		imagepng( $canvas, null, 6 );
 		$bytes = (string) ob_get_clean();
-		// phpcs:ignore Generic.PHP.DeprecatedFunctions.Deprecated -- imagedestroy is deprecated in PHP 8.0+ but still necessary for compatibility.
-		imagedestroy( $canvas );
 
 		return $bytes;
 	}
