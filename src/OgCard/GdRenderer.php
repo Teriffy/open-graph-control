@@ -75,8 +75,8 @@ final class GdRenderer implements RendererInterface {
 	/**
 	 * Paints the background on the canvas.
 	 *
-	 * Currently supports solid backgrounds only. Future enhancements will add
-	 * gradient and image backgrounds.
+	 * Dispatches to appropriate background painter based on template bg_type.
+	 * Supports solid, gradient, and image (fallthrough) backgrounds.
 	 *
 	 * @param \GdImage $canvas   The canvas image resource.
 	 * @param Template $template Template configuration.
@@ -85,12 +85,52 @@ final class GdRenderer implements RendererInterface {
 	 * @throws \RuntimeException When color allocation fails.
 	 */
 	private function paint_background( \GdImage $canvas, Template $template ): void {
-		$rgb   = $this->hex_to_rgb( $template->bg_color );
-		$color = imagecolorallocate( $canvas, $rgb[0], $rgb[1], $rgb[2] );
-		if ( false === $color ) {
-			throw new \RuntimeException( 'imagecolorallocate failed' );
+		if ( 'solid' === $template->bg_type ) {
+			$rgb   = $this->hex_to_rgb( $template->bg_color );
+			$color = imagecolorallocate( $canvas, $rgb[0], $rgb[1], $rgb[2] );
+			if ( false === $color ) {
+				throw new \RuntimeException( 'imagecolorallocate failed' );
+			}
+			imagefilledrectangle( $canvas, 0, 0, self::WIDTH, self::HEIGHT, $color );
+			return;
 		}
-		imagefilledrectangle( $canvas, 0, 0, self::WIDTH, self::HEIGHT, $color );
+		if ( 'gradient' === $template->bg_type ) {
+			$this->paint_gradient( $canvas, $template->bg_color, $template->bg_gradient_to );
+			return;
+		}
+		// Image bg handled in next task.
+	}
+
+	/**
+	 * Paints a gradient background from one color to another.
+	 *
+	 * Creates a 135° gradient (top-left to bottom-right) by drawing diagonal
+	 * lines with linearly interpolated colors across all diagonals.
+	 *
+	 * @param \GdImage $canvas   The canvas image resource.
+	 * @param string   $from_hex Starting color in hex format.
+	 * @param string   $to_hex   Ending color in hex format.
+	 *
+	 * @return void
+	 * @throws \RuntimeException When color allocation fails.
+	 */
+	private function paint_gradient( \GdImage $canvas, string $from_hex, string $to_hex ): void {
+		[ $fr, $fg, $fb ] = $this->hex_to_rgb( $from_hex );
+		[ $tr, $tg, $tb ] = $this->hex_to_rgb( $to_hex );
+		// 135° gradient (top-left → bottom-right).
+		$steps = self::WIDTH + self::HEIGHT;
+		for ( $i = 0; $i < $steps; $i++ ) {
+			$ratio = $i / $steps;
+			$r     = (int) ( $fr + ( $tr - $fr ) * $ratio );
+			$g     = (int) ( $fg + ( $tg - $fg ) * $ratio );
+			$b     = (int) ( $fb + ( $tb - $fb ) * $ratio );
+			$color = imagecolorallocate( $canvas, $r, $g, $b );
+			if ( false === $color ) {
+				throw new \RuntimeException( 'imagecolorallocate failed' );
+			}
+			// Diagonal line at constant x+y = i.
+			imageline( $canvas, $i, 0, 0, $i, $color );
+		}
 	}
 
 	/**

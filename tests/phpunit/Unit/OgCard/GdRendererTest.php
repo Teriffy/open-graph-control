@@ -33,9 +33,28 @@ final class GdRendererTest extends TestCase {
 			Template::default()->with( [ 'bg_type' => 'solid' ] ),
 			new Payload( 'Hello', 'World', 'site', 'https://x.test', '' )
 		);
-		$img = imagecreatefromstring( $bytes );
+		$img      = imagecreatefromstring( $bytes );
 		$this->assertSame( 1200, imagesx( $img ) );
 		$this->assertSame( 630, imagesy( $img ) );
-		imagedestroy( $img );
+	}
+
+	public function test_gradient_background_blends_colors(): void {
+		$renderer = new GdRenderer( new FontProvider() );
+		$bytes    = $renderer->render(
+			Template::default()->with(
+				[
+					'bg_type'        => 'gradient',
+					'bg_color'       => '#000000',
+					'bg_gradient_to' => '#ffffff',
+				]
+			),
+			new Payload( 'Hi', 'd', 's', 'https://x.test', '' )
+		);
+		$img      = imagecreatefromstring( $bytes );
+		// Top-left pixel should be near black, bottom-right near white.
+		$tl = imagecolorat( $img, 0, 0 );
+		$br = imagecolorat( $img, 1199, 629 );
+		$this->assertLessThan( 30, ( $tl >> 16 ) & 0xFF, 'Top-left red channel near 0' );
+		$this->assertGreaterThan( 220, ( $br >> 16 ) & 0xFF, 'Bottom-right red channel near 255' );
 	}
 }
