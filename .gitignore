@@ -25,8 +25,9 @@
 # wp-env
 .wp-env.override.json
 
-# Local tools
+# Local-only (not published)
 /.superpowers/
+/docs/
 
 # Logs
 *.log

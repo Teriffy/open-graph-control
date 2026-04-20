@@ -1,7 +1,6 @@
 # Open Graph Control — status & roadmap
 
 > Živý přehled k **2026-04-19**. Plugin běží na **v0.3.0**, zatím není submitnutý na wordpress.org.
-> Lokální barevná verze: [`docs/roadmap.html`](docs/roadmap.html).
 
 | | |
 |---|---|
@@ -156,4 +155,4 @@
 
 ---
 
-_Generováno 2026-04-19. Lokální interaktivní verze s light/dark mode: [`docs/roadmap.html`](docs/roadmap.html)._
+_Generováno 2026-04-19._
