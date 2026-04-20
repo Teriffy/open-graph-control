@@ -102,7 +102,9 @@ final class GdRendererTest extends TestCase {
 		// Smoke: image still 1200×630, no exception
 		$img = imagecreatefromstring( $bytes );
 		$this->assertSame( 1200, imagesx( $img ) );
+		// phpcs:disable Generic.PHP.DeprecatedFunctions.Deprecated -- 8.5 deprecation; we explicitly free memory.
 		imagedestroy( $img );
+		// phpcs:enable Generic.PHP.DeprecatedFunctions.Deprecated
 	}
 
 	public function test_very_long_title_does_not_overflow_canvas(): void {
@@ -113,6 +115,16 @@ final class GdRendererTest extends TestCase {
 			new Payload( $longest, 'd', 's', 'https://x.test', '' )
 		);
 		// Just confirms no exception + valid PNG
+		$this->assertSame( "\x89PNG\r\n\x1a\n", substr( $bytes, 0, 8 ) );
+	}
+
+	public function test_description_truncates_after_two_lines(): void {
+		$renderer = new GdRenderer( new FontProvider() );
+		$long     = str_repeat( 'A practical guide to WordPress plugin development. ', 10 );
+		$bytes    = $renderer->render(
+			Template::default()->with( [ 'bg_type' => 'solid' ] ),
+			new Payload( 'T', $long, 's', 'https://x.test', '' )
+		);
 		$this->assertSame( "\x89PNG\r\n\x1a\n", substr( $bytes, 0, 8 ) );
 	}
 }

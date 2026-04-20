@@ -64,6 +64,7 @@ final class GdRenderer implements RendererInterface {
 
 		$this->paint_background( $canvas, $template );
 		$this->paint_title( $canvas, $template, $payload );
+		$this->paint_description( $canvas, $template, $payload );
 
 		ob_start();
 		imagepng( $canvas, null, 6 );
@@ -227,6 +228,9 @@ final class GdRenderer implements RendererInterface {
 	private const TITLE_MAX_W    = 1040;
 	private const TITLE_TOP_Y    = 240;
 	private const TITLE_LINE_GAP = 12;
+	private const DESC_TOP_Y     = 470;
+	private const DESC_LINE_GAP  = 8;
+	private const DESC_MAX_LINES = 2;
 
 	/**
 	 * Paints the title on the canvas with auto-shrink and word-wrap.
@@ -336,5 +340,53 @@ final class GdRenderer implements RendererInterface {
 			$lines[] = $cur;
 		}
 		return $lines;
+	}
+
+	/**
+	 * Paints the description on the canvas with word-wrap and 2-line truncation.
+	 *
+	 * Renders the description using the template's text color and regular font. Wraps text
+	 * to fit within the available width and truncates to a maximum of 2 lines with ellipsis.
+	 * Returns early if the description is empty.
+	 *
+	 * @param \GdImage $canvas   The canvas image resource.
+	 * @param Template $template Template configuration.
+	 * @param Payload  $payload  Payload data containing the description.
+	 *
+	 * @return void
+	 * @throws \RuntimeException When color allocation fails.
+	 */
+	private function paint_description( \GdImage $canvas, Template $template, Payload $payload ): void {
+		if ( '' === $payload->description ) {
+			return;
+		}
+		$font_path = $this->fonts->path( 'regular' );
+		$rgb       = $this->hex_to_rgb( $template->text_color );
+		$color     = imagecolorallocate( $canvas, $rgb[0], $rgb[1], $rgb[2] );
+		if ( false === $color ) {
+			throw new \RuntimeException( 'imagecolorallocate failed' );
+		}
+
+		$size  = 28;
+		$lines = $this->wrap_to_lines( $payload->description, $font_path, $size, self::TITLE_MAX_W );
+		if ( count( $lines ) > self::DESC_MAX_LINES ) {
+			$lines                             = array_slice( $lines, 0, self::DESC_MAX_LINES );
+			$lines[ self::DESC_MAX_LINES - 1 ] = rtrim( $lines[ self::DESC_MAX_LINES - 1 ], ' ' ) . ' …';
+		}
+
+		$y = self::DESC_TOP_Y;
+		foreach ( $lines as $line ) {
+			$bbox = imagettfbbox( $size, 0, $font_path, $line );
+			if ( false === $bbox ) {
+				continue;
+			}
+			/** @phpstan-var int $bbox_1 */
+			$bbox_1 = $bbox[1];
+			/** @phpstan-var int $bbox_7 */
+			$bbox_7 = $bbox[7];
+			$line_h = abs( $bbox_7 - $bbox_1 );
+			imagettftext( $canvas, $size, 0, self::PADDING_X, $y + $line_h, $color, $font_path, $line );
+			$y += $line_h + self::DESC_LINE_GAP;
+		}
 	}
 }
