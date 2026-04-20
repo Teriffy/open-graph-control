@@ -63,6 +63,9 @@ final class GdRenderer implements RendererInterface {
 		imagesavealpha( $canvas, true );
 
 		$this->paint_background( $canvas, $template );
+		if ( $template->logo_id > 0 ) {
+			$this->paint_logo( $canvas, $template->logo_id );
+		}
 		$this->paint_title( $canvas, $template, $payload );
 		$this->paint_description( $canvas, $template, $payload );
 		if ( $template->show_site_name ) {
@@ -239,6 +242,9 @@ final class GdRenderer implements RendererInterface {
 	private const DESC_MAX_LINES = 2;
 	private const SITE_NAME_Y    = 100;
 	private const META_Y         = 570;
+	private const LOGO_SIZE      = 36;
+	private const LOGO_X         = 80;
+	private const LOGO_Y         = 70;
 
 	/**
 	 * Paints the title on the canvas with auto-shrink and word-wrap.
@@ -421,8 +427,9 @@ final class GdRenderer implements RendererInterface {
 		if ( false === $color ) {
 			throw new \RuntimeException( 'imagecolorallocate failed' );
 		}
-		$text        = mb_strtoupper( $payload->site_name );
-		$logo_offset = $template->logo_id > 0 ? 56 : 0; // logo width + gap
+		$text = mb_strtoupper( $payload->site_name );
+		// Logo width + gap.
+		$logo_offset = $template->logo_id > 0 ? 56 : 0;
 		imagettftext( $canvas, 18, 0, self::PADDING_X + $logo_offset, self::SITE_NAME_Y, $color, $font_path, $text );
 	}
 
@@ -443,13 +450,49 @@ final class GdRenderer implements RendererInterface {
 		if ( '' === $payload->meta_line ) {
 			return;
 		}
-		$font_path  = $this->fonts->path( 'regular' );
+		$font_path     = $this->fonts->path( 'regular' );
 		[ $r, $g, $b ] = $this->hex_to_rgb( $template->text_color );
 		// 70% opacity via alpha 38/127 ≈ 30% transparent.
-		$color      = imagecolorallocatealpha( $canvas, $r, $g, $b, 38 );
+		$color = imagecolorallocatealpha( $canvas, $r, $g, $b, 38 );
 		if ( false === $color ) {
 			throw new \RuntimeException( 'imagecolorallocatealpha failed' );
 		}
 		imagettftext( $canvas, 20, 0, self::PADDING_X, self::META_Y, $color, $font_path, $payload->meta_line );
+	}
+
+	/**
+	 * Paints a logo on the canvas.
+	 *
+	 * Loads the logo image from the given attachment ID, center-crops it to a square,
+	 * and scales it to a fixed size. Returns early if the attachment doesn't exist or
+	 * the image cannot be loaded.
+	 *
+	 * @param \GdImage $canvas        The canvas image resource.
+	 * @param int      $attachment_id Attachment ID to load logo from.
+	 *
+	 * @return void
+	 */
+	private function paint_logo( \GdImage $canvas, int $attachment_id ): void {
+		if ( ! function_exists( 'wp_get_attachment_image_src' ) ) {
+			return;
+		}
+		$src = wp_get_attachment_image_src( $attachment_id, 'thumbnail' );
+		if ( ! $src || ! file_exists( $src[0] ) ) {
+			return;
+		}
+		$logo = $this->load_image( $src[0] );
+		if ( ! $logo ) {
+			return;
+		}
+		$w = imagesx( $logo );
+		$h = imagesy( $logo );
+		// Center crop to square, then scale to LOGO_SIZE.
+		$side   = min( $w, $h );
+		$crop_x = (int) ( ( $w - $side ) / 2 );
+		$crop_y = (int) ( ( $h - $side ) / 2 );
+		imagecopyresampled( $canvas, $logo, self::LOGO_X, self::LOGO_Y, $crop_x, $crop_y, self::LOGO_SIZE, self::LOGO_SIZE, $side, $side );
+		// phpcs:disable Generic.PHP.DeprecatedFunctions.Deprecated -- 8.5 deprecation; we explicitly free memory.
+		imagedestroy( $logo );
+		// phpcs:enable Generic.PHP.DeprecatedFunctions.Deprecated
 	}
 }

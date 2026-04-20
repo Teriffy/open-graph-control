@@ -156,4 +156,25 @@ final class GdRendererTest extends TestCase {
 		);
 		$this->assertSame( "\x89PNG\r\n\x1a\n", substr( $bytes, 0, 8 ) );
 	}
+
+	public function test_logo_renders_when_attached(): void {
+		Functions\when( 'wp_get_attachment_image_src' )->justReturn(
+			[
+				__DIR__ . '/../../../fixtures/sample-bg.jpg',
+				800,
+				600,
+			]
+		);
+		$renderer = new GdRenderer( new FontProvider() );
+		$bytes    = $renderer->render(
+			Template::default()->with(
+				[
+					'bg_type' => 'solid',
+					'logo_id' => 99,
+				]
+			),
+			new Payload( 'T', 'D', 's', 'https://x.test', '' )
+		);
+		$this->assertSame( "\x89PNG\r\n\x1a\n", substr( $bytes, 0, 8 ) );
+	}
 }
