@@ -76,7 +76,7 @@ final class GdRenderer implements RendererInterface {
 	 * Paints the background on the canvas.
 	 *
 	 * Dispatches to appropriate background painter based on template bg_type.
-	 * Supports solid, gradient, and image (fallthrough) backgrounds.
+	 * Supports solid, gradient, and image backgrounds.
 	 *
 	 * @param \GdImage $canvas   The canvas image resource.
 	 * @param Template $template Template configuration.
@@ -98,7 +98,12 @@ final class GdRenderer implements RendererInterface {
 			$this->paint_gradient( $canvas, $template->bg_color, $template->bg_gradient_to );
 			return;
 		}
-		// Image bg handled in next task.
+		if ( 'image' === $template->bg_type && $template->bg_image_id > 0 ) {
+			$this->paint_image_bg( $canvas, $template->bg_image_id );
+			return;
+		}
+		// Fallback to gradient if image fails.
+		$this->paint_gradient( $canvas, $template->bg_color, $template->bg_gradient_to );
 	}
 
 	/**
@@ -131,6 +136,74 @@ final class GdRenderer implements RendererInterface {
 			// Diagonal line at constant x+y = i.
 			imageline( $canvas, $i, 0, 0, $i, $color );
 		}
+	}
+
+	/**
+	 * Paints an image background with cover crop and 60% black overlay.
+	 *
+	 * Loads the image from the given attachment ID, scales and crops it to cover
+	 * the canvas (center-aligned), and applies a semi-transparent black overlay
+	 * for text contrast.
+	 *
+	 * @param \GdImage $canvas        The canvas image resource.
+	 * @param int      $attachment_id Attachment ID to load image from.
+	 *
+	 * @return void
+	 */
+	private function paint_image_bg( \GdImage $canvas, int $attachment_id ): void {
+		if ( ! function_exists( 'wp_get_attachment_image_src' ) ) {
+			return;
+		}
+		$src = wp_get_attachment_image_src( $attachment_id, 'full' );
+		if ( ! $src || ! file_exists( $src[0] ) ) {
+			return;
+		}
+		$bg = $this->load_image( $src[0] );
+		if ( ! $bg ) {
+			return;
+		}
+		$bg_w = imagesx( $bg );
+		$bg_h = imagesy( $bg );
+		// Cover crop: scale shorter side to canvas, crop center.
+		$scale    = max( self::WIDTH / $bg_w, self::HEIGHT / $bg_h );
+		$scaled_w = (int) ( $bg_w * $scale );
+		$scaled_h = (int) ( $bg_h * $scale );
+		$offset_x = (int) ( ( self::WIDTH - $scaled_w ) / 2 );
+		$offset_y = (int) ( ( self::HEIGHT - $scaled_h ) / 2 );
+		imagecopyresampled( $canvas, $bg, $offset_x, $offset_y, 0, 0, $scaled_w, $scaled_h, $bg_w, $bg_h );
+		// phpcs:disable Generic.PHP.DeprecatedFunctions.Deprecated -- 8.5 deprecation; we explicitly free memory.
+		imagedestroy( $bg );
+		// phpcs:enable Generic.PHP.DeprecatedFunctions.Deprecated
+		// 60% black overlay for text contrast.
+		$overlay = imagecolorallocatealpha( $canvas, 0, 0, 0, 51 );
+		if ( false !== $overlay ) {
+			imagefilledrectangle( $canvas, 0, 0, self::WIDTH, self::HEIGHT, $overlay );
+		}
+	}
+
+	/**
+	 * Loads an image from disk and returns a GD image resource.
+	 *
+	 * Supports JPEG, PNG, GIF, and WebP (if available). Returns null if the file
+	 * cannot be loaded or its MIME type is not supported.
+	 *
+	 * @param string $path File path to the image.
+	 *
+	 * @return ?\GdImage GD image resource or null on failure.
+	 */
+	private function load_image( string $path ): ?\GdImage {
+		$info = getimagesize( $path );
+		if ( ! $info ) {
+			return null;
+		}
+		$result = match ( $info['mime'] ) {
+			'image/jpeg' => imagecreatefromjpeg( $path ),
+			'image/png'  => imagecreatefrompng( $path ),
+			'image/gif'  => imagecreatefromgif( $path ),
+			'image/webp' => function_exists( 'imagecreatefromwebp' ) ? imagecreatefromwebp( $path ) : null,
+			default      => null,
+		};
+		return false === $result ? null : $result;
 	}
 
 	/**

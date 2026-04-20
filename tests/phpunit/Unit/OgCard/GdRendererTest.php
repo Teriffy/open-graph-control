@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace EvzenLeonenko\OpenGraphControl\Tests\Unit\OgCard;
 
+use Brain\Monkey;
+use Brain\Monkey\Functions;
 use EvzenLeonenko\OpenGraphControl\OgCard\FontProvider;
 use EvzenLeonenko\OpenGraphControl\OgCard\GdRenderer;
 use EvzenLeonenko\OpenGraphControl\OgCard\Payload;
@@ -12,9 +14,16 @@ use PHPUnit\Framework\TestCase;
 final class GdRendererTest extends TestCase {
 
 	protected function setUp(): void {
+		parent::setUp();
 		if ( ! extension_loaded( 'gd' ) ) {
 			$this->markTestSkipped( 'GD extension required' );
 		}
+		Monkey\setUp();
+	}
+
+	protected function tearDown(): void {
+		Monkey\tearDown();
+		parent::tearDown();
 	}
 
 	public function test_render_returns_png_bytes(): void {
@@ -56,5 +65,31 @@ final class GdRendererTest extends TestCase {
 		$br = imagecolorat( $img, 1199, 629 );
 		$this->assertLessThan( 30, ( $tl >> 16 ) & 0xFF, 'Top-left red channel near 0' );
 		$this->assertGreaterThan( 220, ( $br >> 16 ) & 0xFF, 'Bottom-right red channel near 255' );
+	}
+
+	public function test_image_bg_renders_with_overlay(): void {
+		// Stub wp_get_attachment_image_src to return our fixture path.
+		Functions\when( 'wp_get_attachment_image_src' )->justReturn(
+			[
+				__DIR__ . '/../../../fixtures/sample-bg.jpg',
+				800,
+				600,
+			]
+		);
+		$renderer = new GdRenderer( new FontProvider() );
+		$bytes    = $renderer->render(
+			Template::default()->with(
+				[
+					'bg_type'     => 'image',
+					'bg_image_id' => 1,
+				]
+			),
+			new Payload( 'Hi', 'd', 's', 'https://x.test', '' )
+		);
+		$img      = imagecreatefromstring( $bytes );
+		// Center pixel should have darkness applied (overlay).
+		$center = imagecolorat( $img, 600, 315 );
+		$r      = ( $center >> 16 ) & 0xFF;
+		$this->assertLessThan( 180, $r, 'Center should be dimmed by overlay' );
 	}
 }
