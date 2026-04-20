@@ -31,6 +31,7 @@ final class Assets {
 			$this->enqueue_bundle( 'metabox' );
 		}
 		if ( in_array( $hook, [ 'edit-tags.php', 'term.php', 'user-edit.php', 'profile.php' ], true ) ) {
+			wp_enqueue_media();
 			$this->enqueue_bundle( 'archive' );
 		}
 	}
