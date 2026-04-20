@@ -65,6 +65,12 @@ final class GdRenderer implements RendererInterface {
 		$this->paint_background( $canvas, $template );
 		$this->paint_title( $canvas, $template, $payload );
 		$this->paint_description( $canvas, $template, $payload );
+		if ( $template->show_site_name ) {
+			$this->paint_site_name( $canvas, $template, $payload );
+		}
+		if ( $template->show_meta_line ) {
+			$this->paint_meta_line( $canvas, $template, $payload );
+		}
 
 		ob_start();
 		imagepng( $canvas, null, 6 );
@@ -231,6 +237,8 @@ final class GdRenderer implements RendererInterface {
 	private const DESC_TOP_Y     = 470;
 	private const DESC_LINE_GAP  = 8;
 	private const DESC_MAX_LINES = 2;
+	private const SITE_NAME_Y    = 100;
+	private const META_Y         = 570;
 
 	/**
 	 * Paints the title on the canvas with auto-shrink and word-wrap.
@@ -388,5 +396,60 @@ final class GdRenderer implements RendererInterface {
 			imagettftext( $canvas, $size, 0, self::PADDING_X, $y + $line_h, $color, $font_path, $line );
 			$y += $line_h + self::DESC_LINE_GAP;
 		}
+	}
+
+	/**
+	 * Paints the site name header on the canvas.
+	 *
+	 * Renders the site name in uppercase bold font at the top of the card. Returns early
+	 * if the site name is empty. Applies logo offset if a logo is present.
+	 *
+	 * @param \GdImage $canvas   The canvas image resource.
+	 * @param Template $template Template configuration.
+	 * @param Payload  $payload  Payload data containing the site name.
+	 *
+	 * @return void
+	 * @throws \RuntimeException When color allocation fails.
+	 */
+	private function paint_site_name( \GdImage $canvas, Template $template, Payload $payload ): void {
+		if ( '' === $payload->site_name ) {
+			return;
+		}
+		$font_path = $this->fonts->path( 'bold' );
+		$rgb       = $this->hex_to_rgb( $template->text_color );
+		$color     = imagecolorallocate( $canvas, $rgb[0], $rgb[1], $rgb[2] );
+		if ( false === $color ) {
+			throw new \RuntimeException( 'imagecolorallocate failed' );
+		}
+		$text        = mb_strtoupper( $payload->site_name );
+		$logo_offset = $template->logo_id > 0 ? 56 : 0; // logo width + gap
+		imagettftext( $canvas, 18, 0, self::PADDING_X + $logo_offset, self::SITE_NAME_Y, $color, $font_path, $text );
+	}
+
+	/**
+	 * Paints the meta line footer on the canvas.
+	 *
+	 * Renders the meta information line at 70% opacity (30% transparent) at the bottom
+	 * of the card using regular font. Returns early if the meta line is empty.
+	 *
+	 * @param \GdImage $canvas   The canvas image resource.
+	 * @param Template $template Template configuration.
+	 * @param Payload  $payload  Payload data containing the meta line.
+	 *
+	 * @return void
+	 * @throws \RuntimeException When color allocation fails.
+	 */
+	private function paint_meta_line( \GdImage $canvas, Template $template, Payload $payload ): void {
+		if ( '' === $payload->meta_line ) {
+			return;
+		}
+		$font_path  = $this->fonts->path( 'regular' );
+		[ $r, $g, $b ] = $this->hex_to_rgb( $template->text_color );
+		// 70% opacity via alpha 38/127 ≈ 30% transparent.
+		$color      = imagecolorallocatealpha( $canvas, $r, $g, $b, 38 );
+		if ( false === $color ) {
+			throw new \RuntimeException( 'imagecolorallocatealpha failed' );
+		}
+		imagettftext( $canvas, 20, 0, self::PADDING_X, self::META_Y, $color, $font_path, $payload->meta_line );
 	}
 }

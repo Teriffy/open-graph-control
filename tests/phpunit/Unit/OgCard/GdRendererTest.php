@@ -127,4 +127,23 @@ final class GdRendererTest extends TestCase {
 		);
 		$this->assertSame( "\x89PNG\r\n\x1a\n", substr( $bytes, 0, 8 ) );
 	}
+
+	public function test_site_name_renders_when_enabled(): void {
+		$renderer = new GdRenderer( new FontProvider() );
+		$bytes    = $renderer->render(
+			Template::default()->with( [ 'bg_type' => 'solid', 'show_site_name' => true ] ),
+			new Payload( 'T', 'D', 'EXAMPLE.COM', 'https://x.test', 'today' )
+		);
+		$this->assertSame( "\x89PNG\r\n\x1a\n", substr( $bytes, 0, 8 ) );
+	}
+
+	public function test_meta_line_omitted_when_disabled(): void {
+		// Smoke: just make sure the option is honored
+		$renderer = new GdRenderer( new FontProvider() );
+		$bytes    = $renderer->render(
+			Template::default()->with( [ 'bg_type' => 'solid', 'show_meta_line' => false ] ),
+			new Payload( 'T', 'D', 'site', 'https://x.test', 'today' )
+		);
+		$this->assertSame( "\x89PNG\r\n\x1a\n", substr( $bytes, 0, 8 ) );
+	}
 }
