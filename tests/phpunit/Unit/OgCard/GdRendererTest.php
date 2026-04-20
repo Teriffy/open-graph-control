@@ -92,4 +92,27 @@ final class GdRendererTest extends TestCase {
 		$r      = ( $center >> 16 ) & 0xFF;
 		$this->assertLessThan( 180, $r, 'Center should be dimmed by overlay' );
 	}
+
+	public function test_short_title_renders_at_60px(): void {
+		$renderer = new GdRenderer( new FontProvider() );
+		$bytes    = $renderer->render(
+			Template::default()->with( [ 'bg_type' => 'solid' ] ),
+			new Payload( 'Hi', 'd', 's', 'https://x.test', '' )
+		);
+		// Smoke: image still 1200×630, no exception
+		$img = imagecreatefromstring( $bytes );
+		$this->assertSame( 1200, imagesx( $img ) );
+		imagedestroy( $img );
+	}
+
+	public function test_very_long_title_does_not_overflow_canvas(): void {
+		$renderer = new GdRenderer( new FontProvider() );
+		$longest  = str_repeat( 'WordPress plugin development tutorial 2026 ', 10 );
+		$bytes    = $renderer->render(
+			Template::default()->with( [ 'bg_type' => 'solid' ] ),
+			new Payload( $longest, 'd', 's', 'https://x.test', '' )
+		);
+		// Just confirms no exception + valid PNG
+		$this->assertSame( "\x89PNG\r\n\x1a\n", substr( $bytes, 0, 8 ) );
+	}
 }

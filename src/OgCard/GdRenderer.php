@@ -36,7 +36,6 @@ final class GdRenderer implements RendererInterface {
 	 * @param FontProvider $fonts Font provider for text rendering.
 	 */
 	public function __construct(
-		/** @phpstan-ignore property.onlyWritten */
 		private readonly FontProvider $fonts
 	) {}
 
@@ -64,6 +63,7 @@ final class GdRenderer implements RendererInterface {
 		imagesavealpha( $canvas, true );
 
 		$this->paint_background( $canvas, $template );
+		$this->paint_title( $canvas, $template, $payload );
 
 		ob_start();
 		imagepng( $canvas, null, 6 );
@@ -220,5 +220,121 @@ final class GdRenderer implements RendererInterface {
 			(int) hexdec( substr( $hex, 2, 2 ) ),
 			(int) hexdec( substr( $hex, 4, 2 ) ),
 		];
+	}
+
+	// 1200 - 2*80.
+	private const PADDING_X      = 80;
+	private const TITLE_MAX_W    = 1040;
+	private const TITLE_TOP_Y    = 240;
+	private const TITLE_LINE_GAP = 12;
+
+	/**
+	 * Paints the title on the canvas with auto-shrink and word-wrap.
+	 *
+	 * Renders the title using the template's text color and bold font. Automatically
+	 * shrinks font size from 60px down to 36px if needed to fit within 3 lines. If even
+	 * 36px exceeds 3 lines, truncates with ellipsis.
+	 *
+	 * @param \GdImage $canvas   The canvas image resource.
+	 * @param Template $template Template configuration.
+	 * @param Payload  $payload  Payload data containing the title.
+	 *
+	 * @return void
+	 * @throws \RuntimeException When color allocation fails.
+	 */
+	private function paint_title( \GdImage $canvas, Template $template, Payload $payload ): void {
+		$font_path = $this->fonts->path( 'bold' );
+		$rgb       = $this->hex_to_rgb( $template->text_color );
+		$color     = imagecolorallocate( $canvas, $rgb[0], $rgb[1], $rgb[2] );
+		if ( false === $color ) {
+			throw new \RuntimeException( 'imagecolorallocate failed' );
+		}
+
+		[ $size, $lines ] = $this->fit_title( $payload->title, $font_path );
+
+		$y = self::TITLE_TOP_Y;
+		foreach ( $lines as $line ) {
+			$bbox = imagettfbbox( $size, 0, $font_path, $line );
+			if ( false === $bbox ) {
+				continue;
+			}
+			/** @phpstan-var int $bbox_1 */
+			$bbox_1 = $bbox[1];
+			/** @phpstan-var int $bbox_7 */
+			$bbox_7 = $bbox[7];
+			$line_h = abs( $bbox_7 - $bbox_1 );
+			imagettftext( $canvas, $size, 0, self::PADDING_X, $y + $line_h, $color, $font_path, $line );
+			$y += $line_h + self::TITLE_LINE_GAP;
+		}
+	}
+
+	/**
+	 * Picks the smallest acceptable font size that wraps title to ≤ 3 lines.
+	 *
+	 * Tries font sizes 60, 52, 44, 36 in order. If even 36px gives >3 lines,
+	 * keeps 36px and truncates to 3 lines with ellipsis.
+	 *
+	 * @param string $title     The title to fit.
+	 * @param string $font_path Path to the TrueType font file.
+	 *
+	 * @return array{0:int,1:list<string>} Tuple of [font_size, wrapped_lines].
+	 */
+	private function fit_title( string $title, string $font_path ): array {
+		foreach ( [ 60, 52, 44, 36 ] as $size ) {
+			$lines = $this->wrap_to_lines( $title, $font_path, $size, self::TITLE_MAX_W );
+			if ( count( $lines ) <= 3 ) {
+				return [ $size, $lines ];
+			}
+		}
+		// Last resort: keep 36px, truncate to 3 lines with ellipsis.
+		$lines   = $this->wrap_to_lines( $title, $font_path, 36, self::TITLE_MAX_W );
+		$kept    = array_slice( $lines, 0, 3 );
+		$kept[2] = rtrim( $kept[2], ' ' ) . ' …';
+		return [ 36, $kept ];
+	}
+
+	/**
+	 * Wraps text to multiple lines based on available width.
+	 *
+	 * Uses greedy word-wrap: tries to fit as many words as possible on each line
+	 * before moving to the next line.
+	 *
+	 * @param string $text     The text to wrap.
+	 * @param string $font_path Path to the TrueType font file.
+	 * @param int    $size     Font size in pixels.
+	 * @param int    $max_w    Maximum line width in pixels.
+	 *
+	 * @return list<string> Array of wrapped lines.
+	 */
+	private function wrap_to_lines( string $text, string $font_path, int $size, int $max_w ): array {
+		$words = preg_split( '/\s+/u', trim( $text ) );
+		if ( false === $words ) {
+			$words = [];
+		}
+		$lines = [];
+		$cur   = '';
+		foreach ( $words as $word ) {
+			$candidate = '' === $cur ? $word : $cur . ' ' . $word;
+			$bbox      = imagettfbbox( $size, 0, $font_path, $candidate );
+			if ( false === $bbox ) {
+				$cur = $candidate;
+				continue;
+			}
+			/** @phpstan-var int $bbox_0 */
+			$bbox_0 = $bbox[0];
+			/** @phpstan-var int $bbox_2 */
+			$bbox_2 = $bbox[2];
+			$width  = abs( $bbox_2 - $bbox_0 );
+			if ( $width > $max_w && '' !== $cur ) {
+				$lines[] = $cur;
+				$cur     = $word;
+			} else {
+				$cur = $candidate;
+			}
+		}
+		if ( '' !== $cur ) {
+			$lines[] = $cur;
+		}
+		return $lines;
 	}
 }
