@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace EvzenLeonenko\OpenGraphControl\Tests\Unit\OgCard;
 
 use Brain\Monkey;
-use EvzenLeonenko\OpenGraphControl\OgCard\{FontProvider, GdRenderer, ImagickRenderer, RendererPicker};
+use EvzenLeonenko\OpenGraphControl\OgCard\{FontProvider, GdRenderer, RendererPicker};
 use PHPUnit\Framework\TestCase;
 
 final class RendererPickerTest extends TestCase {
@@ -25,14 +25,12 @@ final class RendererPickerTest extends TestCase {
 		$this->assertInstanceOf( GdRenderer::class, $picker->pick() );
 	}
 
-	public function test_picker_returns_imagick_when_filter_opts_in(): void {
-		if ( ! extension_loaded( 'imagick' ) ) {
-			$this->markTestSkipped( 'Imagick required' );
-		}
+	public function test_picker_returns_gd_even_when_imagick_filter_opts_in_v04(): void {
 		Monkey\Functions\when( 'apply_filters' )->alias(
 			fn( $hook, $value ) => 'ogc_card_renderer_prefer_imagick' === $hook ? true : $value
 		);
 		$picker = new RendererPicker( new FontProvider() );
-		$this->assertInstanceOf( ImagickRenderer::class, $picker->pick() );
+		// v0.4: Imagick is deferred to v0.5; picker always returns GdRenderer.
+		$this->assertInstanceOf( GdRenderer::class, $picker->pick() );
 	}
 }

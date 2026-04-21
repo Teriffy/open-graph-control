@@ -131,6 +131,10 @@ Yes, GPL-2.0-or-later. Source is on GitHub (URL in the plugin header).
 4. (v0.2) SEO plugin conflict notice
 5. (v0.3) Archive overrides — edit OG title / description / image for a category archive directly on the term edit screen
 
+== Known Limitations ==
+
+* **Imagick renderer support is planned for v0.5.** v0.4 uses the GD extension exclusively (widely available on PHP hosts).
+
 == Changelog ==
 
 = 0.3.0 =

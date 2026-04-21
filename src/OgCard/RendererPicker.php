@@ -14,9 +14,12 @@ defined( 'ABSPATH' ) || exit;
 /**
  * Picks the appropriate card renderer based on user preference and availability.
  *
- * Default renderer is GdRenderer. Users can opt in to ImagickRenderer via the
- * `ogc_card_renderer_prefer_imagick` filter. Imagick is only used if the filter
- * returns true AND the imagick extension is loaded.
+ * Default renderer is GdRenderer. The `ogc_card_renderer_prefer_imagick` filter is
+ * reserved for v0.5+. In v0.4, RendererPicker always returns GdRenderer; the filter
+ * is evaluated to expose it in plugin audits and prepare integrators for v0.5.
+ *
+ * ImagickRenderer full implementation is deferred to v0.5; pick() always returns
+ * GdRenderer in v0.4.
  */
 final class RendererPicker {
 
@@ -30,17 +33,19 @@ final class RendererPicker {
 	/**
 	 * Picks and returns an appropriate renderer.
 	 *
-	 * Checks the `ogc_card_renderer_prefer_imagick` filter. If true and
-	 * imagick extension is loaded, returns ImagickRenderer. Otherwise,
-	 * returns GdRenderer.
+	 * In v0.4, always returns GdRenderer. The `ogc_card_renderer_prefer_imagick`
+	 * filter is evaluated to expose it in plugin audits and prepare integrators.
 	 *
-	 * @return RendererInterface The selected renderer instance.
+	 * @return RendererInterface The selected renderer instance (always GdRenderer in v0.4).
 	 */
 	public function pick(): RendererInterface {
-		$prefer = (bool) apply_filters( 'ogc_card_renderer_prefer_imagick', false );
-		if ( $prefer && extension_loaded( 'imagick' ) ) {
-			return new ImagickRenderer( $this->fonts );
-		}
+		/**
+		 * Imagick opt-in filter — reserved for v0.5+.
+		 * v0.4 always returns GdRenderer regardless of this filter; the filter is
+		 * evaluated to expose it in plugin audits and prepare integrators.
+		 */
+		apply_filters( 'ogc_card_renderer_prefer_imagick', false );
+
 		return new GdRenderer( $this->fonts );
 	}
 }
