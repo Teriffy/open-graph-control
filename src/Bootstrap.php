@@ -19,6 +19,7 @@ use EvzenLeonenko\OpenGraphControl\Admin\Page;
 use EvzenLeonenko\OpenGraphControl\Admin\TermEditor;
 use EvzenLeonenko\OpenGraphControl\Admin\UserEditor;
 use EvzenLeonenko\OpenGraphControl\Admin\Rest\ArchiveMetaController;
+use EvzenLeonenko\OpenGraphControl\Admin\Rest\CardController;
 use EvzenLeonenko\OpenGraphControl\Admin\Rest\ConflictController;
 use EvzenLeonenko\OpenGraphControl\Admin\Rest\MetaController;
 use EvzenLeonenko\OpenGraphControl\Admin\Rest\PreviewController;
@@ -395,6 +396,14 @@ final class Bootstrap {
 					$c->get( 'ogcard.template_provider' )
 				);
 			}
+		);
+		$container->set(
+			'ogcard.rest_controller',
+			static fn ( Container $c ) => new CardController(
+				$c->get( 'ogcard.store' ),
+				$c->get( 'ogcard.generator' ),
+				$c->get( 'ogcard.renderer_picker' )
+			)
 		);
 	}
 }

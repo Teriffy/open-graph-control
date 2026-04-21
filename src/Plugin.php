@@ -52,6 +52,7 @@ final class Plugin {
 		}
 
 		// OG Card generation (v0.4).
+		$this->container->get( 'ogcard.rest_controller' )->register();
 		/** @var \EvzenLeonenko\OpenGraphControl\OgCard\Scheduler $card_scheduler */
 		$card_scheduler = $this->container->get( 'ogcard.scheduler' );
 		$card_scheduler->register();
