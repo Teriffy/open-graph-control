@@ -17,7 +17,8 @@ final class UserEditorTest extends TestCase {
 		Monkey\setUp();
 
 		if ( ! class_exists( 'WP_User' ) ) {
-			\class_alias( \stdClass::class, 'WP_User' );
+			// Cannot class_alias stdClass (internal); declare a minimal stub instead.
+			eval( 'class WP_User {}' ); // phpcs:ignore Squiz.PHP.Eval.Discouraged -- test-only polyfill for PHP 8.2+ compatibility.
 		}
 	}
 

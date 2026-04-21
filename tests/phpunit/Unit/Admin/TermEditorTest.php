@@ -17,7 +17,8 @@ final class TermEditorTest extends TestCase {
 		Monkey\setUp();
 
 		if ( ! class_exists( 'WP_Term' ) ) {
-			\class_alias( \stdClass::class, 'WP_Term' );
+			// Cannot class_alias stdClass (internal); declare a minimal stub instead.
+			eval( 'class WP_Term {}' ); // phpcs:ignore Squiz.PHP.Eval.Discouraged -- test-only polyfill for PHP 8.2+ compatibility.
 		}
 	}
 
