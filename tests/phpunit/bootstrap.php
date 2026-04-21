@@ -19,6 +19,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 require __DIR__ . '/../../vendor/autoload.php';
 
+// Boot Patchwork before declaring any polyfills that Brain Monkey may need to
+// redeclare per-test. Files required AFTER this point are processed by
+// Patchwork's stream wrapper and can be safely redeclared via Functions\when().
+require_once __DIR__ . '/../../vendor/antecedent/patchwork/Patchwork.php';
+require __DIR__ . '/wp-polyfills.php';
+
 if ( ! function_exists( 'esc_attr' ) ) {
 	function esc_attr( $text ) {
 		return htmlspecialchars( (string) $text, ENT_QUOTES, 'UTF-8' );
