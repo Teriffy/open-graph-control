@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Regenerates the five screenshot PNGs in .wordpress-org/ by driving a
+# Regenerates the six screenshot PNGs in .wordpress-org/ by driving a
 # running wp-env instance through Playwright. The release workflow uploads
 # these to the wp.org SVN assets/ subtree.
 #
@@ -8,7 +8,7 @@
 #   npx wp-env start          # http://localhost:8888 with the plugin active
 #   npm install               # Playwright + helpers
 #
-# Output: .wordpress-org/screenshot-{1,2,3,4,5}.png
+# Output: .wordpress-org/screenshot-{1,2,3,4,5,6}.png
 #
 
 set -euo pipefail
@@ -25,5 +25,5 @@ OGC_E2E_WP=1 OGC_WPORG_SCREENSHOTS=1 npx playwright test \
   tests/e2e/playwright/wporg-screenshots.spec.ts \
   --reporter=line
 
-echo "Screenshots regenerated in .wordpress-org/"
+echo "Screenshots 1-6 regenerated in .wordpress-org/"
 ls -lh .wordpress-org/screenshot-*.png

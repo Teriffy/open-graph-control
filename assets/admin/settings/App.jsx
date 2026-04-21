@@ -9,6 +9,7 @@ import Platforms from './sections/Platforms.jsx';
 import PostTypes from './sections/PostTypes.jsx';
 import ArchiveOverrides from './sections/ArchiveOverrides.jsx';
 import Images from './sections/Images.jsx';
+import CardTemplate from './sections/CardTemplate.jsx';
 import FallbackChains from './sections/FallbackChains.jsx';
 import Integrations from './sections/Integrations.jsx';
 import Debug from './sections/Debug.jsx';
@@ -27,6 +28,7 @@ const SECTIONS = [
 		Component: ArchiveOverrides,
 	},
 	{ key: 'images', label: 'Images', Component: Images },
+	{ key: 'card-template', label: 'Card template', Component: CardTemplate },
 	{ key: 'fallback', label: 'Fallback chains', Component: FallbackChains },
 	{ key: 'integrations', label: 'Integrations', Component: Integrations },
 	{ key: 'security', label: 'Security', Component: Security },

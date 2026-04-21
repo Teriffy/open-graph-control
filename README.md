@@ -4,19 +4,20 @@
 ![PHP](https://img.shields.io/badge/PHP-%3E%3D8.1-blue)
 ![WordPress](https://img.shields.io/badge/WordPress-%3E%3D6.2-blue)
 ![License](https://img.shields.io/badge/License-GPL--2.0--or--later-green)
-![Tests](https://img.shields.io/badge/tests-218%20unit%20%7C%2018%20E2E%20%7C%2012%20WP-brightgreen)
+![Tests](https://img.shields.io/badge/tests-322%20total-brightgreen)
 ![PHPStan](https://img.shields.io/badge/PHPStan-level%208-blueviolet)
 [![Security policy](https://img.shields.io/badge/security-policy-informational)](SECURITY.md)
 
 A WordPress plugin that emits Open Graph and social meta tags for 12 platforms, with per-platform rules, SEO-plugin conflict handling, Pinterest Rich Pins, output cache and live per-post preview.
 
-## Status (v0.3.0 — per-archive overrides shipped)
+## Status (v0.4.0 — dynamic OG card generation in progress)
 
 **Backend**
 
 - 12 platform classes — Facebook, X / Twitter, LinkedIn, iMessage, Threads, Mastodon, Bluesky, WhatsApp, Discord, Pinterest, Telegram, Slack
 - 6 resolvers (title, description, image, type, URL, locale) with filterable fallback chains
 - **Per-archive overrides** (v0.3) — OG title / description / image editable on every category, tag, custom taxonomy term, and author edit screen, wired into the resolver chain via a dedicated `archive_override` step
+- **Dynamic OG card generation** (v0.4) — server-side 1200×630 PNG rendering via GD for posts / archives / authors without explicit OG imagery. Auto-generated cards use a fixed layout customizable by filters (logo, site name, title, description, background color). Triggering is opt-in via Settings → Images → Card template; rendering happens on `shutdown` hook, never blocking the editor. Inter font (SIL OFL) is bundled.
 - Pinterest Rich Pins JSON-LD (Article / Product / Recipe)
 - 7 SEO plugin integrations with clean takeover — Yoast, Rank Math, All in One SEO, SEOPress, Jetpack, The SEO Framework, Slim SEO
 - 3 auto-registered image sizes (landscape 1200×630, square 600×600, Pinterest 1000×1500)
@@ -24,21 +25,33 @@ A WordPress plugin that emits Open Graph and social meta tags for 12 platforms, 
 
 **Admin UI (React)**
 
-- Top-level admin menu, 11 settings sections (Overview, Site defaults, Platforms, Post types, Images, Fallback chains, Integrations, Debug/Test, Import/Export, Advanced, Archive overrides)
+- Top-level admin menu, 12 settings sections (Overview, Site defaults, Platforms, Post types, Images, Fallback chains, Integrations, Debug/Test, Import/Export, Advanced, Archive overrides, Card template)
 - Per-post meta box with Base + X / Twitter + Pinterest + Per-platform tabs, live preview for all 12 platforms, inline validation
 - **Archive editor** (v0.3) on every taxonomy term + author edit screen — OG title / description / image with live character-count hints
+- **Card template editor** (v0.4) in Settings → Images — opt-in toggle, live preview, customizable colors + logo + background, and stats dashboard (generated card count)
 - MediaUpload widget for master image + per-platform overrides
 - One-time admin notice when a competing SEO plugin is detected (take-over or keep choice)
 - Bulk "Regenerate OG image sizes" action for existing attachments
 - Reset-to-defaults + import/export JSON
 
-**REST API** under `open-graph-control/v1`: `/settings`, `/preview`, `/conflicts`, `/post-types`, `/meta/{id}`, `/images/regenerate`, `/settings/reset`. All `manage_options`-gated, with rate-limiting on `/preview`.
+**REST API** under `open-graph-control/v1`: `/settings`, `/preview`, `/conflicts`, `/post-types`, `/meta/{id}`, `/images/regenerate`, `/settings/reset`, `/og-card/generate`, `/og-card/regenerate`, `/og-card/status`, `/og-card/purge` (v0.4). All `manage_options`-gated, with rate-limiting on `/preview`.
 
-**WP-CLI**: `wp ogc tags <post_id>`, `wp ogc validate <post_id>`, `wp ogc regenerate`.
+**WP-CLI**: `wp ogc tags <post_id>`, `wp ogc validate <post_id>`, `wp ogc regenerate`, `wp ogc cards generate|regenerate|status|purge` (v0.4).
+
+**Hooks** (filters and actions)
+
+| Hook | Type | Signature | Since | Purpose |
+|---|---|---|---|---|
+| `ogc_resolve_{title,description,image,type,url,locale}_chain` | Filter | `(array $steps): array` | v0.0 | Customize the resolver fallback chain for any field (e.g., add a custom step before `site_default`) |
+| `ogc_resolve_{title,description,image,type,url,locale}_value` | Filter | `(mixed $value, Context $context): mixed` | v0.0 | Final override for any resolved field after the entire chain runs |
+| `ogc_resolve_image_step` | Filter | `(string\|null $value, string $step, Context $context): ?string` | v0.4 | Intercept and override the result of a specific resolver step (e.g., `post_meta_override`, `site_default`, `archive_override`) |
+| `ogc_card_should_generate` | Filter | `(bool $should, CardKey $key): bool` | v0.4 | Control whether a card should be auto-generated for a given post / archive / author (default: true if image chain returns null and card template is enabled) |
+| `ogc_card_renderer_prefer_imagick` | Filter | `(bool $prefer): bool` | v0.4 | Reserved for v0.5: hint the renderer to prefer Imagick over GD if available (currently always false; GD is used exclusively in v0.4) |
+| `ogc_card_generated` | Action | `(CardKey $key, string $path): void` | v0.4 | Fired after a card is successfully rendered; `$key` is the post / archive / author identifier, `$path` is the local filesystem path to the generated PNG |
 
 **Quality gates (CI)**
 
-- PHP 8.1–8.4 matrix × PHPUnit (218 tests, 429 assertions) + PHPStan level 8 + WPCS
+- PHP 8.1–8.4 matrix × PHPUnit (322 tests) + PHPStan level 8 + WPCS
 - Code coverage uploaded as artifact
 - JS lint (`@wordpress/scripts` ESLint + Prettier) + Webpack build
 - Playwright fixture suite (18 tests: rendering + `@axe-core` WCAG 2 A/AA scan)
@@ -75,14 +88,15 @@ Open Graph Control is built so **no user data leaves your server**. The plugin d
 | A09 Logging & Monitoring | — | Delegated to host/site logging |
 | A10 SSRF | — | Plugin does not issue outbound HTTP requests |
 
-**Performance** — measured with the bundled `wp ogc bench` command against a running wp-env instance (500 iterations each):
+**Performance** — measured with the bundled `wp ogc bench` command:
 
 | Context | Mean | p95 | p99 |
 |---|---|---|---|
-| Front page | **0.047 ms** | 0.060 ms | 0.166 ms |
-| Single post (full resolver chain) | **0.396 ms** | 0.601 ms | 2.333 ms |
+| Front page (tag render, 500 iter) | **0.047 ms** | 0.060 ms | 0.166 ms |
+| Single post (tag render, 500 iter) | **0.396 ms** | 0.601 ms | 2.333 ms |
+| Card render (GD, 1200×630, 10 iter) | **< 200 ms median** | — | — |
 
-Output cache reduces cached contexts to a single `get_transient` read.
+Output cache reduces cached contexts to a single `get_transient` read. Card render benchmarks vary by system CPU and GD library version; run `wp ogc bench` on your server for local measurements.
 
 **Responsible disclosure** — please don't open a public issue for security problems. Use the [private advisory form](https://github.com/Teriffy/open-graph-control/security/advisories/new) or email the address in `SECURITY.md`. Response SLA: 3 business days; fix SLA: 30 days.
 

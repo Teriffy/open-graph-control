@@ -180,7 +180,7 @@ final class DefaultSettings {
 		return [
 			'title'       => [ 'post_meta_override', 'archive_override', 'seo_plugin_title', 'post_title', 'site_name' ],
 			'description' => [ 'post_meta_override', 'archive_override', 'seo_plugin_desc', 'post_excerpt', 'post_content_trim', 'site_description' ],
-			'image'       => [ 'post_meta_override', 'archive_override', 'featured_image', 'first_content_image', 'first_block_image', 'site_master_image' ],
+			'image'       => [ 'post_meta_override', 'archive_override', 'featured_image', 'first_content_image', 'first_block_image', 'site_master_image', 'auto_card' ],
 		];
 	}
 }

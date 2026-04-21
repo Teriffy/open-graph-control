@@ -13,6 +13,8 @@ namespace EvzenLeonenko\OpenGraphControl;
 defined( 'ABSPATH' ) || exit;
 
 use EvzenLeonenko\OpenGraphControl\Options\DefaultSettings;
+use EvzenLeonenko\OpenGraphControl\OgCard\BackfillCron;
+use EvzenLeonenko\OpenGraphControl\OgCard\GcCron;
 
 /**
  * Lifecycle handles plugin-level side effects around activation, deactivation
@@ -29,10 +31,14 @@ final class Lifecycle {
 			add_option( self::OPTION_KEY, DefaultSettings::all() );
 		}
 		flush_rewrite_rules();
+		BackfillCron::register();
+		GcCron::register();
 	}
 
 	public static function deactivate(): void {
 		flush_rewrite_rules();
+		wp_clear_scheduled_hook( BackfillCron::HOOK );
+		wp_clear_scheduled_hook( GcCron::HOOK );
 	}
 
 	/**

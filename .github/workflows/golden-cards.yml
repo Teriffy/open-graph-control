@@ -1,0 +1,27 @@
+name: Golden Cards
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  golden:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up PHP with GD
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          extensions: gd, mbstring
+          ini-values: memory_limit=1G
+          coverage: none
+
+      - name: Install composer deps
+        run: composer install --no-interaction --prefer-dist --no-progress
+
+      - name: Run golden-cards tests
+        run: vendor/bin/phpunit --group golden

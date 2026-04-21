@@ -19,6 +19,7 @@ use EvzenLeonenko\OpenGraphControl\Admin\Page;
 use EvzenLeonenko\OpenGraphControl\Admin\TermEditor;
 use EvzenLeonenko\OpenGraphControl\Admin\UserEditor;
 use EvzenLeonenko\OpenGraphControl\Admin\Rest\ArchiveMetaController;
+use EvzenLeonenko\OpenGraphControl\Admin\Rest\CardController;
 use EvzenLeonenko\OpenGraphControl\Admin\Rest\ConflictController;
 use EvzenLeonenko\OpenGraphControl\Admin\Rest\MetaController;
 use EvzenLeonenko\OpenGraphControl\Admin\Rest\PreviewController;
@@ -26,6 +27,7 @@ use EvzenLeonenko\OpenGraphControl\Admin\Rest\RateLimiter;
 use EvzenLeonenko\OpenGraphControl\Admin\Rest\RegenerateController;
 use EvzenLeonenko\OpenGraphControl\Admin\Rest\SettingsController;
 use EvzenLeonenko\OpenGraphControl\ArchiveMeta\Repository as ArchiveMetaRepository;
+use EvzenLeonenko\OpenGraphControl\Cli\CardsCommand;
 use EvzenLeonenko\OpenGraphControl\Cli\Commands as CliCommands;
 use EvzenLeonenko\OpenGraphControl\Images\Regenerator;
 use EvzenLeonenko\OpenGraphControl\Images\SizeRegistry;
@@ -37,6 +39,17 @@ use EvzenLeonenko\OpenGraphControl\Integrations\SEOPress;
 use EvzenLeonenko\OpenGraphControl\Integrations\SlimSEO;
 use EvzenLeonenko\OpenGraphControl\Integrations\TSF;
 use EvzenLeonenko\OpenGraphControl\Integrations\Yoast;
+use EvzenLeonenko\OpenGraphControl\OgCard\BackfillCron;
+use EvzenLeonenko\OpenGraphControl\OgCard\CardGenerator;
+use EvzenLeonenko\OpenGraphControl\OgCard\CardKey;
+use EvzenLeonenko\OpenGraphControl\OgCard\CardStore;
+use EvzenLeonenko\OpenGraphControl\OgCard\FontProvider;
+use EvzenLeonenko\OpenGraphControl\OgCard\GcCron;
+use EvzenLeonenko\OpenGraphControl\OgCard\PayloadBuilder;
+use EvzenLeonenko\OpenGraphControl\OgCard\RendererPicker;
+use EvzenLeonenko\OpenGraphControl\OgCard\ResolverHook;
+use EvzenLeonenko\OpenGraphControl\OgCard\Scheduler;
+use EvzenLeonenko\OpenGraphControl\OgCard\Template;
 use EvzenLeonenko\OpenGraphControl\Options\Repository as OptionsRepository;
 use EvzenLeonenko\OpenGraphControl\Platforms\Bluesky;
 use EvzenLeonenko\OpenGraphControl\Platforms\Discord;
@@ -284,6 +297,13 @@ final class Bootstrap {
 				$c->get( 'images.regenerator' )
 			)
 		);
+		$container->set(
+			'cli.cards_command',
+			static fn ( Container $c ): CardsCommand => new CardsCommand(
+				$c->get( 'ogcard.generator' ),
+				$c->get( 'ogcard.store' ),
+			)
+		);
 
 		// Integrations.
 		$container->set(
@@ -299,6 +319,99 @@ final class Bootstrap {
 				$detector->register( new SlimSEO() );
 				return $detector;
 			}
+		);
+
+		// OG Card generation (v0.4).
+		$container->set(
+			'ogcard.template_provider',
+			static fn () => static fn (): Template => Template::from_array(
+				(array) get_option( 'ogc_card_template', [] )
+			)
+		);
+		$container->set(
+			'ogcard.store',
+			static function (): CardStore {
+				$uploads = wp_upload_dir();
+				return new CardStore(
+					$uploads['basedir'],
+					$uploads['baseurl']
+				);
+			}
+		);
+		$container->set(
+			'ogcard.payload_builder',
+			static fn ( Container $c ) => new PayloadBuilder(
+				$c->get( 'resolver.title' ),
+				$c->get( 'resolver.description' )
+			)
+		);
+		$container->set(
+			'ogcard.renderer_picker',
+			static fn () => new RendererPicker( new FontProvider() )
+		);
+		$container->set(
+			'ogcard.generator',
+			static function ( Container $c ): CardGenerator {
+				/** @var callable(): Template $template_fn */
+				$template_fn     = $c->get( 'ogcard.template_provider' );
+				$payload_builder = $c->get( 'ogcard.payload_builder' );
+				$picker          = $c->get( 'ogcard.renderer_picker' );
+				$payload_fn      = static function ( CardKey $key ) use ( $payload_builder ) {
+					return match ( $key->kind ) {
+						'post'    => $payload_builder->for_post( (int) $key->post_id() ),
+						'archive' => $payload_builder->for_archive_term( (string) $key->taxonomy(), (int) $key->term_id() ),
+						'author'  => $payload_builder->for_author( (int) $key->user_id() ),
+						default   => throw new \UnexpectedValueException( "Unknown CardKey kind: {$key->kind}" ),
+					};
+				};
+				return new CardGenerator(
+					picker: static fn () => $picker->pick(),
+					store: $c->get( 'ogcard.store' ),
+					template_provider: $template_fn,
+					payload_provider: $payload_fn,
+				);
+			}
+		);
+		$container->set(
+			'ogcard.scheduler',
+			static fn ( Container $c ) => new Scheduler(
+				$c->get( 'ogcard.generator' ),
+				$c->get( 'ogcard.store' )
+			)
+		);
+		$container->set(
+			'ogcard.resolver_hook',
+			static fn ( Container $c ) => new ResolverHook(
+				$c->get( 'ogcard.store' ),
+				$c->get( 'ogcard.generator' ),
+				$c->get( 'ogcard.template_provider' )
+			)
+		);
+		$container->set(
+			'ogcard.backfill_cron',
+			static fn ( Container $c ) => new BackfillCron(
+				$c->get( 'ogcard.generator' ),
+				$c->get( 'ogcard.store' ),
+				$c->get( 'ogcard.template_provider' )
+			)
+		);
+		$container->set(
+			'ogcard.gc_cron',
+			static function ( Container $c ): GcCron {
+				$uploads = wp_upload_dir();
+				return new GcCron(
+					$uploads['basedir'] . '/og-cards',
+					$c->get( 'ogcard.template_provider' )
+				);
+			}
+		);
+		$container->set(
+			'ogcard.rest_controller',
+			static fn ( Container $c ) => new CardController(
+				$c->get( 'ogcard.store' ),
+				$c->get( 'ogcard.generator' ),
+				$c->get( 'ogcard.renderer_picker' )
+			)
 		);
 	}
 }
