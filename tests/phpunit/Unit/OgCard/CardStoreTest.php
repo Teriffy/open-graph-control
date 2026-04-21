@@ -149,4 +149,29 @@ final class CardStoreTest extends TestCase {
 		$path = $store->write( CardKey::for_post( 1 ), Template::default(), 'landscape', 'NEW' );
 		$this->assertSame( 'NEW', file_get_contents( $path ) );
 	}
+
+	/**
+	 * Tests url() returns null when file missing.
+	 *
+	 * @return void
+	 */
+	public function test_url_returns_null_when_file_missing(): void {
+		$store = new CardStore( $this->base, 'https://example.test/uploads' );
+		$this->assertNull( $store->url( CardKey::for_post( 999 ), Template::default(), 'landscape' ) );
+	}
+
+	/**
+	 * Tests url() returns public URL when file exists.
+	 *
+	 * @return void
+	 */
+	public function test_url_returns_public_url_when_file_exists(): void {
+		$store = new CardStore( $this->base, 'https://example.test/uploads' );
+		$store->write( CardKey::for_post( 1 ), Template::default(), 'landscape', 'X' );
+		$hash = Template::default()->hash();
+		$this->assertSame(
+			"https://example.test/uploads/og-cards/post-1-{$hash}-landscape.png",
+			$store->url( CardKey::for_post( 1 ), Template::default(), 'landscape' )
+		);
+	}
 }
