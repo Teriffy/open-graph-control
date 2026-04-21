@@ -191,4 +191,32 @@ final class CardStoreTest extends TestCase {
 		$missing = $store->missing_post_ids( Template::default(), 5 );
 		$this->assertSame( [ 1, 3 ], $missing );
 	}
+
+	/**
+	 * Tests delete_for_key removes all versions of a card.
+	 *
+	 * @return void
+	 */
+	public function test_delete_for_key_removes_all_versions(): void {
+		$store = new CardStore( $this->base );
+		$t1    = Template::default();
+		$t2    = $t1->with( [ 'bg_color' => '#ff0000' ] );
+		$store->write( CardKey::for_post( 1 ), $t1, 'landscape', 'A' );
+		$store->write( CardKey::for_post( 1 ), $t2, 'landscape', 'B' );
+		$store->delete_for_key( CardKey::for_post( 1 ) );
+		$this->assertFalse( $store->exists( CardKey::for_post( 1 ), $t1, 'landscape' ) );
+		$this->assertFalse( $store->exists( CardKey::for_post( 1 ), $t2, 'landscape' ) );
+	}
+
+	/**
+	 * Tests purge_all removes directory contents.
+	 *
+	 * @return void
+	 */
+	public function test_purge_all_removes_directory_contents(): void {
+		$store = new CardStore( $this->base );
+		$store->write( CardKey::for_post( 1 ), Template::default(), 'landscape', 'A' );
+		$store->purge_all();
+		$this->assertFalse( $store->exists( CardKey::for_post( 1 ), Template::default(), 'landscape' ) );
+	}
 }

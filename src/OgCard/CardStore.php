@@ -126,7 +126,7 @@ final class CardStore {
 		if ( ! function_exists( 'get_posts' ) ) {
 			return [];
 		}
-		$ids = get_posts(
+		$ids     = get_posts(
 			[
 				'post_type'      => 'any',
 				'post_status'    => 'publish',
@@ -144,5 +144,49 @@ final class CardStore {
 			}
 		}
 		return $missing;
+	}
+
+	/**
+	 * Deletes all template-version variants of a card key.
+	 *
+	 * Removes all cached PNG files for a given CardKey, regardless of template
+	 * version or size. Used when template config changes to remove orphaned
+	 * versions of cards.
+	 *
+	 * @param CardKey $key Card key to delete all versions for.
+	 *
+	 * @return void
+	 */
+	public function delete_for_key( CardKey $key ): void {
+		$glob  = rtrim( $this->base_dir, '/' ) . '/og-cards/' . $key->segment . '-*-landscape.png';
+		$files = glob( $glob );
+		if ( false === $files ) {
+			return;
+		}
+		foreach ( $files as $file ) {
+			@unlink( $file );
+		}
+	}
+
+	/**
+	 * Purges the entire og-cards directory.
+	 *
+	 * Completely removes all cached card files. Used by "Regenerate all" admin
+	 * action and other bulk operations. Silently succeeds if directory doesn't exist.
+	 *
+	 * @return void
+	 */
+	public function purge_all(): void {
+		$dir = rtrim( $this->base_dir, '/' ) . '/og-cards';
+		if ( ! is_dir( $dir ) ) {
+			return;
+		}
+		$iter = new \RecursiveIteratorIterator(
+			new \RecursiveDirectoryIterator( $dir, \FilesystemIterator::SKIP_DOTS ),
+			\RecursiveIteratorIterator::CHILD_FIRST
+		);
+		foreach ( $iter as $file ) {
+			$file->isDir() ? @rmdir( $file->getPathname() ) : @unlink( $file->getPathname() );
+		}
 	}
 }
