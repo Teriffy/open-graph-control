@@ -192,4 +192,18 @@ final class ImageTest extends TestCase {
 		$r = $this->resolver( [], [ 'archive_override' ], [], $archive );
 		self::assertNull( $r->resolve( Context::for_post( 1 ) ) );
 	}
+
+	public function test_per_step_filter_can_supply_value_for_unknown_step(): void {
+		Filters\expectApplied( 'ogc_resolve_image_chain' )
+			->andReturn( [ 'post_meta_override', 'custom_step' ] );
+		Filters\expectApplied( 'ogc_resolve_image_step' )
+			->with( null, 'custom_step', \Mockery::type( Context::class ) )
+			->andReturn( '999' );
+		Filters\expectApplied( 'ogc_resolve_image_value' )
+			->with( '999', \Mockery::type( Context::class ) )
+			->andReturn( '999' );
+
+		$r = $this->resolver( [], [ 'post_meta_override', 'custom_step' ] );
+		self::assertSame( '999', $r->resolve( Context::for_post( 1 ) ) );
+	}
 }
