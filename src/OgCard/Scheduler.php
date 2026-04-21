@@ -28,7 +28,6 @@ final class Scheduler {
 	 */
 	public function __construct(
 		private readonly CardGenerator $generator,
-		/** @phpstan-ignore-next-line -- Used in delete handlers (Task 5.2) */
 		private readonly CardStore $store,
 	) {}
 
@@ -79,7 +78,8 @@ final class Scheduler {
 	/**
 	 * Handles term edit events.
 	 *
-	 * Handled in Task 5.2.
+	 * Defers term archive card rendering to shutdown for viewable taxonomies.
+	 * Skips non-public taxonomies.
 	 *
 	 * @param int    $term_id  Term ID.
 	 * @param int    $tt_id    Term taxonomy ID.
@@ -88,39 +88,52 @@ final class Scheduler {
 	 * @return void
 	 */
 	public function on_edited_term( int $term_id, int $tt_id, string $taxonomy ): void {
-		// Handled in Task 5.2.
+		if ( ! \is_taxonomy_viewable( $taxonomy ) ) {
+			return;
+		}
+		\add_action(
+			'shutdown',
+			function () use ( $term_id, $taxonomy ) {
+				$this->generator->ensure( CardKey::for_archive( $taxonomy, $term_id ) );
+			}
+		);
 	}
 
 	/**
 	 * Handles user profile update events.
 	 *
-	 * Handled in Task 5.2.
+	 * Defers author archive card rendering to shutdown.
 	 *
 	 * @param int $user_id User ID.
 	 *
 	 * @return void
 	 */
 	public function on_profile_update( int $user_id ): void {
-		// Handled in Task 5.2.
+		\add_action(
+			'shutdown',
+			function () use ( $user_id ) {
+				$this->generator->ensure( CardKey::for_author( $user_id ) );
+			}
+		);
 	}
 
 	/**
 	 * Handles post deletion.
 	 *
-	 * Handled in Task 5.2.
+	 * Immediately removes stored card for deleted post.
 	 *
 	 * @param int $post_id Post ID.
 	 *
 	 * @return void
 	 */
 	public function on_delete_post( int $post_id ): void {
-		// Handled in Task 5.2.
+		$this->store->delete_for_key( CardKey::for_post( $post_id ) );
 	}
 
 	/**
 	 * Handles term deletion.
 	 *
-	 * Handled in Task 5.2.
+	 * Immediately removes stored card for deleted term archive.
 	 *
 	 * @param int    $term_id  Term ID.
 	 * @param int    $tt_id    Term taxonomy ID.
@@ -129,19 +142,19 @@ final class Scheduler {
 	 * @return void
 	 */
 	public function on_delete_term( int $term_id, int $tt_id, string $taxonomy ): void {
-		// Handled in Task 5.2.
+		$this->store->delete_for_key( CardKey::for_archive( $taxonomy, $term_id ) );
 	}
 
 	/**
 	 * Handles user deletion.
 	 *
-	 * Handled in Task 5.2.
+	 * Immediately removes stored card for deleted author archive.
 	 *
 	 * @param int $user_id User ID.
 	 *
 	 * @return void
 	 */
 	public function on_delete_user( int $user_id ): void {
-		// Handled in Task 5.2.
+		$this->store->delete_for_key( CardKey::for_author( $user_id ) );
 	}
 }

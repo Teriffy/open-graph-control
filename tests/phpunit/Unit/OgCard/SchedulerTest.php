@@ -142,4 +142,126 @@ final class SchedulerTest extends TestCase {
 		);
 		$this->assertTrue( true );
 	}
+
+	public function test_on_edited_term_schedules_shutdown_for_viewable_tax(): void {
+		Functions\when( 'is_taxonomy_viewable' )->justReturn( true );
+		Functions\expect( 'add_action' )->with( 'shutdown', \Mockery::type( 'Closure' ) )->once();
+
+		$store     = new CardStore( $this->base );
+		$renderer  = $this->createMock( RendererInterface::class );
+		$generator = new CardGenerator(
+			picker: fn() => $renderer,
+			store: $store,
+			template_provider: fn() => Template::default(),
+			payload_provider: fn() => new Payload( 'T', 'D', 'S', 'https://x.test', 'today' ),
+		);
+		$scheduler = new Scheduler( $generator, $store );
+		$scheduler->on_edited_term( 5, 10, 'category' );
+		$this->assertTrue( true );
+	}
+
+	public function test_on_edited_term_skips_non_viewable_tax(): void {
+		Functions\when( 'is_taxonomy_viewable' )->justReturn( false );
+		Functions\expect( 'add_action' )->never();
+
+		$store     = new CardStore( $this->base );
+		$renderer  = $this->createMock( RendererInterface::class );
+		$generator = new CardGenerator(
+			picker: fn() => $renderer,
+			store: $store,
+			template_provider: fn() => Template::default(),
+			payload_provider: fn() => new Payload( 'T', 'D', 'S', 'https://x.test', 'today' ),
+		);
+		$scheduler = new Scheduler( $generator, $store );
+		$scheduler->on_edited_term( 5, 10, 'private_tax' );
+		$this->assertTrue( true );
+	}
+
+	public function test_on_profile_update_schedules_shutdown(): void {
+		Functions\expect( 'add_action' )->with( 'shutdown', \Mockery::type( 'Closure' ) )->once();
+
+		$store     = new CardStore( $this->base );
+		$renderer  = $this->createMock( RendererInterface::class );
+		$generator = new CardGenerator(
+			picker: fn() => $renderer,
+			store: $store,
+			template_provider: fn() => Template::default(),
+			payload_provider: fn() => new Payload( 'T', 'D', 'S', 'https://x.test', 'today' ),
+		);
+		$scheduler = new Scheduler( $generator, $store );
+		$scheduler->on_profile_update( 42 );
+		$this->assertTrue( true );
+	}
+
+	public function test_on_delete_post_calls_store_delete_directly(): void {
+		$store     = new CardStore( $this->base );
+		$renderer  = $this->createMock( RendererInterface::class );
+		$generator = new CardGenerator(
+			picker: fn() => $renderer,
+			store: $store,
+			template_provider: fn() => Template::default(),
+			payload_provider: fn() => new Payload( 'T', 'D', 'S', 'https://x.test', 'today' ),
+		);
+
+		// Create a dummy card file for the post
+		$template = Template::default();
+		$key      = CardKey::for_post( 99 );
+		$path     = $store->path( $key, $template, 'landscape' );
+		@mkdir( dirname( $path ), 0777, true );
+		file_put_contents( $path, 'dummy' );
+		$this->assertTrue( file_exists( $path ), 'Card file should exist before deletion' );
+
+		$scheduler = new Scheduler( $generator, $store );
+		$scheduler->on_delete_post( 99 );
+
+		$this->assertFalse( file_exists( $path ), 'Card file should be deleted after on_delete_post' );
+	}
+
+	public function test_on_delete_term_calls_store_delete_with_archive_key(): void {
+		$store     = new CardStore( $this->base );
+		$renderer  = $this->createMock( RendererInterface::class );
+		$generator = new CardGenerator(
+			picker: fn() => $renderer,
+			store: $store,
+			template_provider: fn() => Template::default(),
+			payload_provider: fn() => new Payload( 'T', 'D', 'S', 'https://x.test', 'today' ),
+		);
+
+		// Create a dummy card file for the term archive
+		$template = Template::default();
+		$key      = CardKey::for_archive( 'category', 7 );
+		$path     = $store->path( $key, $template, 'landscape' );
+		@mkdir( dirname( $path ), 0777, true );
+		file_put_contents( $path, 'dummy' );
+		$this->assertTrue( file_exists( $path ), 'Card file should exist before deletion' );
+
+		$scheduler = new Scheduler( $generator, $store );
+		$scheduler->on_delete_term( 7, 10, 'category' );
+
+		$this->assertFalse( file_exists( $path ), 'Card file should be deleted after on_delete_term' );
+	}
+
+	public function test_on_delete_user_calls_store_delete_with_author_key(): void {
+		$store     = new CardStore( $this->base );
+		$renderer  = $this->createMock( RendererInterface::class );
+		$generator = new CardGenerator(
+			picker: fn() => $renderer,
+			store: $store,
+			template_provider: fn() => Template::default(),
+			payload_provider: fn() => new Payload( 'T', 'D', 'S', 'https://x.test', 'today' ),
+		);
+
+		// Create a dummy card file for the author
+		$template = Template::default();
+		$key      = CardKey::for_author( 5 );
+		$path     = $store->path( $key, $template, 'landscape' );
+		@mkdir( dirname( $path ), 0777, true );
+		file_put_contents( $path, 'dummy' );
+		$this->assertTrue( file_exists( $path ), 'Card file should exist before deletion' );
+
+		$scheduler = new Scheduler( $generator, $store );
+		$scheduler->on_delete_user( 5 );
+
+		$this->assertFalse( file_exists( $path ), 'Card file should be deleted after on_delete_user' );
+	}
 }
