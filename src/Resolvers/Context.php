@@ -124,6 +124,12 @@ final class Context {
 		return is_int( $user_id ) ? $user_id : null;
 	}
 
+	public function archive_taxonomy(): ?string {
+		return is_string( $this->extra['archive_kind'] ?? null )
+			? $this->extra['archive_kind']
+			: null;
+	}
+
 	public function extra( string $key, mixed $fallback = null ): mixed {
 		return $this->extra[ $key ] ?? $fallback;
 	}
