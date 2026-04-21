@@ -177,4 +177,19 @@ final class GdRendererTest extends TestCase {
 		);
 		$this->assertSame( "\x89PNG\r\n\x1a\n", substr( $bytes, 0, 8 ) );
 	}
+
+	public function test_output_under_100kb(): void {
+		$renderer = new GdRenderer( new FontProvider() );
+		$bytes    = $renderer->render(
+			Template::default()->with(
+				[
+					'bg_type'        => 'gradient',
+					'bg_color'       => '#000000',
+					'bg_gradient_to' => '#ffffff',
+				]
+			),
+			new Payload( 'How to ship a WordPress plugin', 'A practical guide', 'example.com', 'https://x.test', 'April 2026' )
+		);
+		$this->assertLessThan( 100 * 1024, strlen( $bytes ), 'PNG should be < 100 KB' );
+	}
 }
