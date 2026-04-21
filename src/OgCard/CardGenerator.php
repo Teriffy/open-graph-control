@@ -74,6 +74,9 @@ final class CardGenerator {
 	 * @return string|null Path to the card file, or null if rendering failed.
 	 */
 	public function ensure( CardKey $key ): ?string {
+		if ( ! apply_filters( 'ogc_card_should_generate', true, $key ) ) {
+			return null;
+		}
 		$template = ( $this->template_provider )();
 		if ( $this->store->exists( $key, $template, 'landscape' ) ) {
 			return $this->store->path( $key, $template, 'landscape' );
@@ -82,7 +85,9 @@ final class CardGenerator {
 			$payload  = ( $this->payload_provider )( $key );
 			$renderer = ( $this->picker )();
 			$bytes    = $renderer->render( $template, $payload );
-			return $this->store->write( $key, $template, 'landscape', $bytes );
+			$path     = $this->store->write( $key, $template, 'landscape', $bytes );
+			do_action( 'ogc_card_generated', $key, $path );
+			return $path;
 		} catch ( \Throwable $e ) {
 			// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Justified: native error logging for rendering failures, matches CardStore filesystem error pattern.
 			error_log( sprintf( '[OGC] CardGenerator::ensure failed for %s: %s', $key->segment, $e->getMessage() ) );

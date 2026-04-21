@@ -9,6 +9,9 @@ declare(strict_types=1);
 
 namespace EvzenLeonenko\OpenGraphControl\Tests\Unit\OgCard;
 
+use Brain\Monkey;
+use Brain\Monkey\Filters;
+use Brain\Monkey\Actions;
 use EvzenLeonenko\OpenGraphControl\OgCard\CardGenerator;
 use EvzenLeonenko\OpenGraphControl\OgCard\CardKey;
 use EvzenLeonenko\OpenGraphControl\OgCard\CardStore;
@@ -40,6 +43,7 @@ final class CardGeneratorTest extends TestCase {
 	 */
 	protected function setUp(): void {
 		parent::setUp();
+		Monkey\setUp();
 		$this->base = sys_get_temp_dir() . '/' . uniqid( 'ogc_test_', true );
 	}
 
@@ -49,6 +53,7 @@ final class CardGeneratorTest extends TestCase {
 	 * @return void
 	 */
 	protected function tearDown(): void {
+		Monkey\tearDown();
 		parent::tearDown();
 		if ( is_dir( $this->base ) ) {
 			$this->remove_dir_recursively( $this->base );
@@ -127,5 +132,57 @@ final class CardGeneratorTest extends TestCase {
 
 		$path = $gen->ensure( CardKey::for_post( 1 ) );
 		$this->assertSame( 'EXISTING', file_get_contents( $path ) );
+	}
+
+	/**
+	 * Tests ensure() returns null without rendering when ogc_card_should_generate returns false.
+	 *
+	 * @return void
+	 */
+	public function test_ensure_skips_when_should_generate_returns_false(): void {
+		Filters\expectApplied( 'ogc_card_should_generate' )
+			->once()
+			->andReturn( false );
+
+		$store    = new CardStore( $this->base );
+		$renderer = $this->createMock( RendererInterface::class );
+		$renderer->expects( $this->never() )->method( 'render' );
+
+		$gen = new CardGenerator(
+			picker: fn() => $renderer,
+			store: $store,
+			template_provider: fn() => Template::default(),
+			payload_provider: fn() => new Payload( 'T', 'D', 'S', 'https://x.test', '' ),
+		);
+
+		$result = $gen->ensure( CardKey::for_post( 42 ) );
+		$this->assertNull( $result );
+	}
+
+	/**
+	 * Tests ensure() fires ogc_card_generated action after a successful write.
+	 *
+	 * @return void
+	 */
+	public function test_ensure_fires_generated_action_after_write(): void {
+		$store    = new CardStore( $this->base );
+		$renderer = $this->createMock( RendererInterface::class );
+		$renderer->method( 'render' )->willReturn( 'PNGBYTES' );
+
+		$key = CardKey::for_post( 7 );
+
+		Actions\expectDone( 'ogc_card_generated' )
+			->once()
+			->with( $key, \Mockery::type( 'string' ) );
+
+		$gen = new CardGenerator(
+			picker: fn() => $renderer,
+			store: $store,
+			template_provider: fn() => Template::default(),
+			payload_provider: fn() => new Payload( 'T', 'D', 'S', 'https://x.test', '' ),
+		);
+
+		$path = $gen->ensure( $key );
+		$this->assertNotNull( $path );
 	}
 }
