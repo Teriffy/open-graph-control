@@ -6,5 +6,6 @@ module.exports = {
     'admin/settings': './assets/admin/settings/index.jsx',
     'admin/metabox': './assets/admin/metabox/index.jsx',
     'admin/archive': './assets/admin/archive/index.jsx',
+    'admin/card-template': './assets/admin/card-template/index.jsx',
   },
 };

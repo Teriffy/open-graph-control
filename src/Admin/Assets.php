@@ -26,6 +26,8 @@ final class Assets {
 	public function enqueue( string $hook ): void {
 		if ( str_contains( $hook, Page::MENU_SLUG ) ) {
 			$this->enqueue_bundle( 'settings' );
+			wp_enqueue_media();
+			$this->enqueue_bundle( 'card-template' );
 		}
 		if ( 'post.php' === $hook || 'post-new.php' === $hook ) {
 			$this->enqueue_bundle( 'metabox' );
