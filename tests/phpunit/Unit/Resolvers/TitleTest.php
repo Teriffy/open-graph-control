@@ -164,4 +164,18 @@ final class TitleTest extends TestCase {
 		$t = $this->resolver( [], [ 'archive_override' ], $archive );
 		self::assertNull( $t->resolve( Context::for_post( 1 ) ) );
 	}
+
+	public function test_per_step_filter_can_supply_value_for_unknown_step(): void {
+		Filters\expectApplied( 'ogc_resolve_title_chain' )
+			->andReturn( [ 'post_meta_override', 'custom_step' ] );
+		Filters\expectApplied( 'ogc_resolve_title_step' )
+			->with( null, 'custom_step', \Mockery::type( Context::class ) )
+			->andReturn( 'Custom title' );
+		Filters\expectApplied( 'ogc_resolve_title_value' )
+			->with( 'Custom title', \Mockery::type( Context::class ) )
+			->andReturn( 'Custom title' );
+
+		$t = $this->resolver( [], [ 'post_meta_override', 'custom_step' ] );
+		self::assertSame( 'Custom title', $t->resolve( Context::for_post( 1 ) ) );
+	}
 }

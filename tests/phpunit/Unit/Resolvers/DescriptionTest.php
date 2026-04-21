@@ -157,4 +157,18 @@ final class DescriptionTest extends TestCase {
 		$r = $this->resolver( [], [ 'archive_override' ], $archive );
 		self::assertNull( $r->resolve( Context::for_post( 1 ) ) );
 	}
+
+	public function test_per_step_filter_can_supply_value_for_unknown_step(): void {
+		Filters\expectApplied( 'ogc_resolve_description_chain' )
+			->andReturn( [ 'post_meta_override', 'custom_step' ] );
+		Filters\expectApplied( 'ogc_resolve_description_step' )
+			->with( null, 'custom_step', \Mockery::type( Context::class ) )
+			->andReturn( 'Custom description' );
+		Filters\expectApplied( 'ogc_resolve_description_value' )
+			->with( 'Custom description', \Mockery::type( Context::class ) )
+			->andReturn( 'Custom description' );
+
+		$r = $this->resolver( [], [ 'post_meta_override', 'custom_step' ] );
+		self::assertSame( 'Custom description', $r->resolve( Context::for_post( 1 ) ) );
+	}
 }
