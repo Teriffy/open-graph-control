@@ -1,0 +1,26 @@
+{
+	"gradient-default": {
+		"bg_type":        "gradient",
+		"bg_color":       "#1e40af",
+		"bg_gradient_to": "#3b82f6",
+		"text_color":     "#ffffff"
+	},
+	"solid-dark": {
+		"bg_type":    "solid",
+		"bg_color":   "#0f172a",
+		"text_color": "#ffffff"
+	},
+	"image-bg": {
+		"bg_type":      "image",
+		"bg_image_id":  0,
+		"text_color":   "#ffffff"
+	},
+	"no-logo": {
+		"bg_type":  "gradient",
+		"logo_id":  0
+	},
+	"with-logo": {
+		"bg_type":  "gradient",
+		"logo_id":  0
+	}
+}
