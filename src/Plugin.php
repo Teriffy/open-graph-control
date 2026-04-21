@@ -49,6 +49,7 @@ final class Plugin {
 
 		if ( defined( 'WP_CLI' ) && \WP_CLI ) {
 			\WP_CLI::add_command( 'ogc', $this->container->get( 'cli.commands' ) );
+			\WP_CLI::add_command( 'ogc cards', $this->container->get( 'cli.cards_command' ) );
 		}
 
 		// OG Card generation (v0.4).

@@ -101,3 +101,38 @@ if ( ! class_exists( 'WP_REST_Response' ) ) {
 		}
 	}
 }
+
+if ( ! class_exists( 'WP_CLI' ) ) {
+	/**
+	 * Minimal WP_CLI shim for unit tests.
+	 *
+	 * Records calls so tests can assert on them.
+	 */
+	class WP_CLI {
+		/** @var array<int, array{method: string, message: string}> */
+		public static array $calls = [];
+
+		public static function reset(): void {
+			self::$calls = [];
+		}
+
+		public static function success( string $message ): void {
+			self::$calls[] = [ 'method' => 'success', 'message' => $message ];
+		}
+
+		public static function error( string $message, bool $exit = true ): void {
+			self::$calls[] = [ 'method' => 'error', 'message' => $message ];
+			if ( $exit ) {
+				throw new \RuntimeException( "WP_CLI::error: {$message}" );
+			}
+		}
+
+		public static function warning( string $message ): void {
+			self::$calls[] = [ 'method' => 'warning', 'message' => $message ];
+		}
+
+		public static function line( string $message = '' ): void {
+			self::$calls[] = [ 'method' => 'line', 'message' => $message ];
+		}
+	}
+}

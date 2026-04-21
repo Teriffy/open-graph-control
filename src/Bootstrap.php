@@ -27,6 +27,7 @@ use EvzenLeonenko\OpenGraphControl\Admin\Rest\RateLimiter;
 use EvzenLeonenko\OpenGraphControl\Admin\Rest\RegenerateController;
 use EvzenLeonenko\OpenGraphControl\Admin\Rest\SettingsController;
 use EvzenLeonenko\OpenGraphControl\ArchiveMeta\Repository as ArchiveMetaRepository;
+use EvzenLeonenko\OpenGraphControl\Cli\CardsCommand;
 use EvzenLeonenko\OpenGraphControl\Cli\Commands as CliCommands;
 use EvzenLeonenko\OpenGraphControl\Images\Regenerator;
 use EvzenLeonenko\OpenGraphControl\Images\SizeRegistry;
@@ -294,6 +295,13 @@ final class Bootstrap {
 				$c->get( 'options.repository' ),
 				$c->get( 'validation.validator' ),
 				$c->get( 'images.regenerator' )
+			)
+		);
+		$container->set(
+			'cli.cards_command',
+			static fn ( Container $c ): CardsCommand => new CardsCommand(
+				$c->get( 'ogcard.generator' ),
+				$c->get( 'ogcard.store' ),
 			)
 		);
 
