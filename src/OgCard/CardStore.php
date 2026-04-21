@@ -110,4 +110,39 @@ final class CardStore {
 		}
 		return $path;
 	}
+
+	/**
+	 * Finds published post IDs without cached cards for the given template.
+	 *
+	 * Overfetches 4× batch_size from get_posts() to account for posts
+	 * that already have cards. Stops early once enough missing cards found.
+	 *
+	 * @param Template $template Template to check for missing cards.
+	 * @param int      $batch_size Maximum posts to return.
+	 *
+	 * @return list<int> Post IDs lacking cards for this template, up to batch_size.
+	 */
+	public function missing_post_ids( Template $template, int $batch_size ): array {
+		if ( ! function_exists( 'get_posts' ) ) {
+			return [];
+		}
+		$ids = get_posts(
+			[
+				'post_type'      => 'any',
+				'post_status'    => 'publish',
+				'posts_per_page' => $batch_size * 4,
+				'fields'         => 'ids',
+			]
+		);
+		$missing = [];
+		foreach ( (array) $ids as $id ) {
+			if ( ! $this->exists( CardKey::for_post( (int) $id ), $template, 'landscape' ) ) {
+				$missing[] = (int) $id;
+				if ( count( $missing ) >= $batch_size ) {
+					break;
+				}
+			}
+		}
+		return $missing;
+	}
 }

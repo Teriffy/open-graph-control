@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace EvzenLeonenko\OpenGraphControl\Tests\Unit\OgCard;
 
+use Brain\Monkey;
+use Brain\Monkey\Functions;
 use EvzenLeonenko\OpenGraphControl\OgCard\CardKey;
 use EvzenLeonenko\OpenGraphControl\OgCard\CardStore;
 use EvzenLeonenko\OpenGraphControl\OgCard\Template;
@@ -36,6 +38,7 @@ final class CardStoreTest extends TestCase {
 	 */
 	protected function setUp(): void {
 		parent::setUp();
+		Monkey\setUp();
 		$this->base = sys_get_temp_dir() . '/' . uniqid( 'ogc_test_', true );
 	}
 
@@ -45,6 +48,7 @@ final class CardStoreTest extends TestCase {
 	 * @return void
 	 */
 	protected function tearDown(): void {
+		Monkey\tearDown();
 		parent::tearDown();
 		if ( is_dir( $this->base ) ) {
 			$this->remove_dir_recursively( $this->base );
@@ -173,5 +177,18 @@ final class CardStoreTest extends TestCase {
 			"https://example.test/uploads/og-cards/post-1-{$hash}-landscape.png",
 			$store->url( CardKey::for_post( 1 ), Template::default(), 'landscape' )
 		);
+	}
+
+	/**
+	 * Tests missing_post_ids() returns published posts without cards.
+	 *
+	 * @return void
+	 */
+	public function test_missing_post_ids_returns_published_without_card(): void {
+		Functions\when( 'get_posts' )->justReturn( [ 1, 2, 3 ] );
+		$store = new CardStore( $this->base );
+		$store->write( CardKey::for_post( 2 ), Template::default(), 'landscape', 'X' );
+		$missing = $store->missing_post_ids( Template::default(), 5 );
+		$this->assertSame( [ 1, 3 ], $missing );
 	}
 }
