@@ -151,14 +151,10 @@ test( 'screenshot-6: card template settings', async ( { page } ) => {
 	await login( page );
 	await gotoSettings( page );
 	await page
-		.locator( '.ogc-nav button', { hasText: /^Images$/ } )
+		.locator( '.ogc-nav button', { hasText: /^Card template$/ } )
 		.click();
-	await page.waitForTimeout( 400 );
-
-	// Scroll to the Card template section and take a screenshot.
-	const cardSection = page.locator( 'h2', { hasText: /Card template/ } );
-	await cardSection.scrollIntoViewIfNeeded();
-	await page.waitForTimeout( 300 );
+	// Wait for the tab to render + live preview to load (debounced 300 ms REST call).
+	await page.waitForTimeout( 1200 );
 
 	await page.screenshot( {
 		path: path.join( OUT, 'screenshot-6.png' ),
