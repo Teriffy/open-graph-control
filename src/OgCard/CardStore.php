@@ -44,4 +44,37 @@ final class CardStore {
 	public function path( CardKey $key, Template $template, string $size ): string {
 		return rtrim( $this->base_dir, '/' ) . '/og-cards/' . $key->segment . '-' . $template->hash() . '-' . $size . '.png';
 	}
+
+	/**
+	 * Writes card bytes to disk atomically.
+	 *
+	 * Uses .tmp → rename pattern to prevent partial reads if concurrent save
+	 * happens or if the process is killed mid-write. Auto-creates directory
+	 * on first write.
+	 *
+	 * @param CardKey  $key      Identifies the card target.
+	 * @param Template $template Card template (used to generate versioning hash).
+	 * @param string   $size     Card size (e.g., 'landscape', 'square').
+	 * @param string   $bytes    PNG image bytes to write.
+	 *
+	 * @return string Path to the written file.
+	 *
+	 * @throws \RuntimeException If directory creation or file write fails.
+	 */
+	public function write( CardKey $key, Template $template, string $size, string $bytes ): string {
+		$path = $this->path( $key, $template, $size );
+		$dir  = dirname( $path );
+		if ( ! is_dir( $dir ) && ! mkdir( $dir, 0755, true ) && ! is_dir( $dir ) ) {
+			throw new \RuntimeException( "Failed to create dir: {$dir}" );
+		}
+		$tmp = $path . '.tmp';
+		if ( file_put_contents( $tmp, $bytes ) === false ) {
+			throw new \RuntimeException( "Failed to write tmp: {$tmp}" );
+		}
+		if ( ! rename( $tmp, $path ) ) {
+			@unlink( $tmp );
+			throw new \RuntimeException( "Failed to rename {$tmp} -> {$path}" );
+		}
+		return $path;
+	}
 }

@@ -23,6 +23,63 @@ use PHPUnit\Framework\TestCase;
 final class CardStoreTest extends TestCase {
 
 	/**
+	 * Temporary base directory for write tests.
+	 *
+	 * @var string
+	 */
+	private string $base;
+
+	/**
+	 * Sets up test fixtures.
+	 *
+	 * @return void
+	 */
+	protected function setUp(): void {
+		parent::setUp();
+		$this->base = sys_get_temp_dir() . '/' . uniqid( 'ogc_test_', true );
+	}
+
+	/**
+	 * Cleans up temporary files after each test.
+	 *
+	 * @return void
+	 */
+	protected function tearDown(): void {
+		parent::tearDown();
+		if ( is_dir( $this->base ) ) {
+			$this->remove_dir_recursively( $this->base );
+		}
+	}
+
+	/**
+	 * Recursively removes a directory and all its contents.
+	 *
+	 * @param string $dir Directory path.
+	 *
+	 * @return void
+	 */
+	private function remove_dir_recursively( string $dir ): void {
+		if ( ! is_dir( $dir ) ) {
+			return;
+		}
+		$files = scandir( $dir );
+		if ( false === $files ) {
+			return;
+		}
+		foreach ( $files as $file ) {
+			if ( '.' !== $file && '..' !== $file ) {
+				$path = $dir . '/' . $file;
+				if ( is_dir( $path ) ) {
+					$this->remove_dir_recursively( $path );
+				} else {
+					unlink( $path );
+				}
+			}
+		}
+		rmdir( $dir );
+	}
+
+	/**
 	 * Tests path generation for post cards includes template hash.
 	 *
 	 * @return void
@@ -56,5 +113,40 @@ final class CardStoreTest extends TestCase {
 		$path  = $store->path( CardKey::for_author( 5 ), Template::default(), 'landscape' );
 		$hash  = Template::default()->hash();
 		$this->assertSame( '/uploads/og-cards/author/5-' . $hash . '-landscape.png', $path );
+	}
+
+	/**
+	 * Tests write() creates file with provided bytes.
+	 *
+	 * @return void
+	 */
+	public function test_write_creates_file_with_bytes(): void {
+		$store = new CardStore( $this->base );
+		$path  = $store->write( CardKey::for_post( 1 ), Template::default(), 'landscape', 'PNGBYTES' );
+		$this->assertFileExists( $path );
+		$this->assertSame( 'PNGBYTES', file_get_contents( $path ) );
+	}
+
+	/**
+	 * Tests write() creates directory if missing.
+	 *
+	 * @return void
+	 */
+	public function test_write_creates_directory_if_missing(): void {
+		$store = new CardStore( $this->base );
+		$path  = $store->write( CardKey::for_archive( 'tag', 9 ), Template::default(), 'landscape', 'X' );
+		$this->assertDirectoryExists( dirname( $path ) );
+	}
+
+	/**
+	 * Tests write() overwrites existing file.
+	 *
+	 * @return void
+	 */
+	public function test_write_overwrites_existing(): void {
+		$store = new CardStore( $this->base );
+		$store->write( CardKey::for_post( 1 ), Template::default(), 'landscape', 'OLD' );
+		$path = $store->write( CardKey::for_post( 1 ), Template::default(), 'landscape', 'NEW' );
+		$this->assertSame( 'NEW', file_get_contents( $path ) );
 	}
 }
