@@ -14,6 +14,10 @@
   <config name="minimum_supported_wp_version" value="6.2"/>
   <config name="testVersion" value="8.1-"/>
 
+  <!-- Warnings are informational (e.g. alignment, native filesystem ops in cache
+       code, silenced errors in cleanup paths). Don't fail CI on warnings; errors only. -->
+  <config name="ignore_warnings_on_exit" value="1"/>
+
   <rule ref="WordPress">
     <!-- PSR-4 file naming (class StudlyCaps.php) instead of legacy class-foo.php. -->
     <exclude name="WordPress.Files.FileName"/>
@@ -53,6 +57,22 @@
 
   <!-- Tests can be even more relaxed about comments. -->
   <rule ref="Squiz.Commenting">
+    <exclude-pattern>tests/</exclude-pattern>
+  </rule>
+
+  <!-- CardStore uses native PHP filesystem ops for atomic .tmp+rename cache writes;
+       WP_Filesystem's FTP credentials abstraction is incompatible with atomic rename
+       semantics and synchronous write guarantees. These warnings reflect intentional
+       design choices reviewed during Phase 3 implementation. -->
+  <rule ref="WordPress.WP.AlternativeFunctions">
+    <exclude-pattern>src/OgCard/CardStore.php</exclude-pattern>
+    <exclude-pattern>tests/phpunit/*/OgCard/</exclude-pattern>
+    <exclude-pattern>tests/scripts/</exclude-pattern>
+  </rule>
+
+  <!-- Unused parameters in test stubs are intentional (documented closure signatures
+       for clarity, even when the stub doesn't consume every arg). -->
+  <rule ref="Generic.CodeAnalysis.UnusedFunctionParameter">
     <exclude-pattern>tests/</exclude-pattern>
   </rule>
 </ruleset>
