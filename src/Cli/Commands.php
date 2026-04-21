@@ -170,6 +170,70 @@ final class Commands {
 				$iterations
 			)
 		);
+
+		// Benchmark card rendering.
+		$card_stats = $this->bench_card_render( 10 );
+		if ( $card_stats['iterations'] > 0 ) {
+			\WP_CLI::line(
+				sprintf(
+					'Card render (GD, 1200×630) — median %.3f ms, mean %.3f ms, min %.3f ms, max %.3f ms (n=%d)',
+					$card_stats['median_ms'],
+					$card_stats['mean_ms'],
+					$card_stats['min_ms'],
+					$card_stats['max_ms'],
+					$card_stats['iterations']
+				)
+			);
+		} else {
+			\WP_CLI::warning( 'Card render skipped: GD extension not loaded.' );
+		}
+	}
+
+	/**
+	 * Benchmark card rendering.
+	 *
+	 * @param int $iterations Number of renders to measure.
+	 *
+	 * @return array{median_ms:float, mean_ms:float, min_ms:float, max_ms:float, iterations:int}
+	 */
+	private function bench_card_render( int $iterations = 10 ): array {
+		if ( ! extension_loaded( 'gd' ) ) {
+			return [
+				'median_ms'  => 0.0,
+				'mean_ms'    => 0.0,
+				'min_ms'     => 0.0,
+				'max_ms'     => 0.0,
+				'iterations' => 0,
+			];
+		}
+
+		$renderer = new \EvzenLeonenko\OpenGraphControl\OgCard\GdRenderer(
+			new \EvzenLeonenko\OpenGraphControl\OgCard\FontProvider()
+		);
+		$template = \EvzenLeonenko\OpenGraphControl\OgCard\Template::default();
+		$payload  = new \EvzenLeonenko\OpenGraphControl\OgCard\Payload(
+			'How to ship a WordPress plugin in 2026',
+			'A practical guide to wp.org submission',
+			'example.com',
+			'https://example.com',
+			'example.com · April 2026'
+		);
+
+		$times = [];
+		for ( $i = 0; $i < $iterations; $i++ ) {
+			$start = microtime( true );
+			$renderer->render( $template, $payload );
+			$times[] = ( microtime( true ) - $start ) * 1000;
+		}
+		sort( $times );
+		$count = count( $times );
+		return [
+			'median_ms'  => $times[ (int) ( $count / 2 ) ],
+			'mean_ms'    => array_sum( $times ) / $count,
+			'min_ms'     => min( $times ),
+			'max_ms'     => max( $times ),
+			'iterations' => $count,
+		];
 	}
 
 	/**

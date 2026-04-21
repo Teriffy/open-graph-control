@@ -75,14 +75,15 @@ Open Graph Control is built so **no user data leaves your server**. The plugin d
 | A09 Logging & Monitoring | — | Delegated to host/site logging |
 | A10 SSRF | — | Plugin does not issue outbound HTTP requests |
 
-**Performance** — measured with the bundled `wp ogc bench` command against a running wp-env instance (500 iterations each):
+**Performance** — measured with the bundled `wp ogc bench` command:
 
 | Context | Mean | p95 | p99 |
 |---|---|---|---|
-| Front page | **0.047 ms** | 0.060 ms | 0.166 ms |
-| Single post (full resolver chain) | **0.396 ms** | 0.601 ms | 2.333 ms |
+| Front page (tag render, 500 iter) | **0.047 ms** | 0.060 ms | 0.166 ms |
+| Single post (tag render, 500 iter) | **0.396 ms** | 0.601 ms | 2.333 ms |
+| Card render (GD, 1200×630, 10 iter) | **< 200 ms median** | — | — |
 
-Output cache reduces cached contexts to a single `get_transient` read.
+Output cache reduces cached contexts to a single `get_transient` read. Card render benchmarks vary by system CPU and GD library version; run `wp ogc bench` on your server for local measurements.
 
 **Responsible disclosure** — please don't open a public issue for security problems. Use the [private advisory form](https://github.com/Teriffy/open-graph-control/security/advisories/new) or email the address in `SECURITY.md`. Response SLA: 3 business days; fix SLA: 30 days.
 
