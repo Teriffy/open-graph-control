@@ -3,7 +3,7 @@ import { login, gotoSettings } from './helpers';
 import path from 'node:path';
 
 /**
- * Regenerates the five PNG screenshots described in readme.txt's
+ * Regenerates the six PNG screenshots described in readme.txt's
  * "== Screenshots ==" section. Output lands in .wordpress-org/ which
  * the release workflow uploads to the wp.org SVN `assets/` subtree.
  *
@@ -142,6 +142,26 @@ test( 'screenshot-5: archive editor on term edit', async ( { page } ) => {
 
 	await page.screenshot( {
 		path: path.join( OUT, 'screenshot-5.png' ),
+		fullPage: true,
+	} );
+} );
+
+test( 'screenshot-6: card template settings', async ( { page } ) => {
+	test.skip( ! SHOULD_RUN, 'Opt in with OGC_WPORG_SCREENSHOTS=1' );
+	await login( page );
+	await gotoSettings( page );
+	await page
+		.locator( '.ogc-nav button', { hasText: /^Images$/ } )
+		.click();
+	await page.waitForTimeout( 400 );
+
+	// Scroll to the Card template section and take a screenshot.
+	const cardSection = page.locator( 'h2', { hasText: /Card template/ } );
+	await cardSection.scrollIntoViewIfNeeded();
+	await page.waitForTimeout( 300 );
+
+	await page.screenshot( {
+		path: path.join( OUT, 'screenshot-6.png' ),
 		fullPage: true,
 	} );
 } );

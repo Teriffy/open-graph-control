@@ -36,9 +36,13 @@ Open Graph Control emits correctly-escaped Open Graph, Twitter Card, and platfor
 * Filterable fallback chains for title, description, image, type, URL, and locale
 * Detects seven competing SEO/social plugins (Yoast SEO, Rank Math, All in One SEO, SEOPress, Jetpack, The SEO Framework, Slim SEO) and, with the site owner's consent, disables their Open Graph output to avoid duplicate tags
 
-= What it doesn't do (yet) =
+= v0.4 feature: Dynamic OG card generation =
 
-* Dynamic OG image generation from templates — v0.4
+* Auto-generated OG cards: server-side 1200×630 PNG rendering for posts, archives, and authors without explicit OG imagery
+* Opt-in via Settings → Images → Card template
+* Fixed layout customizable by filters (site logo, colors, background, text styling)
+* Built with GD (universally available on PHP hosts); Imagick renderer planned for v0.5
+* Bundled Inter font (SIL OFL) for predictable typography
 
 Per-post overrides can additionally be set programmatically via the `ogc_resolve_{title,description,image,type,url,locale}_value` filters or by writing to the `_ogc_meta` post meta key directly.
 
@@ -130,12 +134,22 @@ Yes, GPL-2.0-or-later. Source is on GitHub (URL in the plugin header).
 3. (v0.2) Per-post meta box with live preview
 4. (v0.2) SEO plugin conflict notice
 5. (v0.3) Archive overrides — edit OG title / description / image for a category archive directly on the term edit screen
+6. (v0.4) Card template settings — toggle, preview, and customization options in Settings → Images
 
 == Known Limitations ==
 
 * **Imagick renderer support is planned for v0.5.** v0.4 uses the GD extension exclusively (widely available on PHP hosts).
 
 == Changelog ==
+
+= 0.4.0 =
+* feature: dynamic OG card generation — server-side 1200×630 PNG rendering via GD for posts, archives, and authors without explicit OG imagery. Opt-in per site-wide defaults (Settings → Images → Card template).
+* feature: card template customization — filters to override card layout colors, logo, background, and text styling.
+* feature: new REST endpoints `/og-card/generate`, `/og-card/regenerate`, `/og-card/status`, `/og-card/purge` under `open-graph-control/v1`.
+* feature: WP-CLI `wp ogc cards` subcommand — generate, regenerate, view status, or purge generated cards.
+* feature: new filter hooks `ogc_resolve_image_step`, `ogc_card_should_generate`, `ogc_card_renderer_prefer_imagick` and action hook `ogc_card_generated` for extending card behavior.
+* bundled: Inter font (SIL OFL, 400 + 700 weights) for predictable typography in rendered cards.
+* note: Imagick renderer support is reserved for v0.5; v0.4 uses GD exclusively.
 
 = 0.3.0 =
 * feature: per-archive overrides — edit OG title / description / image for any category, tag, custom taxonomy term, or author directly on its edit screen. Values are persisted in term/user meta with sanitization and capability checks (`edit_term` / `edit_user`).
@@ -164,6 +178,9 @@ Yes, GPL-2.0-or-later. Source is on GitHub (URL in the plugin header).
 * Initial development snapshot. Backend rendering pipeline (12 platforms, 7 SEO integrations, Pinterest Rich Pins JSON-LD).
 
 == Upgrade Notice ==
+
+= 0.4.0 =
+v0.4 adds auto-generated OG cards for posts without explicit imagery. Enable via Settings → Images → Card template. No breaking changes; fully backward-compatible. Safe to upgrade.
 
 = 0.3.0 =
 Adds per-archive OG overrides for categories, tags, custom taxonomy terms, and authors. Fully additive — existing sites keep the same rendered tags until you edit a term or author.
