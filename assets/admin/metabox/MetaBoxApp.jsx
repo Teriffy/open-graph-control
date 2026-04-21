@@ -17,6 +17,7 @@ import { api } from '../shared/api.js';
 import MediaPicker from '../shared/MediaPicker.jsx';
 import WarningList from '../shared/WarningList.jsx';
 import Preview from './previews/Preview.jsx';
+import CardStatusBadge from '../card-status/CardStatusBadge.jsx';
 
 const LIMITS = {
 	title: { warn: 60, error: 90 },
@@ -362,6 +363,8 @@ export default function MetaBoxApp( { postId } ) {
 						);
 					} }
 				</TabPanel>
+
+				<CardStatusBadge kind="post" postId={ postId } />
 
 				<div className="ogc-section-footer">
 					<Button

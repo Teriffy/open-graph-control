@@ -10,6 +10,7 @@ import {
 
 import { api } from '../shared/api.js';
 import MediaPicker from '../shared/MediaPicker.jsx';
+import CardStatusBadge from '../card-status/CardStatusBadge.jsx';
 
 export default function ArchiveEditor( { kind, tax, id } ) {
 	const [ meta, setMeta ] = useState( null );
@@ -49,8 +50,14 @@ export default function ArchiveEditor( { kind, tax, id } ) {
 		}
 	};
 
+	const badgeProps =
+		kind === 'user'
+			? { kind: 'author', userId: id }
+			: { kind: 'archive', tax, termId: id };
+
 	return (
 		<div className="ogc-archive-editor">
+			<CardStatusBadge { ...badgeProps } />
 			<TextControl
 				label={ __( 'OG title', 'open-graph-control' ) }
 				value={ meta.title || '' }
