@@ -18,6 +18,7 @@ A WordPress plugin that emits Open Graph and social meta tags for 12 platforms, 
 - 6 resolvers (title, description, image, type, URL, locale) with filterable fallback chains
 - **Per-archive overrides** (v0.3) — OG title / description / image editable on every category, tag, custom taxonomy term, and author edit screen, wired into the resolver chain via a dedicated `archive_override` step
 - **Dynamic OG card generation** (v0.4) — server-side 1200×630 PNG rendering via GD for posts / archives / authors without explicit OG imagery. Auto-generated cards use a fixed layout customizable by filters (logo, site name, title, description, background color). Triggering is opt-in via Settings → Images → Card template; rendering happens on `shutdown` hook, never blocking the editor. Inter font (SIL OFL) is bundled.
+- **Dynamic field sources** (v0.4+) — map ACF or JetEngine custom fields to the OG title and description chains per post type. When mapped and populated, the field value wins over `post_title` / `post_excerpt`. Configure in Settings → Field sources.
 - Pinterest Rich Pins JSON-LD (Article / Product / Recipe)
 - 7 SEO plugin integrations with clean takeover — Yoast, Rank Math, All in One SEO, SEOPress, Jetpack, The SEO Framework, Slim SEO
 - 3 auto-registered image sizes (landscape 1200×630, square 600×600, Pinterest 1000×1500)
@@ -45,6 +46,8 @@ A WordPress plugin that emits Open Graph and social meta tags for 12 platforms, 
 | `ogc_resolve_{title,description,image,type,url,locale}_chain` | Filter | `(array $steps): array` | v0.0 | Customize the resolver fallback chain for any field (e.g., add a custom step before `site_default`) |
 | `ogc_resolve_{title,description,image,type,url,locale}_value` | Filter | `(mixed $value, Context $context): mixed` | v0.0 | Final override for any resolved field after the entire chain runs |
 | `ogc_resolve_image_step` | Filter | `(string\|null $value, string $step, Context $context): ?string` | v0.4 | Intercept and override the result of a specific resolver step (e.g., `post_meta_override`, `site_default`, `archive_override`) |
+| `ogc_resolve_title_step` | Filter | `(string\|null $value, string $step, Context $context): ?string` | v0.4+ | Intercept per-step in the title resolver chain (e.g., provide a value for the `acf_title_field` or `jet_title_field` steps) |
+| `ogc_resolve_description_step` | Filter | `(string\|null $value, string $step, Context $context): ?string` | v0.4+ | Intercept per-step in the description resolver chain |
 | `ogc_card_should_generate` | Filter | `(bool $should, CardKey $key): bool` | v0.4 | Control whether a card should be auto-generated for a given post / archive / author (default: true if image chain returns null and card template is enabled) |
 | `ogc_card_renderer_prefer_imagick` | Filter | `(bool $prefer): bool` | v0.4 | Reserved for v0.5: hint the renderer to prefer Imagick over GD if available (currently always false; GD is used exclusively in v0.4) |
 | `ogc_card_generated` | Action | `(CardKey $key, string $path): void` | v0.4 | Fired after a card is successfully rendered; `$key` is the post / archive / author identifier, `$path` is the local filesystem path to the generated PNG |

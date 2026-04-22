@@ -84,10 +84,10 @@ final class ResolverHookTest extends TestCase {
 
 	public function test_returns_null_when_feature_disabled(): void {
 		\Brain\Monkey\Functions\when( 'get_option' )->justReturn( [ 'enabled' => false ] );
-		$store = new CardStore( $this->base );
+		$store     = new CardStore( $this->base );
 		$generator = $this->build_generator_stub();
-		$hook = new ResolverHook( $store, $generator, fn() => Template::default() );
-		$value = $hook->on_step( null, 'auto_card', Context::for_post( 1 ) );
+		$hook      = new ResolverHook( $store, $generator, fn() => Template::default() );
+		$value     = $hook->on_step( null, 'auto_card', Context::for_post( 1 ) );
 		$this->assertNull( $value );
 	}
 
@@ -97,25 +97,25 @@ final class ResolverHookTest extends TestCase {
 		// Write a test card to the store
 		$store->write( CardKey::for_post( 1 ), Template::default(), 'landscape', 'test-card-data' );
 		$generator = $this->build_generator_stub();
-		$hook = new ResolverHook( $store, $generator, fn() => Template::default() );
-		$value = $hook->on_step( null, 'auto_card', Context::for_post( 1 ) );
+		$hook      = new ResolverHook( $store, $generator, fn() => Template::default() );
+		$value     = $hook->on_step( null, 'auto_card', Context::for_post( 1 ) );
 		$this->assertIsString( $value );
 		$this->assertStringContainsString( 'post-1-', $value );
 	}
 
 	public function test_passes_through_when_step_is_not_auto_card(): void {
-		$store = new CardStore( $this->base );
+		$store     = new CardStore( $this->base );
 		$generator = $this->build_generator_stub();
-		$hook = new ResolverHook( $store, $generator, fn() => Template::default() );
-		$value = $hook->on_step( 'existing-value', 'featured_image', Context::for_post( 1 ) );
+		$hook      = new ResolverHook( $store, $generator, fn() => Template::default() );
+		$value     = $hook->on_step( 'existing-value', 'featured_image', Context::for_post( 1 ) );
 		$this->assertSame( 'existing-value', $value );
 	}
 
 	public function test_passes_through_when_value_is_already_set(): void {
-		$store = new CardStore( $this->base );
+		$store     = new CardStore( $this->base );
 		$generator = $this->build_generator_stub();
-		$hook = new ResolverHook( $store, $generator, fn() => Template::default() );
-		$value = $hook->on_step( '99', 'auto_card', Context::for_post( 1 ) );
+		$hook      = new ResolverHook( $store, $generator, fn() => Template::default() );
+		$value     = $hook->on_step( '99', 'auto_card', Context::for_post( 1 ) );
 		$this->assertSame( '99', $value );
 	}
 
@@ -124,10 +124,10 @@ final class ResolverHookTest extends TestCase {
 		\Brain\Monkey\Functions\when( 'get_transient' )->justReturn( false );
 		\Brain\Monkey\Functions\expect( 'set_transient' )->once();
 		\Brain\Monkey\Functions\expect( 'add_action' )->with( 'shutdown', Mockery::type( 'Closure' ) )->once();
-		$store = new CardStore( $this->base );
+		$store     = new CardStore( $this->base );
 		$generator = $this->build_generator_stub();
-		$hook = new ResolverHook( $store, $generator, fn() => Template::default() );
-		$value = $hook->on_step( null, 'auto_card', Context::for_post( 1 ) );
+		$hook      = new ResolverHook( $store, $generator, fn() => Template::default() );
+		$value     = $hook->on_step( null, 'auto_card', Context::for_post( 1 ) );
 		$this->assertNull( $value );
 	}
 }

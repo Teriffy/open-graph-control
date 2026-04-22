@@ -32,6 +32,7 @@ Open Graph Control emits correctly-escaped Open Graph, Twitter Card, and platfor
 * Emits `og:*`, `article:*`, `twitter:*`, `fediverse:creator`, `theme-color`, and schema.org JSON-LD Rich Pins on `wp_head`
 * Site-wide defaults stored in one option row; per-post overrides in one meta blob
 * Per-archive overrides — edit OG title / description / image directly on the category, tag, custom taxonomy, or author edit screen
+* Dynamic field sources — map ACF or JetEngine custom fields to OG title and description per post type (v0.4+)
 * Three platform-optimized image sizes auto-registered (landscape 1200×630, square 600×600, Pinterest 1000×1500)
 * Filterable fallback chains for title, description, image, type, URL, and locale
 * Detects seven competing SEO/social plugins (Yoast SEO, Rank Math, All in One SEO, SEOPress, Jetpack, The SEO Framework, Slim SEO) and, with the site owner's consent, disables their Open Graph output to avoid duplicate tags
@@ -141,6 +142,11 @@ Yes, GPL-2.0-or-later. Source is on GitHub (URL in the plugin header).
 * **Imagick renderer support is planned for v0.5.** v0.4 uses the GD extension exclusively (widely available on PHP hosts).
 
 == Changelog ==
+
+= 0.4.1 =
+* NEW: Dynamic field sources — map ACF or JetEngine custom fields to OG title / description per post type
+* NEW: Filters `ogc_resolve_title_step` and `ogc_resolve_description_step` for extending the respective resolver chains
+* Settings → Field sources sub-section with per-plugin detection badge and per-post-type dropdowns
 
 = 0.4.0 =
 * feature: dynamic OG card generation — server-side 1200×630 PNG rendering via GD for posts, archives, and authors without explicit OG imagery. Opt-in per site-wide defaults (Settings → Images → Card template).
