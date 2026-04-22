@@ -11,6 +11,7 @@ import ArchiveOverrides from './sections/ArchiveOverrides.jsx';
 import Images from './sections/Images.jsx';
 import CardTemplate from './sections/CardTemplate.jsx';
 import FallbackChains from './sections/FallbackChains.jsx';
+import FieldSources from './sections/FieldSources.jsx';
 import Integrations from './sections/Integrations.jsx';
 import Debug from './sections/Debug.jsx';
 import ImportExport from './sections/ImportExport.jsx';
@@ -31,6 +32,7 @@ const SECTIONS = [
 	{ key: 'card-template', label: 'Card template', Component: CardTemplate },
 	{ key: 'fallback', label: 'Fallback chains', Component: FallbackChains },
 	{ key: 'integrations', label: 'Integrations', Component: Integrations },
+	{ key: 'field-sources', label: 'Field sources', Component: FieldSources },
 	{ key: 'security', label: 'Security', Component: Security },
 	{ key: 'debug', label: 'Debug / Test', Component: Debug },
 	{ key: 'import-export', label: 'Import / Export', Component: ImportExport },
