@@ -3,7 +3,7 @@
  * Plugin Name:       Open Graph Control
  * Plugin URI:        https://wordpress.org/plugins/open-graph-control/
  * Description:       Full control over Open Graph and social meta tags across 12 platforms.
- * Version:           0.4.0
+ * Version:           0.4.1
  * Requires at least: 6.2
  * Requires PHP:      8.1
  * Author:            Evžen Leonenko
@@ -28,7 +28,7 @@ defined( 'ABSPATH' ) || exit;
 require_once __DIR__ . '/vendor/autoload.php';
 
 // Constants.
-define( 'OGC_VERSION', '0.4.0' );
+define( 'OGC_VERSION', '0.4.1' );
 define( 'OGC_FILE', __FILE__ );
 define( 'OGC_DIR', plugin_dir_path( __FILE__ ) );
 define( 'OGC_URL', plugin_dir_url( __FILE__ ) );
