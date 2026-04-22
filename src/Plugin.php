@@ -52,6 +52,17 @@ final class Plugin {
 			\WP_CLI::add_command( 'ogc cards', $this->container->get( 'cli.cards_command' ) );
 		}
 
+		// Field-sources resolvers + REST controller (v0.4).
+		/** @var \EvzenLeonenko\OpenGraphControl\Integrations\AcfFieldResolver $acf_resolver */
+		$acf_resolver = $this->container->get( 'integrations.acf_field_resolver' );
+		$acf_resolver->register();
+		/** @var \EvzenLeonenko\OpenGraphControl\Integrations\JetEngineFieldResolver $jet_resolver */
+		$jet_resolver = $this->container->get( 'integrations.jetengine_field_resolver' );
+		$jet_resolver->register();
+		/** @var \EvzenLeonenko\OpenGraphControl\Admin\Rest\FieldSourcesController $field_sources_controller */
+		$field_sources_controller = $this->container->get( 'rest.field_sources_controller' );
+		$field_sources_controller->register();
+
 		// OG Card generation (v0.4).
 		$this->container->get( 'ogcard.rest_controller' )->register();
 		/** @var \EvzenLeonenko\OpenGraphControl\OgCard\Scheduler $card_scheduler */
