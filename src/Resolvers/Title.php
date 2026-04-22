@@ -37,7 +37,10 @@ class Title implements ResolverInterface {
 		$chain = apply_filters( 'ogc_resolve_title_chain', $chain, $context );
 
 		foreach ( $chain as $step ) {
-			$value = $this->step( (string) $step, $context );
+			$step_name = (string) $step;
+			$value     = $this->step( $step_name, $context );
+			/** @var string|null $value */
+			$value = apply_filters( 'ogc_resolve_title_step', $value, $step_name, $context );
 			if ( null !== $value && '' !== $value ) {
 				/** @var string $filtered */
 				$filtered = apply_filters( 'ogc_resolve_title_value', $value, $context );

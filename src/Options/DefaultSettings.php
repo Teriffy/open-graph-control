@@ -178,8 +178,8 @@ final class DefaultSettings {
 	 */
 	private static function fallback_chains(): array {
 		return [
-			'title'       => [ 'post_meta_override', 'archive_override', 'seo_plugin_title', 'post_title', 'site_name' ],
-			'description' => [ 'post_meta_override', 'archive_override', 'seo_plugin_desc', 'post_excerpt', 'post_content_trim', 'site_description' ],
+			'title'       => [ 'post_meta_override', 'acf_title_field', 'jet_title_field', 'archive_override', 'seo_plugin_title', 'post_title', 'site_name' ],
+			'description' => [ 'post_meta_override', 'acf_description_field', 'jet_description_field', 'archive_override', 'seo_plugin_desc', 'post_excerpt', 'post_content_trim', 'site_description' ],
 			'image'       => [ 'post_meta_override', 'archive_override', 'featured_image', 'first_content_image', 'first_block_image', 'site_master_image', 'auto_card' ],
 		];
 	}

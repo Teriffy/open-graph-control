@@ -28,6 +28,7 @@ final class Assets {
 			$this->enqueue_bundle( 'settings' );
 			wp_enqueue_media();
 			$this->enqueue_bundle( 'card-template' );
+			$this->enqueue_bundle( 'field-sources' );
 		}
 		if ( 'post.php' === $hook || 'post-new.php' === $hook ) {
 			$this->enqueue_bundle( 'metabox' );

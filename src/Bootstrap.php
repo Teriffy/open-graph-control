@@ -21,6 +21,7 @@ use EvzenLeonenko\OpenGraphControl\Admin\UserEditor;
 use EvzenLeonenko\OpenGraphControl\Admin\Rest\ArchiveMetaController;
 use EvzenLeonenko\OpenGraphControl\Admin\Rest\CardController;
 use EvzenLeonenko\OpenGraphControl\Admin\Rest\ConflictController;
+use EvzenLeonenko\OpenGraphControl\Admin\Rest\FieldSourcesController;
 use EvzenLeonenko\OpenGraphControl\Admin\Rest\MetaController;
 use EvzenLeonenko\OpenGraphControl\Admin\Rest\PreviewController;
 use EvzenLeonenko\OpenGraphControl\Admin\Rest\RateLimiter;
@@ -31,8 +32,11 @@ use EvzenLeonenko\OpenGraphControl\Cli\CardsCommand;
 use EvzenLeonenko\OpenGraphControl\Cli\Commands as CliCommands;
 use EvzenLeonenko\OpenGraphControl\Images\Regenerator;
 use EvzenLeonenko\OpenGraphControl\Images\SizeRegistry;
+use EvzenLeonenko\OpenGraphControl\Integrations\AcfFieldResolver;
 use EvzenLeonenko\OpenGraphControl\Integrations\AIOSEO;
 use EvzenLeonenko\OpenGraphControl\Integrations\Detector;
+use EvzenLeonenko\OpenGraphControl\Integrations\FieldDiscovery;
+use EvzenLeonenko\OpenGraphControl\Integrations\JetEngineFieldResolver;
 use EvzenLeonenko\OpenGraphControl\Integrations\Jetpack;
 use EvzenLeonenko\OpenGraphControl\Integrations\RankMath;
 use EvzenLeonenko\OpenGraphControl\Integrations\SEOPress;
@@ -319,6 +323,26 @@ final class Bootstrap {
 				$detector->register( new SlimSEO() );
 				return $detector;
 			}
+		);
+
+		// Field-sources (v0.4).
+		$container->set(
+			'integrations.field_discovery',
+			static fn ( Container $c ): FieldDiscovery => new FieldDiscovery()
+		);
+		$container->set(
+			'integrations.acf_field_resolver',
+			static fn ( Container $c ): AcfFieldResolver => new AcfFieldResolver()
+		);
+		$container->set(
+			'integrations.jetengine_field_resolver',
+			static fn ( Container $c ): JetEngineFieldResolver => new JetEngineFieldResolver()
+		);
+		$container->set(
+			'rest.field_sources_controller',
+			static fn ( Container $c ): FieldSourcesController => new FieldSourcesController(
+				$c->get( 'integrations.field_discovery' )
+			)
 		);
 
 		// OG Card generation (v0.4).
