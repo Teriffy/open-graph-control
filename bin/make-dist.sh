@@ -42,6 +42,7 @@ rsync -a \
   --exclude '.vscode/' \
   --exclude '.superpowers/' \
   --exclude '.wordpress-org/' \
+  --exclude '.worktrees/' \
   --exclude '.phpunit.cache/' \
   --exclude '.phpunit.result.cache' \
   --exclude '.claude/' \
@@ -52,6 +53,8 @@ rsync -a \
   --exclude 'dist/' \
   --exclude 'assets/' \
   --exclude 'coverage/' \
+  --exclude 'test-results/' \
+  --exclude 'playwright-report/' \
   --exclude '*.log' \
   --exclude '*.lock' \
   --exclude '.DS_Store' \
@@ -64,7 +67,10 @@ rsync -a \
   --exclude 'webpack.config.js' \
   --exclude 'package.json' \
   --exclude 'package-lock.json' \
+  --exclude 'playwright.config.ts' \
   --exclude 'README.md' \
+  --exclude 'ROADMAP.md' \
+  --exclude 'SECURITY.md' \
   ./ "$STAGE/"
 
 # Restore dev composer deps for local work.

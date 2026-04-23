@@ -133,11 +133,11 @@ final class Template {
 	 */
 	private function validate(): void {
 		if ( ! in_array( $this->bg_type, [ 'gradient', 'solid', 'image' ], true ) ) {
-			throw new \InvalidArgumentException( 'Invalid bg_type: ' . $this->bg_type );
+			throw new \InvalidArgumentException( esc_html( 'Invalid bg_type: ' . $this->bg_type ) );
 		}
 		foreach ( [ 'bg_color', 'bg_gradient_to', 'text_color' ] as $field ) {
 			if ( ! preg_match( self::HEX_REGEX, $this->{$field} ) ) {
-				throw new \InvalidArgumentException( "Invalid hex for {$field}: " . $this->{$field} );
+				throw new \InvalidArgumentException( esc_html( "Invalid hex for {$field}: " . $this->{$field} ) );
 			}
 		}
 	}

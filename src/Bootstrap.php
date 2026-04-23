@@ -385,7 +385,7 @@ final class Bootstrap {
 						'post'    => $payload_builder->for_post( (int) $key->post_id() ),
 						'archive' => $payload_builder->for_archive_term( (string) $key->taxonomy(), (int) $key->term_id() ),
 						'author'  => $payload_builder->for_author( (int) $key->user_id() ),
-						default   => throw new \UnexpectedValueException( "Unknown CardKey kind: {$key->kind}" ),
+						default   => throw new \UnexpectedValueException( esc_html( "Unknown CardKey kind: {$key->kind}" ) ),
 					};
 				};
 				return new CardGenerator(

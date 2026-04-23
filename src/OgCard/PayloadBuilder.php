@@ -50,7 +50,7 @@ final class PayloadBuilder {
 	public function for_post( int $post_id ): Payload {
 		$post = function_exists( 'get_post' ) ? get_post( $post_id ) : null;
 		if ( ! $post ) {
-			throw new \InvalidArgumentException( "Post not found: {$post_id}" );
+			throw new \InvalidArgumentException( esc_html( "Post not found: {$post_id}" ) );
 		}
 
 		$context     = Context::for_post( $post_id );

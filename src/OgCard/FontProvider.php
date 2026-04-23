@@ -40,7 +40,7 @@ final class FontProvider {
 	 */
 	public function path( string $weight ): string {
 		if ( ! isset( self::FONTS[ $weight ] ) ) {
-			throw new \InvalidArgumentException( 'Unknown weight: ' . $weight );
+			throw new \InvalidArgumentException( esc_html( 'Unknown weight: ' . $weight ) );
 		}
 		return defined( 'OGC_DIR' )
 			? OGC_DIR . 'assets/fonts/Inter/' . self::FONTS[ $weight ]

@@ -97,16 +97,23 @@ final class CardStore {
 	public function write( CardKey $key, Template $template, string $size, string $bytes ): string {
 		$path = $this->path( $key, $template, $size );
 		$dir  = dirname( $path );
-		if ( ! is_dir( $dir ) && ! mkdir( $dir, 0755, true ) && ! is_dir( $dir ) ) {
-			throw new \RuntimeException( "Failed to create dir: {$dir}" );
+		if ( ! wp_mkdir_p( $dir ) ) {
+			throw new \RuntimeException( esc_html( "Failed to create dir: {$dir}" ) );
 		}
 		$tmp = $path . '.tmp';
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents -- card renderer owns dedicated uploads/og-cards dir; WP_Filesystem init is overkill on every render.
 		if ( file_put_contents( $tmp, $bytes ) === false ) {
-			throw new \RuntimeException( "Failed to write tmp: {$tmp}" );
+			throw new \RuntimeException( esc_html( "Failed to write tmp: {$tmp}" ) );
 		}
-		if ( ! rename( $tmp, $path ) ) {
-			@unlink( $tmp );
-			throw new \RuntimeException( "Failed to rename {$tmp} -> {$path}" );
+		$filesystem = self::filesystem();
+		if ( null === $filesystem ) {
+			if ( ! @rename( $tmp, $path ) ) { // phpcs:ignore WordPress.WP.AlternativeFunctions.rename_rename, WordPress.PHP.NoSilencedErrors.Discouraged -- WP_Filesystem unavailable fallback; suppress warning on cross-filesystem rename.
+				wp_delete_file( $tmp );
+				throw new \RuntimeException( esc_html( "Failed to rename {$tmp} -> {$path}" ) );
+			}
+		} elseif ( ! $filesystem->move( $tmp, $path, true ) ) {
+			wp_delete_file( $tmp );
+			throw new \RuntimeException( esc_html( "Failed to rename {$tmp} -> {$path}" ) );
 		}
 		return $path;
 	}
@@ -164,7 +171,7 @@ final class CardStore {
 			return;
 		}
 		foreach ( $files as $file ) {
-			@unlink( $file );
+			wp_delete_file( $file );
 		}
 	}
 
@@ -181,12 +188,47 @@ final class CardStore {
 		if ( ! is_dir( $dir ) ) {
 			return;
 		}
-		$iter = new \RecursiveIteratorIterator(
+		$filesystem = self::filesystem();
+		$iter       = new \RecursiveIteratorIterator(
 			new \RecursiveDirectoryIterator( $dir, \FilesystemIterator::SKIP_DOTS ),
 			\RecursiveIteratorIterator::CHILD_FIRST
 		);
 		foreach ( $iter as $file ) {
-			$file->isDir() ? @rmdir( $file->getPathname() ) : @unlink( $file->getPathname() );
+			if ( $file->isDir() ) {
+				if ( null !== $filesystem ) {
+					$filesystem->rmdir( $file->getPathname() );
+				} else {
+					// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_rmdir, WordPress.PHP.NoSilencedErrors.Discouraged -- WP_Filesystem unavailable fallback; rmdir is harmless on missing/non-empty dirs.
+					@rmdir( $file->getPathname() );
+				}
+				continue;
+			}
+			wp_delete_file( $file->getPathname() );
 		}
+	}
+
+	/**
+	 * Returns an initialised WP_Filesystem instance in direct mode, or null if unavailable.
+	 *
+	 * Cached across calls on the same request so repeated store operations don't re-initialise.
+	 *
+	 * @return \WP_Filesystem_Base|null
+	 */
+	private static function filesystem(): ?\WP_Filesystem_Base {
+		if ( ! function_exists( 'WP_Filesystem' ) ) {
+			if ( ! defined( 'ABSPATH' ) ) {
+				return null;
+			}
+			$file_admin = ABSPATH . 'wp-admin/includes/file.php';
+			if ( ! is_file( $file_admin ) ) {
+				return null;
+			}
+			require_once $file_admin;
+		}
+		if ( ! WP_Filesystem() ) {
+			return null;
+		}
+		global $wp_filesystem;
+		return $wp_filesystem instanceof \WP_Filesystem_Base ? $wp_filesystem : null;
 	}
 }
