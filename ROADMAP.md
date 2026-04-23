@@ -87,10 +87,10 @@
 | ✅ | Žádné phone-home ani externí HTTP (ověřeno auditem) |
 | ✅ | Capability checks + nonces všude |
 | ✅ | Screenshot files 1–5 PNG v `.wordpress-org/` |
-| ⏳ | **Banner 772×250 PNG** (dnes jen SVG placeholder) |
-| ⏳ | **Banner 1544×500 PNG** (retina) |
-| ⏳ | **Icon 128×128 PNG** |
-| ⏳ | **Icon 256×256 PNG** (retina) |
+| ✅ | Banner 772×250 PNG — rendered z SVG placeholderu přes `bin/make-wporg-assets.mjs` |
+| ✅ | Banner 1544×500 PNG (retina) |
+| ✅ | Icon 128×128 PNG |
+| ✅ | Icon 256×256 PNG (retina) |
 | ⏳ | **GitHub Security Advisory publikace** (draft hotový v `.wordpress-org/GHSA-draft.md`) |
 | ⏳ | **wordpress.org účet** (pokud ještě není) |
 
@@ -226,6 +226,37 @@ Customizable: `bg_type` (gradient/solid/image), `bg_color`, `bg_gradient_to`, `b
 - ⏳ **Implementace plán A** — ~2 týdny, ~50 commitů (TDD per task)
 - ⏳ **Implementace plán B** — ~3–4 dny, ~15 commitů
 - ⏳ **Tag v0.4.0** — po A; B případně 0.4.1 nebo 0.5.0
+
+### v0.5 — Setup wizard (onboarding)
+
+**Co to dělá:** První-aktivační wizard, který novému uživateli během 60 sekund vybere nejpodstatnější nastavení bez nutnosti prolítnout 14 settings sekcí. Cílí na ~80 % uživatelů, kteří jinak jdou do Settings → Overview, kouknou a zavřou záložku. Klíčem je: pokud nevyplní ani site defaults + platform toggle + card opt-in, plugin je de facto silent — a proto je wizard guardrail, ne nadstavba.
+
+#### Flow (5 kroků, všechny skip-able)
+
+| # | Krok | Co se ptá | Hodnota pro uživatele |
+|---|---|---|---|
+| 1 | **Welcome** | Co OGC dělá, seznam 12 platforem | Nastaví očekávání, link na docs |
+| 2 | **SEO conflict** | (jen když detekovaný) Yoast/RankMath/AIOSEO/… → takeover? | Přesně jeden CTA, žádné hádání |
+| 3 | **Site defaults** | Site name (z bloginfo), master image upload, default type | Odbavuje 90 % OG tagů na front-page + archivech |
+| 4 | **Platforms** | Toggle seznam — které z 12 emitujeme (default: vše zapnuto) | Uživatel z B2B může rychle vypnout Discord/iMessage/TikTok |
+| 5 | **Dynamic cards** | Opt-in checkbox: "Auto-render OG card pro posty bez obrázku" | Jeden klik odblokuje v0.4 feature |
+| 6 | **Done** | CTA: "Otevři testovací preview" + "Přejdi do Settings" | Uzavírá loop — uživatel vidí výsledek, ne blank state |
+
+#### Architectural decisions (draft, nutno brainstormit)
+
+| # | Decision | Rationale |
+|---|---|---|
+| 1 | **Trigger:** activation hook nastaví `ogc_wizard_pending` transient; `admin_notices` na všech screens kromě wizard samotného | Nenucené, ale viditelné |
+| 2 | **UI:** samostatná stránka pod `admin.php?page=ogc-wizard` se skrytým menu; React komponenta sdílí `@wordpress/components` + existující MediaPicker | Konzistence s rest of admin, zero new JS deps |
+| 3 | **Persistence:** používá stávající `ogc_settings` option — wizard nepíše nic nového, jen předvyplňuje existující pole | Nulová migrace; uživatel může cokoli z wizardu později přepsat v plných Settings |
+| 4 | **Skip-ability:** každý krok má "Skip" + "Zpět" + "Použít výchozí"; na konci dismiss flag `ogc_wizard_dismissed` aby se už neotevíral | Uživatel ≠ rukojmí |
+| 5 | **No data leak:** wizard nikdy nepošle telemetrii; žádný phone-home check | wp.org compliance |
+
+#### Out of scope (→ v0.6+)
+
+- Video tutorial embed (externí hosting = wp.org submission risk)
+- Gamifikovaný progress s badges (overkill pro B2B tool)
+- Multi-language wizard conversations (i18n ano, chatbot ne)
 
 ### v0.3.x — drobné doplňky (backlog)
 
