@@ -4,7 +4,7 @@ Tags: open graph, social meta, twitter cards, pinterest, mastodon
 Requires at least: 6.2
 Tested up to: 6.9
 Requires PHP: 8.1
-Stable tag: 0.4.1
+Stable tag: 0.4.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -142,6 +142,9 @@ Yes, GPL-2.0-or-later. Source is on GitHub (URL in the plugin header).
 * **Imagick renderer support is planned for v0.5.** v0.4 uses the GD extension exclusively (widely available on PHP hosts).
 
 == Changelog ==
+
+= 0.4.2 =
+* FIX: Fatal TypeError in cache invalidation when `deleted_user_meta` / `deleted_term_meta` fired (e.g., during Google Site Kit OAuth user-option deletion). The first hook argument is an array of meta IDs on delete, but was typed `int`.
 
 = 0.4.1 =
 * NEW: Dynamic field sources — map ACF or JetEngine custom fields to OG title / description per post type

@@ -107,12 +107,12 @@ class Cache {
 	/**
 	 * Flush the archive-term cache when `_ogc_meta` is written for a term.
 	 *
-	 * @param int    $meta_id    Ignored.
-	 * @param int    $term_id    Term ID whose meta changed.
-	 * @param string $meta_key   Meta key.
-	 * @param mixed  $meta_value Ignored.
+	 * @param int|int[] $meta_id    Ignored. Single int on add/update, array of IDs on delete.
+	 * @param int       $term_id    Term ID whose meta changed.
+	 * @param string    $meta_key   Meta key.
+	 * @param mixed     $meta_value Ignored.
 	 */
-	public function flush_term_from_meta( int $meta_id, int $term_id, string $meta_key, mixed $meta_value ): void {
+	public function flush_term_from_meta( int|array $meta_id, int $term_id, string $meta_key, mixed $meta_value ): void {
 		unset( $meta_id, $meta_value );
 		if ( '_ogc_meta' !== $meta_key ) {
 			return;
@@ -135,12 +135,12 @@ class Cache {
 	/**
 	 * Flush the author cache when `_ogc_meta` is written for a user.
 	 *
-	 * @param int    $meta_id    Ignored.
-	 * @param int    $user_id    User ID whose meta changed.
-	 * @param string $meta_key   Meta key.
-	 * @param mixed  $meta_value Ignored.
+	 * @param int|int[] $meta_id    Ignored. Single int on add/update, array of IDs on delete.
+	 * @param int       $user_id    User ID whose meta changed.
+	 * @param string    $meta_key   Meta key.
+	 * @param mixed     $meta_value Ignored.
 	 */
-	public function flush_user_from_meta( int $meta_id, int $user_id, string $meta_key, mixed $meta_value ): void {
+	public function flush_user_from_meta( int|array $meta_id, int $user_id, string $meta_key, mixed $meta_value ): void {
 		unset( $meta_id, $meta_value );
 		if ( '_ogc_meta' !== $meta_key ) {
 			return;

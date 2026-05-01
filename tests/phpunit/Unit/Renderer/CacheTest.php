@@ -154,6 +154,30 @@ final class CacheTest extends TestCase {
 		self::assertTrue( true );
 	}
 
+	public function test_flush_user_from_meta_accepts_array_meta_ids_from_deleted_user_meta(): void {
+		// `deleted_user_meta` passes an array of meta IDs, not a single int.
+		Functions\when( 'get_option' )->justReturn( 'salt1' );
+		$expected_key = 'ogc_cache_' . md5( implode( ':', [ Context::TYPE_AUTHOR, '', '', '', '42', 'salt1' ] ) );
+		Functions\expect( 'delete_transient' )->once()->with( $expected_key );
+		( new Cache( $this->options( 3600 ) ) )->flush_user_from_meta( [ 1, 2 ], 42, '_ogc_meta', [] );
+		self::assertTrue( true );
+	}
+
+	public function test_flush_term_from_meta_accepts_array_meta_ids_from_deleted_term_meta(): void {
+		// `deleted_term_meta` passes an array of meta IDs, not a single int.
+		Functions\when( 'get_option' )->justReturn( 'salt1' );
+		Functions\when( 'get_term' )->justReturn(
+			(object) [
+				'taxonomy' => 'category',
+				'term_id'  => 42,
+			]
+		);
+		$expected_key = 'ogc_cache_' . md5( implode( ':', [ Context::TYPE_ARCHIVE, '', 'category', '42', '', 'salt1' ] ) );
+		Functions\expect( 'delete_transient' )->once()->with( $expected_key );
+		( new Cache( $this->options( 3600 ) ) )->flush_term_from_meta( [ 1, 2 ], 42, '_ogc_meta', [] );
+		self::assertTrue( true );
+	}
+
 	public function test_flush_user_on_delete_flushes_author_context(): void {
 		Functions\when( 'get_option' )->justReturn( 'salt1' );
 		$expected_key = 'ogc_cache_' . md5( implode( ':', [ Context::TYPE_AUTHOR, '', '', '', '42', 'salt1' ] ) );
