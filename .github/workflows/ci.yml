@@ -36,7 +36,7 @@ jobs:
           coverage: pcov
       - run: composer install --no-progress --no-interaction
       - run: composer coverage
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: coverage-html
           path: coverage/html/
@@ -63,7 +63,7 @@ jobs:
       - run: npm install --no-audit --no-fund --prefer-offline
       - run: npx playwright install chromium --with-deps
       - run: npm run e2e
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: failure()
         with:
           name: playwright-report
